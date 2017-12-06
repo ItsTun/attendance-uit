@@ -163,7 +163,81 @@ class AttendanceController extends Controller
 
     public function totalAbsence(Request $request, $rollNo) {
 
-        
+        $month = $request->month;
+
+        $date = strtotime($month);
+        $month = date('m', $date);
+
+        $results = DB::select( DB::raw(
+            'SELECT subjects.subject_code, count(open_periods.open_period_id) - sum(period_attendance.present) as total_absence 
+            FROM subjects, periods, open_periods, period_attendance, students
+            WHERE periods.subject_id = subjects.subject_id 
+            AND open_periods.period_id = periods.period_id 
+            AND period_attendance.open_period_id = open_periods.open_period_id 
+            AND students.roll_no = :roll_no 
+            AND period_attendance.roll_no = students.roll_no 
+            AND subjects.class_id = students.class_id 
+            AND MONTH(open_periods.date) = :month 
+            GROUP BY subjects.subject_code;'
+        ), array('roll_no' => $rollNo, 'month' => $month) );
+
+        if (!$results) return response('No Data!');
+
+        foreach ($results as $value) {
+            
+            $response[$value->subject_code] = $value->total_absence;
+
+        }
+
+        return response($response);
+
+    }
+
+    public function absentStudentList(Request $request, $klass) {
+
+        $month = $request->month;
+
+        $date = strtotime($month);
+        $month = date('m', $date);
+
+        $results = DB::select( DB::raw(
+            'SELECT students.roll_no, students.name,subjects.subject_code, count(open_periods.open_period_id) - sum(period_attendance.present) as total_absence 
+            FROM subjects, periods, open_periods, period_attendance, students
+            WHERE periods.subject_id = subjects.subject_id 
+            AND open_periods.period_id = periods.period_id 
+            AND period_attendance.open_period_id = open_periods.open_period_id 
+            AND period_attendance.roll_no = students.roll_no 
+            AND subjects.class_id = :klass
+            AND MONTH(open_periods.date) = :month 
+            GROUP BY students.roll_no, subjects.subject_code;'
+        ), array('klass' => $klass, 'month' => $month) );
+
+        if (!$results) return response('No Data!');
+
+        $response = [];
+
+        if (count($results) > 0)
+            $previousStudent = $results[0]->roll_no;
+
+        foreach ($results as $value) {
+
+            if ($value->roll_no != $previousStudent) {
+
+                array_push($response, $info);
+
+                $previousStudent = $value->roll_no;
+
+            }
+
+            $info['student']['roll_no'] = $value->roll_no;
+            $info['student']['name'] = $value->name;
+            $info['total_absence'][$value->subject_code] = $value->total_absence;
+
+        }
+
+        array_push($response, $info);
+
+        return response($response);
 
     }
 

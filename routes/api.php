@@ -24,3 +24,7 @@ Route::put('/v1/attendance', 'AttendanceController@update');
 Route::get('/v1/attendance/{date}/student-list', 'AttendanceController@index');
 
 Route::get('/v1/attendance/{roll_no}/detail', 'AttendanceController@detail');
+
+Route::get('/v1/attendance/{roll_no}/totalabsence', 'AttendanceController@totalAbsence');
+
+Route::get('/v1/attendance/{klass}/absentstudentlist', 'AttendanceController@absentStudentList');
