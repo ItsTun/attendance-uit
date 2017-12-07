@@ -34,7 +34,16 @@ class PeriodsController extends Controller
 			ORDER BY periods.period_num;'
     	), array('day' => $day, 'class_id' => $klassId) );
 
-    	return response($periods);
+        foreach ($periods as $value) {
+            
+            $response[$value->period_num]['period_id'] = $value->period_id;
+            $response[$value->period_num]['subject_code'] = $value->subject_code;
+            $response[$value->period_num]['name'] = $value->name;
+            $response[$value->period_num]['duration'] = $value->duration;
+
+        }
+
+    	return response($response);
 
     }
 
