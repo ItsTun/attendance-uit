@@ -91,9 +91,11 @@ class AttendanceController extends Controller
         // if attendance is already called
         if ($openPeriod) {
 
+            $attendStudents = $openPeriod->attendStudents()->orderByRaw('LENGTH(roll_no) ASC, roll_no ASC')->get();
+
             $responseAry = array();
 
-            foreach ($openPeriod->attendStudents as $value) {
+            foreach ($attendStudents as $value) {
 
                 $student = Student::find($value['roll_no']);
 
@@ -112,7 +114,7 @@ class AttendanceController extends Controller
         // else
         $klassId = Period::find($periodId)->subject->class_id;
 
-        $studentList = Student::where('class_id', $klassId)->get();
+        $studentList = Student::where('class_id', $klassId)->orderByRaw('LENGTH(roll_no) ASC, roll_no ASC')->get();
 
         $responseAry = array();
 
@@ -141,14 +143,16 @@ class AttendanceController extends Controller
             'SELECT open_periods.open_period_id, open_periods.date, periods.period_num, subjects.subject_code, period_attendance.present 
             FROM open_periods, students, subjects, periods, period_attendance 
             WHERE MONTH(open_periods.date) = :month
-                AND students.roll_no = :roll_no 
-                AND subjects.class_id = students.class_id 
-                AND periods.subject_id = subjects.subject_id 
-                AND open_periods.period_id = periods.period_id 
-                AND period_attendance.roll_no = students.roll_no 
-                AND period_attendance.open_period_id = open_periods.open_period_id
+            AND students.roll_no = :roll_no 
+            AND subjects.class_id = students.class_id 
+            AND periods.subject_id = subjects.subject_id 
+            AND open_periods.period_id = periods.period_id 
+            AND period_attendance.roll_no = students.roll_no 
+            AND period_attendance.open_period_id = open_periods.open_period_id
             ORDER BY open_periods.open_period_id, periods.period_num;'
         ), array('month' => $month, 'roll_no' => $rollNo) );
+
+        if (!$results) return response('No data!');
 
         foreach ($results as $value) {
             
@@ -181,7 +185,7 @@ class AttendanceController extends Controller
             GROUP BY subjects.subject_code;'
         ), array('roll_no' => $rollNo, 'month' => $month) );
 
-        if (!$results) return response('No Data!');
+        if (!$results) return response('No data!');
 
         foreach ($results as $value) {
             
@@ -209,10 +213,11 @@ class AttendanceController extends Controller
             AND period_attendance.roll_no = students.roll_no 
             AND subjects.class_id = :klass
             AND MONTH(open_periods.date) = :month 
-            GROUP BY students.roll_no, subjects.subject_code;'
+            GROUP BY students.roll_no, subjects.subject_code
+            ORDER BY LENGTH(students.roll_no) ASC, students.roll_no ASC;'
         ), array('klass' => $klass, 'month' => $month) );
 
-        if (!$results) return response('No Data!');
+        if (!$results) return response('No data!');
 
         $response = [];
 
@@ -226,6 +231,8 @@ class AttendanceController extends Controller
                 array_push($response, $info);
 
                 $previousStudent = $value->roll_no;
+
+                $info = null;
 
             }
 
@@ -273,6 +280,8 @@ class AttendanceController extends Controller
             ORDER BY B.period_num;'
         ), array('roll_no' => $student->roll_no, 'date' => $date, 'klass' => $student->class_id, 'day' => $dayOfWeek) );
 
+        if(!$results) return response('No data!');
+
         $totalAbsenceResults = DB::select( DB::raw(
             'SELECT subjects.subject_code, count(open_periods.open_period_id) - sum(period_attendance.present) as total_absence 
             FROM subjects, periods, open_periods, period_attendance, students
@@ -285,6 +294,8 @@ class AttendanceController extends Controller
             AND MONTH(open_periods.date) = :month 
             GROUP BY subjects.subject_code;'
         ), array('roll_no' => $student->roll_no, 'month' => $month) );
+
+        if(!$totalAbsenceResults) return response('No data!');
 
         foreach ($totalAbsenceResults as $value) {
 

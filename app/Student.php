@@ -16,7 +16,7 @@ class Student extends Model
     	return $this->belongsTo(Klass::class, 'class_id', 'class_id');
     }
 
-    public function scopeAttendedPeriods($query, $month) {
-    	return $query->where('month');
-    }
+    // public function scopeAttendedPeriods($query, $month) {
+    // 	return $query->where('month');
+    // }
 }
