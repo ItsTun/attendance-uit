@@ -12,7 +12,7 @@ use App\Student;
 use App\Period_Attendance;
 use App\Period;
 
-class AttendanceController extends Controller
+class AttendancesController extends Controller
 {
     public function store() {
 
