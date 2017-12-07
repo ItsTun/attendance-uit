@@ -28,3 +28,6 @@ Route::get('/v1/attendance/{roll_no}/detail', 'AttendanceController@detail');
 Route::get('/v1/attendance/{roll_no}/totalabsence', 'AttendanceController@totalAbsence');
 
 Route::get('/v1/attendance/{klass}/absentstudentlist', 'AttendanceController@absentStudentList');
+
+Route::get('/v1/attendance/{student}/daily/detail', 'AttendanceController@dailyDetail');
+

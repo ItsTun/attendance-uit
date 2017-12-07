@@ -241,4 +241,39 @@ class AttendanceController extends Controller
 
     }
 
+    public function dailyDetail(Request $request, Student $student) {
+
+        $date = $request->date;
+
+        $date = strtotime($date);
+        $dayOfWeek = date('w', $date);
+        $date = date('Y-m-d', $date);
+
+        $results = DB::select( DB::raw(
+            'SELECT B.period_id, B.subject_code, B.period_num, A.present 
+            FROM 
+            ( SELECT periods.period_id, subjects.subject_code, periods.period_num, period_attendance.present
+            FROM periods, subjects, open_periods, period_attendance, students 
+            WHERE subjects.class_id = students.class_id 
+            AND periods.subject_id = subjects.subject_id 
+            AND open_periods.date = :date 
+            AND period_attendance.open_period_id = open_periods.open_period_id 
+            AND students.roll_no = :roll_no 
+            AND period_attendance.roll_no = students.roll_no 
+            AND open_periods.period_id = periods.period_id
+            ORDER BY periods.period_num ) A 
+            RIGHT OUTER JOIN 
+            ( SELECT periods.period_id, subjects.subject_code, periods.period_num 
+            FROM periods, subjects 
+            WHERE subjects.class_id = :klass 
+            AND periods.subject_id = subjects.subject_id 
+            AND periods.day = :day ) B 
+            ON A.period_id = B.period_id
+            ORDER BY B.period_num;'
+        ), array('roll_no' => $student->roll_no, 'date' => $date, 'klass' => $student->class_id, 'day' => $dayOfWeek) );
+
+        return response($results);
+
+    }
+
 }
