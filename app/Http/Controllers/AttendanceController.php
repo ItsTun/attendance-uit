@@ -247,6 +247,7 @@ class AttendanceController extends Controller
 
         $date = strtotime($date);
         $dayOfWeek = date('w', $date);
+        $month = date('m', $date);
         $date = date('Y-m-d', $date);
 
         $results = DB::select( DB::raw(
@@ -271,6 +272,31 @@ class AttendanceController extends Controller
             ON A.period_id = B.period_id
             ORDER BY B.period_num;'
         ), array('roll_no' => $student->roll_no, 'date' => $date, 'klass' => $student->class_id, 'day' => $dayOfWeek) );
+
+        $totalAbsenceResults = DB::select( DB::raw(
+            'SELECT subjects.subject_code, count(open_periods.open_period_id) - sum(period_attendance.present) as total_absence 
+            FROM subjects, periods, open_periods, period_attendance, students
+            WHERE periods.subject_id = subjects.subject_id 
+            AND open_periods.period_id = periods.period_id 
+            AND period_attendance.open_period_id = open_periods.open_period_id 
+            AND students.roll_no = :roll_no 
+            AND period_attendance.roll_no = students.roll_no 
+            AND subjects.class_id = students.class_id 
+            AND MONTH(open_periods.date) = :month 
+            GROUP BY subjects.subject_code;'
+        ), array('roll_no' => $student->roll_no, 'month' => $month) );
+
+        foreach ($totalAbsenceResults as $value) {
+
+            $totalAbsence[$value->subject_code] = $value->total_absence;
+
+        }
+
+        foreach ($results as $key => $value) {
+
+                $value->total_absence = $totalAbsence[$value->subject_code];
+
+        }
 
         return response($results);
 
