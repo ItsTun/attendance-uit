@@ -28,9 +28,13 @@ class PeriodsController extends Controller
     	$day = array_search($day, $days);
 
     	$periods = DB::select( DB::raw(
-    		'SELECT periods.period_id, subjects.subject_code, subjects.name, periods.duration, periods.period_num
-			FROM periods, subjects
-			WHERE subjects.class_id = :class_id AND periods.subject_id = subjects.subject_id AND periods.day = :day
+    		'SELECT periods.period_id, subjects.subject_code, subjects.name subject_name, periods.duration, periods.period_num, periods.room, teachers.name teacher_name
+			FROM periods, subjects, subject_teacher, teachers
+			WHERE subjects.class_id = :class_id 
+            AND periods.subject_id = subjects.subject_id 
+            AND periods.day = :day
+            AND teachers.teacher_id = subject_teacher.teacher_id
+            AND subjects.subject_id = subject_teacher.subject_id
 			ORDER BY periods.period_num;'
     	), array('day' => $day, 'class_id' => $klassId) );
 
@@ -38,8 +42,10 @@ class PeriodsController extends Controller
             
             $response[$value->period_num]['period_id'] = $value->period_id;
             $response[$value->period_num]['subject_code'] = $value->subject_code;
-            $response[$value->period_num]['name'] = $value->name;
+            $response[$value->period_num]['subject_name'] = $value->subject_name;
             $response[$value->period_num]['duration'] = $value->duration;
+            $response[$value->period_num]['room'] = $value->room;
+            $response[$value->period_num]['teacher_name'] = $value->teacher_name;
 
         }
 

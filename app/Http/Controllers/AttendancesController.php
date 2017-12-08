@@ -17,33 +17,39 @@ class AttendancesController extends Controller
     public function store() {
 
     	$date = Input::get('date');
-    	$periodId = Input::get('period');
     	$presentStudents = Input::get('present');
     	$klass = Input::get('class');
+        $periods = Input::get('period');
+
+        $periodAry = explode(',', $periods);
 
     	$presentStudentsAry = explode(',', $presentStudents);
 
     	$date = strtotime($date);
     	$date = date('Y-m-d', $date);
 
-    	$openPeriod = Open_Period::firstOrNew(array('date' => $date, 'period_id' => $periodId));
-    	$openPeriod->save();
+        foreach ($periodAry as $periodId) {
+            
+            $openPeriod = Open_Period::firstOrNew(array('date' => $date, 'period_id' => $periodId));
+            $openPeriod->save();
 
-    	$openPeriodId = $openPeriod->open_period_id;
+            $openPeriodId = $openPeriod->open_period_id;
 
-    	$students = Student::select('roll_no')->where('class_id', $klass)->get();
+            $students = Student::select('roll_no')->where('class_id', $klass)->get();
 
-    	foreach ($students as $value) {
+            foreach ($students as $value) {
 
-    		$rollNo = $value['roll_no'];
+                $rollNo = $value['roll_no'];
 
-    		$periodAttendance = new Period_Attendance();
-    		$periodAttendance->roll_no = $rollNo;
-    		$periodAttendance->open_period_id = $openPeriodId;
-    		$periodAttendance->present = in_array($rollNo, $presentStudentsAry);
-    		$periodAttendance->save();
+                $periodAttendance = new Period_Attendance();
+                $periodAttendance->roll_no = $rollNo;
+                $periodAttendance->open_period_id = $openPeriodId;
+                $periodAttendance->present = in_array($rollNo, $presentStudentsAry);
+                $periodAttendance->save();
 
-    	}
+            }
+
+        }
 
     	return response('Successfully added!');
 
@@ -52,24 +58,30 @@ class AttendancesController extends Controller
     public function update() {
 
         $date = Input::get('date');
-        $periodId = Input::get('period');
         $presentStudents = Input::get('present');
+        $periods = Input::get('period');
+
+        $periodAry = explode(',', $periods);
 
         $presentStudentsAry = explode(',', $presentStudents);
 
         $date = strtotime($date);
         $date = date('Y-m-d', $date);
 
-        $openPeriod = Open_Period::where('date', $date)
-                                ->where('period_id', $periodId)
-                                ->first();
-
-        foreach ($openPeriod->attendStudents as $periodAttendance) {
-
-            $rollNo = $periodAttendance['roll_no'];
+        foreach ($periodAry as $periodId) {
             
-            $periodAttendance->present = in_array($rollNo, $presentStudentsAry);
-            $periodAttendance->save();
+            $openPeriod = Open_Period::where('date', $date)
+                        ->where('period_id', $periodId)
+                        ->first();
+
+            foreach ($openPeriod->attendStudents as $periodAttendance) {
+
+                $rollNo = $periodAttendance['roll_no'];
+                
+                $periodAttendance->present = in_array($rollNo, $presentStudentsAry);
+                $periodAttendance->save();
+
+            }
 
         }
 

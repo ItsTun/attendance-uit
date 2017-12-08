@@ -7,7 +7,7 @@
 #
 # Host: localhost (MySQL 5.7.19)
 # Database: uit_attendance
-# Generation Time: 2017-12-06 15:11:07 +0000
+# Generation Time: 2017-12-08 06:03:50 +0000
 # ************************************************************
 
 
@@ -56,7 +56,7 @@ CREATE TABLE `open_periods` (
   PRIMARY KEY (`open_period_id`),
   KEY `period_id` (`period_id`),
   CONSTRAINT `open_periods_ibfk_1` FOREIGN KEY (`period_id`) REFERENCES `periods` (`period_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 
@@ -68,8 +68,10 @@ CREATE TABLE `period_attendance` (
   `roll_no` varchar(10) NOT NULL,
   `open_period_id` int(11) NOT NULL,
   `present` tinyint(1) NOT NULL,
-  PRIMARY KEY (`period_attendance_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`period_attendance_id`),
+  KEY `open_period_id` (`open_period_id`),
+  CONSTRAINT `period_attendance_ibfk_1` FOREIGN KEY (`open_period_id`) REFERENCES `open_periods` (`open_period_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 
@@ -82,10 +84,11 @@ CREATE TABLE `periods` (
   `period_num` int(11) NOT NULL,
   `duration` varchar(50) NOT NULL,
   `day` int(11) NOT NULL,
+  `room` varchar(10) DEFAULT '',
   PRIMARY KEY (`period_id`),
   KEY `subject_id` (`subject_id`),
   CONSTRAINT `periods_ibfk_1` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`subject_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 
@@ -111,7 +114,9 @@ CREATE TABLE `subject_teacher` (
   `subject_id` int(11) NOT NULL,
   `teacher_id` int(11) NOT NULL,
   PRIMARY KEY (`subject_id`,`teacher_id`),
-  CONSTRAINT `subject_teacher_ibfk_1` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`subject_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `teacher_id` (`teacher_id`),
+  CONSTRAINT `subject_teacher_ibfk_1` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`subject_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `subject_teacher_ibfk_2` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`teacher_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
@@ -127,7 +132,7 @@ CREATE TABLE `subjects` (
   PRIMARY KEY (`subject_id`),
   KEY `class_id` (`class_id`),
   CONSTRAINT `subjects_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`class_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 
@@ -135,10 +140,10 @@ CREATE TABLE `subjects` (
 # ------------------------------------------------------------
 
 CREATE TABLE `teachers` (
-  `teachers_id` int(11) NOT NULL AUTO_INCREMENT,
+  `teacher_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(35) NOT NULL,
-  `email` int(50) NOT NULL,
-  PRIMARY KEY (`teachers_id`)
+  `email` varchar(50) NOT NULL DEFAULT '',
+  PRIMARY KEY (`teacher_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
@@ -148,9 +153,9 @@ CREATE TABLE `teachers` (
 
 CREATE TABLE `years` (
   `year_id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` int(11) NOT NULL,
+  `name` varchar(11) NOT NULL DEFAULT '',
   PRIMARY KEY (`year_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 
