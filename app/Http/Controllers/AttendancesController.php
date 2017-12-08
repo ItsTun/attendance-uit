@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\DB;
 use Config;
 
 use App\Open_Period;
@@ -96,9 +95,7 @@ class AttendancesController extends Controller
         $date = strtotime($date);
         $date = date('Y-m-d', $date);
 
-        $openPeriod = Open_Period::where('period_id', $periodId)
-                                ->where('date', $date)
-                                ->first();
+        $openPeriod = (new Open_Period())->fetch($periodId, $date);
 
         // if attendance is already called
         if ($openPeriod) {
@@ -151,18 +148,9 @@ class AttendancesController extends Controller
         $date = strtotime($month);
         $month = date('m', $date);
 
-        $results = DB::select( DB::raw(
-            'SELECT open_periods.open_period_id, open_periods.date, periods.period_num, subjects.subject_code, period_attendance.present 
-            FROM open_periods, students, subjects, periods, period_attendance 
-            WHERE MONTH(open_periods.date) = :month
-            AND students.roll_no = :roll_no 
-            AND subjects.class_id = students.class_id 
-            AND periods.subject_id = subjects.subject_id 
-            AND open_periods.period_id = periods.period_id 
-            AND period_attendance.roll_no = students.roll_no 
-            AND period_attendance.open_period_id = open_periods.open_period_id
-            ORDER BY open_periods.open_period_id, periods.period_num;'
-        ), array('month' => $month, 'roll_no' => $rollNo) );
+        $periodAttendance = new Period_Attendance();
+
+        $results = $periodAttendance->getAttendanceDetail($rollNo, $month);
 
         if (!$results) return response('No data!');
 
@@ -184,18 +172,9 @@ class AttendancesController extends Controller
         $date = strtotime($month);
         $month = date('m', $date);
 
-        $results = DB::select( DB::raw(
-            'SELECT subjects.subject_code, count(open_periods.open_period_id) - sum(period_attendance.present) as total_absence 
-            FROM subjects, periods, open_periods, period_attendance, students
-            WHERE periods.subject_id = subjects.subject_id 
-            AND open_periods.period_id = periods.period_id 
-            AND period_attendance.open_period_id = open_periods.open_period_id 
-            AND students.roll_no = :roll_no 
-            AND period_attendance.roll_no = students.roll_no 
-            AND subjects.class_id = students.class_id 
-            AND MONTH(open_periods.date) = :month 
-            GROUP BY subjects.subject_code;'
-        ), array('roll_no' => $rollNo, 'month' => $month) );
+        $periodAttendance = new Period_Attendance();
+
+        $results = $periodAttendance->getTotalAbsence($rollNo, $month);
 
         if (!$results) return response('No data!');
 
@@ -216,18 +195,9 @@ class AttendancesController extends Controller
         $date = strtotime($month);
         $month = date('m', $date);
 
-        $results = DB::select( DB::raw(
-            'SELECT students.roll_no, students.name,subjects.subject_code, count(open_periods.open_period_id) - sum(period_attendance.present) as total_absence 
-            FROM subjects, periods, open_periods, period_attendance, students
-            WHERE periods.subject_id = subjects.subject_id 
-            AND open_periods.period_id = periods.period_id 
-            AND period_attendance.open_period_id = open_periods.open_period_id 
-            AND period_attendance.roll_no = students.roll_no 
-            AND subjects.class_id = :klass
-            AND MONTH(open_periods.date) = :month 
-            GROUP BY students.roll_no, subjects.subject_code
-            ORDER BY LENGTH(students.roll_no) ASC, students.roll_no ASC;'
-        ), array('klass' => $klass, 'month' => $month) );
+        $periodAttendance = new Period_Attendance();
+
+        $results = $periodAttendance->getAbsentStudentList($klass, $month);
 
         if (!$results) return response('No data!');
 
@@ -269,45 +239,15 @@ class AttendancesController extends Controller
         $month = date('m', $date);
         $date = date('Y-m-d', $date);
 
-        $results = DB::select( DB::raw(
-            'SELECT B.period_id, B.subject_code, B.period_num, A.present 
-            FROM 
-            ( SELECT periods.period_id, subjects.subject_code, periods.period_num, period_attendance.present
-            FROM periods, subjects, open_periods, period_attendance, students 
-            WHERE subjects.class_id = students.class_id 
-            AND periods.subject_id = subjects.subject_id 
-            AND open_periods.date = :date 
-            AND period_attendance.open_period_id = open_periods.open_period_id 
-            AND students.roll_no = :roll_no 
-            AND period_attendance.roll_no = students.roll_no 
-            AND open_periods.period_id = periods.period_id
-            ORDER BY periods.period_num ) A 
-            RIGHT OUTER JOIN 
-            ( SELECT periods.period_id, subjects.subject_code, periods.period_num 
-            FROM periods, subjects 
-            WHERE subjects.class_id = :klass 
-            AND periods.subject_id = subjects.subject_id 
-            AND periods.day = :day ) B 
-            ON A.period_id = B.period_id
-            ORDER BY B.period_num;'
-        ), array('roll_no' => $student->roll_no, 'date' => $date, 'klass' => $student->class_id, 'day' => $dayOfWeek) );
+        $periodAttendance = new Period_Attendance();
 
-        if(!$results) return response('No data!');
+        $results = $periodAttendance->getDailyDetail($student, $date, $dayOfWeek);
 
-        $totalAbsenceResults = DB::select( DB::raw(
-            'SELECT subjects.subject_code, count(open_periods.open_period_id) - sum(period_attendance.present) as total_absence 
-            FROM subjects, periods, open_periods, period_attendance, students
-            WHERE periods.subject_id = subjects.subject_id 
-            AND open_periods.period_id = periods.period_id 
-            AND period_attendance.open_period_id = open_periods.open_period_id 
-            AND students.roll_no = :roll_no 
-            AND period_attendance.roll_no = students.roll_no 
-            AND subjects.class_id = students.class_id 
-            AND MONTH(open_periods.date) = :month 
-            GROUP BY subjects.subject_code;'
-        ), array('roll_no' => $student->roll_no, 'month' => $month) );
+        if (!$results) return response('No data!');
 
-        if(!$totalAbsenceResults) return response('No data!');
+        $totalAbsenceResults = $periodAttendance->getTotalAbsence($student->roll_no, $month);
+
+        if (!$totalAbsenceResults) return response('No data!');
 
         foreach ($totalAbsenceResults as $value) {
 
@@ -317,11 +257,31 @@ class AttendancesController extends Controller
 
         foreach ($results as $key => $value) {
 
-                $value->total_absence = $totalAbsence[$value->subject_code];
+            $info['period_id'] = $value->period_id;
+            $info['subject_code'] = $value->subject_code;
+            $info['present'] = $value->present;
+            $info['total_absence'] = $totalAbsence[$value->subject_code];
+
+            $response[$value->period_num] = $info;
 
         }
 
-        return response($results);
+        $period = new Period();
+
+        $periodResults = $period->getTimetable($student->class_id, $dayOfWeek);
+
+        if (!$periodResults) return response('No data!');
+
+        foreach ($periodResults as $value) {
+
+            $response[$value->period_num]['subject_code'] = $value->subject_code;
+            $response[$value->period_num]['duration'] = $value->duration;
+            $response[$value->period_num]['room'] = $value->room;
+            $response[$value->period_num]['teacher_name'] = $value->teacher_name;
+
+        }
+
+        return response($response);
 
     }
 
