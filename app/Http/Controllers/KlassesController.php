@@ -10,6 +10,8 @@ class KlassesController extends Controller
 {
     public function index() {
 
+        $response = [];
+
     	$years = Year::all();
 
     	foreach ($years as $year) {
