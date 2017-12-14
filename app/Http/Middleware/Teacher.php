@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class Teacher
 {
@@ -20,6 +21,6 @@ class Teacher
             return $next($request);
         }
 
-        return redirect('teacher.login');
+        return redirect('teacher/login');
     }
 }

@@ -2,8 +2,8 @@
 
 Route::get('login', 'TeacherController@login');
 
-Route::group(['middleware' => ['auth', 'teacher']], function () {
-	Route::get('dashboard', 'TeacherController@dashboard');
+Route::group(['middleware' => ['teacher']], function () {
+	Route::get('timetable', 'TeacherController@timetable');
 	Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 });
 
