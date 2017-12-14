@@ -9,7 +9,6 @@ use App\Year;
 class KlassesController extends Controller
 {
     public function index() {
-
     	$years = Year::all();
 
     	foreach ($years as $year) {
@@ -31,6 +30,5 @@ class KlassesController extends Controller
     	}
 
     	return response($response);
-
     }
 }

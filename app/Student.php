@@ -15,8 +15,4 @@ class Student extends Model
     public function klass() {
     	return $this->belongsTo(Klass::class, 'class_id', 'class_id');
     }
-
-    // public function scopeAttendedPeriods($query, $month) {
-    // 	return $query->where('month');
-    // }
 }

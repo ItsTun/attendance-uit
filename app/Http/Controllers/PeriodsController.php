@@ -8,19 +8,14 @@ use App\Period;
 class PeriodsController extends Controller
 {
     public function show(Period $period) {
-
     	$days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     	$periodStr = $days[$period->period_num].' '.$period->duration;
-
     	$response['period_str'] = $periodStr;
-
     	return response($response);
-
     }
 
     public function timetable(Request $request, $klassId) {
-
     	$days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     	$day = $request->day;
@@ -41,7 +36,6 @@ class PeriodsController extends Controller
         }
 
     	return response($response);
-
     }
 
 }

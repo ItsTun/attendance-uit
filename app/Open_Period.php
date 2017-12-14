@@ -21,12 +21,9 @@ class Open_Period extends Model
 	}
 
 	public function fetch($periodId, $date) {
-
 		$openPeriod = Open_Period::where('period_id', $periodId)
                                 ->where('date', $date)
                                 ->first();
-
         return $openPeriod;
-
 	}
 }

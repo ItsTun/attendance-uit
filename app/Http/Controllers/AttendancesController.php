@@ -14,7 +14,6 @@ use App\Period;
 class AttendancesController extends Controller
 {
     public function store() {
-
     	$date = Input::get('date');
     	$presentStudents = Input::get('present');
     	$klass = Input::get('class');
@@ -51,11 +50,9 @@ class AttendancesController extends Controller
         }
 
     	return response('Successfully added!');
-
     }
 
     public function update() {
-
         $date = Input::get('date');
         $presentStudents = Input::get('present');
         $periods = Input::get('period');
@@ -67,8 +64,7 @@ class AttendancesController extends Controller
         $date = strtotime($date);
         $date = date('Y-m-d', $date);
 
-        foreach ($periodAry as $periodId) {
-            
+        foreach ($periodAry as $periodId) {    
             $openPeriod = Open_Period::where('date', $date)
                         ->where('period_id', $periodId)
                         ->first();
@@ -81,15 +77,12 @@ class AttendancesController extends Controller
                 $periodAttendance->save();
 
             }
-
         }
 
         return response('Successfully updated!');
-
     }
 
     public function index(Request $request, $date) {
-
         $periodId = $request->period;
 
         $date = strtotime($date);
@@ -99,13 +92,11 @@ class AttendancesController extends Controller
 
         // if attendance is already called
         if ($openPeriod) {
-
             $attendStudents = $openPeriod->attendStudents()->orderByRaw('LENGTH(roll_no) ASC, roll_no ASC')->get();
 
             $responseAry = array();
 
             foreach ($attendStudents as $value) {
-
                 $student = Student::find($value['roll_no']);
 
                 $info['roll_no'] = $student->roll_no;
@@ -113,11 +104,9 @@ class AttendancesController extends Controller
                 $info['present'] = $value['present'];
 
                 array_push($responseAry, $info);
-
             }
 
             return response($responseAry);
-
         } 
 
         // else
@@ -128,21 +117,17 @@ class AttendancesController extends Controller
         $responseAry = array();
 
         foreach ($studentList as $value) {
-            
             $info['roll_no'] = $value->roll_no;
             $info['name'] = $value->name;
             $info['present'] = 0;
 
             array_push($responseAry, $info);
-
         }
 
         return response($responseAry);
-
     }
 
     public function detail(Request $request, $rollNo) {
-
         $month = $request->month;
 
         $date = strtotime($month);
@@ -155,18 +140,14 @@ class AttendancesController extends Controller
         if (!$results) return response('No data!');
 
         foreach ($results as $value) {
-            
             $response[$value->date][$value->period_num]['subject'] = $value->subject_code;
             $response[$value->date][$value->period_num]['present'] = $value->present;
-
         }
 
         return response($response);
-
     }
 
     public function totalAbsence(Request $request, $rollNo) {
-
         $month = $request->month;
 
         $date = strtotime($month);
@@ -185,11 +166,9 @@ class AttendancesController extends Controller
         }
 
         return response($response);
-
     }
 
     public function absentStudentList(Request $request, $klass) {
-
         $month = $request->month;
 
         $date = strtotime($month);
@@ -227,11 +206,9 @@ class AttendancesController extends Controller
         array_push($response, $info);
 
         return response($response);
-
     }
 
     public function dailyDetail(Request $request, Student $student) {
-
         $date = $request->date;
 
         $date = strtotime($date);
@@ -250,20 +227,17 @@ class AttendancesController extends Controller
         if (!$totalAbsenceResults) return response('No data!');
 
         foreach ($totalAbsenceResults as $value) {
-
             $totalAbsence[$value->subject_code] = $value->total_absence;
-
         }
 
         foreach ($results as $key => $value) {
-
             $info['period_id'] = $value->period_id;
             $info['subject_code'] = $value->subject_code;
+            $info['subject_name'] = $value->name;
             $info['present'] = $value->present;
             $info['total_absence'] = $totalAbsence[$value->subject_code];
 
             $response[$value->period_num] = $info;
-
         }
 
         $period = new Period();
@@ -282,7 +256,6 @@ class AttendancesController extends Controller
         }
 
         return response($response);
-
     }
 
 }
