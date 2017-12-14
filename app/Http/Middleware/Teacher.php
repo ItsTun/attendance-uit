@@ -15,6 +15,11 @@ class Teacher
      */
     public function handle($request, Closure $next)
     {
-        return $next($request);
+        if (Auth::check() && Auth::user()->isTeacher())
+        {
+            return $next($request);
+        }
+
+        return redirect('teacher.login');
     }
 }
