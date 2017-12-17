@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 class TeacherController extends Controller
 {
     public function login() {
+        if(Auth::check() && Auth::user()->isAdmin()){
+            Auth::logout();
+        }
         return view('teacher.login');
     }
 
@@ -19,5 +22,9 @@ class TeacherController extends Controller
     	//$timetable = $period->getTeacherTimetable($teacher_id, date('N'));
     	$timetable = $period->getTeacherTimetable($teacher_id, 1);
         return view('teacher.timetable')->with('timetables', $timetable);
+    }
+
+    public function addAttendance() {
+    	return view('teacher.add_attendance');
     }
 }
