@@ -8,9 +8,9 @@
 // Authentication Routes...
 Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');
-Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
-Route::group(['middleware' => ['auth', 'admin']], function () {
+Route::group(['middleware' => ['admin']], function () {
 	Route::get('dashboard', 'AdminController@dashboard');
 	Route::get('teachers', 'AdminController@teachers');
 	Route::get('students', 'AdminController@students');
