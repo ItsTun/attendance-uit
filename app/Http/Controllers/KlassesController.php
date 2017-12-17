@@ -9,6 +9,7 @@ use App\Year;
 class KlassesController extends Controller
 {
     public function index() {
+        $response = [];
     	$years = Year::all();
 
     	foreach ($years as $year) {
@@ -28,7 +29,6 @@ class KlassesController extends Controller
     		$response[$year->name] = $info;
 
     	}
-
     	return response($response);
     }
 }
