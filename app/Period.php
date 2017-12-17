@@ -10,7 +10,7 @@ class Period extends Model
     protected $table = "periods";
     protected $primaryKey = "period_id";
 
-    public function subject() {
+    public function subjects() {
     	return $this->belongsTo(Subject::class, 'subject_id');
     }
 
@@ -30,5 +30,16 @@ class Period extends Model
 
     	return $results;
 
+    }
+
+    public function getTeacherTimetable($teacher_id, $day) {
+        return DB::table('periods')
+            ->join('subject_teacher', 'subject_teacher.subject_id', '=', 'periods.subject_id')
+            ->join('subjects', 'subjects.subject_id', '=', 'periods.subject_id')
+            ->where('subject_teacher.teacher_id', $teacher_id)
+            ->where('periods.day', $day)
+            ->select('subjects.*', 'periods.*')
+            ->orderby('period_num')
+            ->get();
     }
 }
