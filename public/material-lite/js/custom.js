@@ -58,6 +58,9 @@ $(function() {
     // ============================================================== 
     $(function() {
         var url = window.location;
+        url.replace('#','');
+        url = url.substring(0, url.indexOf('?'));
+        console.log(url);
         var element = $('ul#sidebarnav a').filter(function() {
             return this.href == url;
         }).addClass('active').parent().addClass('active');
