@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Period;
 use App\Teacher;
+use App\Student;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -24,7 +25,9 @@ class TeacherController extends Controller
         return view('teacher.timetable')->with('timetables', $timetable);
     }
 
-    public function addAttendance() {
-    	return view('teacher.add_attendance');
+    public function addAttendance($period_id) {
+        $student = new Student();
+        $students = $student->getStudentFromPeriod($period_id);
+    	return view('teacher.add_attendance')->with('students', $students);
     }
 }

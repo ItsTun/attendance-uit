@@ -19,7 +19,7 @@ Timetable
 		@else
 		@foreach ($timetables as $timetable)
 		<div class="col-12">
-			<a href="timetable/add/{{ $timetable->period_id }}" style="color:#67757c;">
+			<a href="add/{{ $timetable->period_id }}" style="color:#67757c;">
 				<div class="card" style="cursor: pointer;">
 					<div class="card-block">
 						<div class="col-md-3 col-sm-12" style="float: left;">
