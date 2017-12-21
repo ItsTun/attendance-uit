@@ -17,7 +17,7 @@ class Student extends Model
     	return $this->belongsTo(Klass::class, 'class_id', 'class_id');
     }
 
-    public function getStudentFromPeriod($period_id) {
+    public static function getStudentFromPeriod($period_id) {
         return DB::table('periods')
             ->join('subjects', 'subjects.subject_id', '=', 'periods.subject_id')
             ->join('students', 'students.class_id', '=', 'subjects.class_id')
@@ -25,8 +25,4 @@ class Student extends Model
             ->select('students.*')
             ->get();
     }
-
-    // public function scopeAttendedPeriods($query, $month) {
-    // 	return $query->where('month');
-    // }
 }
