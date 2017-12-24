@@ -16,9 +16,9 @@ class Klass extends Model
 
 	public static function getClassFromPeriod($period_id) {
 		return DB::table('periods')
-            ->join('subjects', 'subjects.subject_id', '=', 'periods.subject_id')
+            ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
             ->where('periods.period_id', $period_id)
-            ->select('subjects.class_id')
+            ->select('subject_class.class_id')
             ->first();
 	}
 }

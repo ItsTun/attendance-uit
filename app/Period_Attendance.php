@@ -105,15 +105,11 @@ class Period_Attendance extends Model
 
 	}
 
-    public static function saveAttendance($periods, $date, $presentStudents) {
-        $periodAry = explode(',', $periods);
-
-        $presentStudentsAry = explode(',', $presentStudents);
-
+    public static function saveAttendance($period_ids, $date, $presentStudents) {
         $date = strtotime($date);
         $date = date('Y-m-d', $date);
 
-        foreach ($periodAry as $periodId) {
+        foreach ($period_ids as $periodId) {
 
             $klass = Klass::getClassFromPeriod($periodId);
             
@@ -131,7 +127,7 @@ class Period_Attendance extends Model
                 $periodAttendance = new Period_Attendance();
                 $periodAttendance->roll_no = $rollNo;
                 $periodAttendance->open_period_id = $openPeriodId;
-                $periodAttendance->present = in_array($rollNo, $presentStudentsAry);
+                $periodAttendance->present = in_array($rollNo, $presentStudents[$periodId . '_student']);
                 $periodAttendance->save();
 
             }

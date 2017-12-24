@@ -31,7 +31,7 @@ class Utils {
 
 	public static function getDatesInThisWeek() {
 		$dates = [];
-		for($i = 0; $i < 7; $i++) {
+		for($i = 0; $i < 5; $i++) {
 			$date = strtotime($i.' day', strtotime('monday this week'));
 			$date = date('Y-m-d', $date);
 			array_push($dates, $date);

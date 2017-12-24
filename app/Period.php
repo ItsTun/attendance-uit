@@ -34,12 +34,20 @@ class Period extends Model
 
     public function getTeacherTimetable($teacher_id, $day) {
         return DB::table('periods')
-            ->join('subject_teacher', 'subject_teacher.subject_id', '=', 'periods.subject_id')
-            ->join('subjects', 'subjects.subject_id', '=', 'periods.subject_id')
+            ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
+            ->join('subject_teacher', 'subject_teacher.subject_class_id', '=', 'subject_class.subject_class_id')
+            ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
             ->where('subject_teacher.teacher_id', $teacher_id)
             ->where('periods.day', $day)
             ->select('subjects.*', 'periods.*')
             ->orderby('period_num')
             ->get();
+    }
+
+    public function checkPeriodsAreOfSameClassAndSubject($period_ids) {
+        $subject_id = 0; $class_id = 0;
+        foreach($period_ids as $period_id) {
+
+        }
     }
 }
