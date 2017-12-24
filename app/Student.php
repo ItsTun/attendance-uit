@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Student extends Model
 {
@@ -14,5 +15,18 @@ class Student extends Model
 
     public function klass() {
     	return $this->belongsTo(Klass::class, 'class_id', 'class_id');
+    }
+
+    public function getStudentFromPeriod($period_id) {
+        return DB::table('periods')
+            ->join('subjects', 'subjects.subject_id', '=', 'periods.subject_id')
+            ->join('students', 'students.class_id', '=', 'subjects.class_id')
+            ->where('periods.period_id', $period_id)
+            ->select('students.*')
+            ->get();
+    }
+
+    public function scopeEmail($query, $email) {
+        return $query->where('email', '=',$email);
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 use App\Student;
+use App\Klass;
 
 class Period_Attendance extends Model
 {
@@ -91,4 +92,38 @@ class Period_Attendance extends Model
 
         return $results;
 	}
+
+    public static function saveAttendance($periods, $date, $presentStudents) {
+        $periodAry = explode(',', $periods);
+
+        $presentStudentsAry = explode(',', $presentStudents);
+
+        $date = strtotime($date);
+        $date = date('Y-m-d', $date);
+
+        foreach ($periodAry as $periodId) {
+
+            $klass = Klass::getClassFromPeriod($periodId);
+            
+            $openPeriod = Open_Period::firstOrNew(array('date' => $date, 'period_id' => $periodId));
+            $openPeriod->save();
+
+            $openPeriodId = $openPeriod->open_period_id;
+
+            $students = Student::select('roll_no')->where('class_id', $klass->class_id)->get();
+
+            foreach ($students as $value) {
+
+                $rollNo = $value['roll_no'];
+
+                $periodAttendance = new Period_Attendance();
+                $periodAttendance->roll_no = $rollNo;
+                $periodAttendance->open_period_id = $openPeriodId;
+                $periodAttendance->present = in_array($rollNo, $presentStudentsAry);
+                $periodAttendance->save();
+
+            }
+
+        }
+    }
 }

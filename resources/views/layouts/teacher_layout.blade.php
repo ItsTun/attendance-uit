@@ -92,9 +92,9 @@
                 <!-- Sidebar navigation-->
                 <nav class="sidebar-nav">
                     <ul id="sidebarnav">
-                        <li> <a class="waves-effect waves-dark" href="timetable" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Timetable</span></a>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('timetable') }}" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Timetable</span></a>
                         </li>
-                        <li> <a class="waves-effect waves-dark" href="students" aria-expanded="false"><i class="mdi mdi-account-check"></i><span class="hide-menu">Students' Attendance</span></a>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('students_attendance') }}" aria-expanded="false"><i class="mdi mdi-account-check"></i><span class="hide-menu">Students' Attendance</span></a>
                         </li>
                     </ul>
                 </nav>

@@ -861,6 +861,11 @@ html body .waves-notransition {
 /*******************
 Buttons
 ******************/
+input[type="button" i], input[type="submit" i] {
+  background-color: transparent !important;
+  border: solid transparent 0px;
+  color: white;
+}
 .btn {
   padding: 7px 12px;
   font-size: 14px;

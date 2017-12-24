@@ -30,3 +30,6 @@ Route::get('/v1/classes', 'KlassesController@index');
 Route::get('/v1/period/{period}', 'PeriodsController@show');
 
 Route::get('/v1/timetables/{class_id}', 'PeriodsController@timetable');
+
+Route::get('/v1/students/{student}', 'StudentsController@show');
+Route::get('/v1/students/email/{email}', 'StudentsController@findByEmail');

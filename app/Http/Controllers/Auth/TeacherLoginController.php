@@ -80,10 +80,14 @@ class TeacherLoginController extends Controller
 
             Auth::loginUsingId($user->id);
 
-            return "Dashboard";
-
+            return redirect('teacher/timetable');
         } else {
             return "Your email is currently not in our database. If you are a teacher at UIT, you contact admin to register.";
         }
+    }
+
+    public function logout() {
+        Auth::logout();
+        return redirect('teacher/login');
     }
 }

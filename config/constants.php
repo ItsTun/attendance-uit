@@ -63,5 +63,11 @@ return [
 		'TABLE_NAME' => 'years',
 		'PRIMARY_KEY' => 'year_id',
 	],
+	'MSG_CODES' => [
+		'1' => 'ADDED_SUCCESSFULLY',
+	],
+	'MESSAGES' => [
+		'ADDED_SUCCESSFULLY' => "Attendance added successfully!",
+	],
 
 ];
