@@ -39,15 +39,17 @@ class TeacherController extends Controller
         return view('teacher.timetable')->with($with);
     }
 
-    public function addAttendance($period_id) {
+    public function addAttendance($period_ids) {
         $date = Input::get('date');
+        $periods = explode(',', $period_ids);
         if(Utils::validateDate($date)) {
             if(Utils::checkDateIsEligible($date)){
-                if(Utils::periodIsInDate($period_id, $date)) {
-                    $students = Student::getStudentFromPeriod($period_id);
-                	return view('teacher.add_attendance')->with(['students'=>$students,'period'=>$period_id, 'date'=>$date]);
+                if(Utils::periodIsInDate($period_ids, $date)) {
+                    $students = Student::getStudentFromPeriod($period_ids);
+                	return view('teacher.add_attendance')->with(['students'=>$students,'period'=>$period_ids, 'date'=>$date, 
+                        'period_ids' => $periods]);
                 } else {
-                    return "There is no period with id $period_id in $date";
+                    return "There is no period with id $period_ids in $date";
                 }
             } else {
                 return "You can't add attendance for $date. It is either because the date is ahead of current time or the period to add this attendance has expired.";
@@ -59,10 +61,17 @@ class TeacherController extends Controller
 
     public function saveAttendance() {
         $date = Input::get('date');
-        $presentStudents = Input::get('student');
+        $presentStudents = [];
         $periods = Input::get('period');
 
-        Period_Attendance::saveAttendance($periods, $date, $presentStudents);
+        $period_ids = explode(',', $periods);
+
+        foreach($period_ids as $period_id) {
+            $key = $period_id . '_student';
+            $presentStudents[$key] = Input::post($key);
+        }
+
+        Period_Attendance::saveAttendance($period_ids, $date, $presentStudents);
 
         return redirect()->action('TeacherController@timetable', ['msg_code' => '1']);
     }

@@ -15,7 +15,7 @@ Timetable
 				</div>
 			</div>
 		</div>
-		<div class="col-3">
+		<div class="col-md-3 col-sm-12 col-xs-12" style="margin-bottom: 30px;">
 			<form class="form-material">
 				<select class="form-control form-control-line" id="date" onChange="dateChange(this.selectedIndex)">
 					@foreach ($dates as $date)
@@ -25,7 +25,7 @@ Timetable
 			</form>
 		</div>
 		@if (count($timetables) === 0)
-		<div class="col-12" style="margin-top: 30px;">
+		<div class="col-12">
 			<div class="card">
 				<div class="card-block">
 					No timetable for today.
@@ -33,24 +33,50 @@ Timetable
 			</div>
 		</div>
 		@else
-			@foreach ($timetables as $timetable)
-				<div class="col-12" style="margin-top: 30px;">
-					<a href="add/{{ $timetable->period_id }}?date={{ $selectedDate }}" style="color:#67757c;">
+		@php 
+		$numberOfPeriods = 1; $start_time = 0; $periods = "";
+		@endphp
+			@for ($i = 0; $i < count($timetables); $i++)
+			@php 
+			if($numberOfPeriods == 1) {
+				$start_time = $timetables[$i]->start_time;
+			} 
+			@endphp
+			@if($i < count($timetables)-1 && $timetables[$i]->subject_class_id == $timetables[$i+1]->subject_class_id)
+				@php 
+					$periods .= $timetables[$i]->period_id. ",";
+					$numberOfPeriods += 1;
+				@endphp
+			@else
+			@php 
+				$periods .= $timetables[$i]->period_id; 
+			@endphp
+			<div class="col-12">
+					<a href="add/{{ $periods }}?date={{ $selectedDate }}" style="color:#67757c;">
 						<div class="card" style="cursor: pointer;">
 							<div class="card-block">
 								<div class="col-md-3 col-sm-12" style="float: left;">
-									{{ $timetable->duration }}
+									{{ date("g:i a", strtotime($start_time)) }} 
+									- 
+									{{ date("g:i a", strtotime($timetables[$i]->end_time)) }}
 								</div>
-								<div class="col-md-8" style="float: left;">
-									<b>{{ $timetable->name }}</b>
+								<div class="col-md-6" style="float: left;">
+									<b>{{ $timetables[$i]->name }}</b>
 									<br/>
-									Room - {{ $timetable->room }}
+									Room - {{ $timetables[$i]->room }}
+								</div>
+								<div class="col-md-2" style="float: left;">
+									@if($numberOfPeriods > 1)<span class="label label-info">{{ $numberOfPeriods." Periods" }}</span>@endif
 								</div>
 							</div>
 						</div>
 					</a>
+					@php 
+						$numberOfPeriods = 1; $start_time = 0; $periods = "";
+					@endphp
 				</div>
-			@endforeach
+			@endif
+			@endfor
 		@endif
 		</div>
 	</div>

@@ -19,8 +19,8 @@ class Student extends Model
 
     public function getStudentFromPeriod($period_id) {
         return DB::table('periods')
-            ->join('subjects', 'subjects.subject_id', '=', 'periods.subject_id')
-            ->join('students', 'students.class_id', '=', 'subjects.class_id')
+            ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
+            ->join('students', 'students.class_id', '=', 'subject_class.class_id')
             ->where('periods.period_id', $period_id)
             ->select('students.*')
             ->get();
