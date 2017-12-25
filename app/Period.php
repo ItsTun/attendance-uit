@@ -10,8 +10,8 @@ class Period extends Model
     protected $table = "periods";
     protected $primaryKey = "period_id";
 
-    public function subjects() {
-    	return $this->belongsTo(Subject::class, 'subject_id');
+    public function subject_class() {
+    	return $this->belongsTo(Subject_Class::class, 'subject_class_id');
     }
 
     public function getTimetable($klassId, $day) {
@@ -44,10 +44,18 @@ class Period extends Model
             ->get();
     }
 
-    public function checkPeriodsAreOfSameClassAndSubject($period_ids) {
+    public static function checkPeriodsAreOfSameClassAndSubject($period_ids) {
         $subject_id = 0; $class_id = 0;
         foreach($period_ids as $period_id) {
-
+            $period = Period::find($period_id);
+            $subject_class = $period->subject_class;
+            if($subject_id == 0 && $class_id == 0) {
+                $subject_id = $subject_class->subject_id;
+                $class_id = $subject_class->class_id;
+            } else {
+                if($subject_id != $subject_class->subject_id || $class_id != $subject_class->class_id) return false;
+            }
         }
+        return true;
     }
 }
