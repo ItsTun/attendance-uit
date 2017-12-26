@@ -60,7 +60,7 @@ class AttendancesController extends Controller
         $date = strtotime($date);
         $date = date('Y-m-d', $date);
 
-        $openPeriod = (new Open_Period())->fetch($periodId, $date);
+        $openPeriod = Open_Period::fetch($periodId, $date);
 
         // if attendance is already called
         if ($openPeriod) {
@@ -105,9 +105,7 @@ class AttendancesController extends Controller
         $date = strtotime($month);
         $month = date('m', $date);
 
-        $periodAttendance = new Period_Attendance();
-
-        $results = $periodAttendance->getAttendanceDetail($rollNo, $month);
+        $results = Period_Attendance::getAttendanceDetail($rollNo, $month);
 
         if (!$results) return response('No data!');
 
@@ -125,9 +123,7 @@ class AttendancesController extends Controller
         $date = strtotime($month);
         $month = date('m', $date);
 
-        $periodAttendance = new Period_Attendance();
-
-        $results = $periodAttendance->getTotalAbsence($rollNo, $month);
+        $results = Period_Attendance::getTotalAbsence($rollNo, $month);
 
         if (!$results) return response('No data!');
 
@@ -146,9 +142,7 @@ class AttendancesController extends Controller
         $date = strtotime($month);
         $month = date('m', $date);
 
-        $periodAttendance = new Period_Attendance();
-
-        $results = $periodAttendance->getAbsentStudentList($klass, $month);
+        $results = Period_Attendance::getAbsentStudentList($klass, $month);
 
         if (!$results) return response('No data!');
 
@@ -188,13 +182,11 @@ class AttendancesController extends Controller
         $month = date('m', $date);
         $date = date('Y-m-d', $date);
 
-        $periodAttendance = new Period_Attendance();
-
-        $results = $periodAttendance->getDailyDetail($student, $date, $dayOfWeek);
+        $results = Period_Attendance::getDailyDetail($student, $date, $dayOfWeek);
 
         if (!$results) return response('No data!');
 
-        $totalAbsenceResults = $periodAttendance->getTotalAbsence($student->roll_no, $month);
+        $totalAbsenceResults = Period_Attendance::getTotalAbsence($student->roll_no, $month);
 
         if (!$totalAbsenceResults) return response('No data!');
 
@@ -212,9 +204,7 @@ class AttendancesController extends Controller
             $response[$value->period_num] = $info;
         }
 
-        $period = new Period();
-
-        $periodResults = $period->getTimetable($student->class_id, $dayOfWeek);
+        $periodResults = Period::getTimetable($student->class_id, $dayOfWeek);
 
         if (!$periodResults) return response('No data!');
 
