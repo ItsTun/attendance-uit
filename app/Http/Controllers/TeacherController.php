@@ -43,10 +43,11 @@ class TeacherController extends Controller
         $date = Input::get('date');
         $periods = explode(',', $period_ids);
         if(Utils::validateDate($date)) {
-            if(Period::checkPeriodsAreOfSameClassAndSubject($periods)){
+            if(Period::checkPeriodsAreTaughtByCurrentTeacher($periods)){
+            if(Period::checkPeriodsAreOfSameSubjectAndClass($periods)){
                 if(Utils::checkDateIsEligible($date)){
                     if(Utils::periodIsInDate($period_ids, $date)) {
-                        $students = Student::getStudentFromPeriod($period_ids);
+                        $students = Student::getStudentsFromPeriod($period_ids);
                     	return view('teacher.add_attendance')->with(['students'=>$students,'period'=>$period_ids, 'date'=>$date, 
                             'period_ids' => $periods]);
                     } else {
@@ -56,8 +57,11 @@ class TeacherController extends Controller
                     return "You can't add attendance for $date. It is either because the date is ahead of current time or the period to add this attendance has expired.";
                 }
             } else {
-                return "Only periods of same class and subjects are allowed.";
+                return "Only periods of same subject and class can be added.";
             }
+        } else {
+            return "You can only add attendance for periods you teach.";
+        }
         } else {
             return "Invalid date format!";
         }

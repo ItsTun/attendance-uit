@@ -5,6 +5,8 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Support\Facades\Auth;
+
 class Period extends Model
 {
     protected $table = "periods";
@@ -44,16 +46,33 @@ class Period extends Model
             ->get();
     }
 
-    public static function checkPeriodsAreOfSameClassAndSubject($period_ids) {
-        $subject_id = 0; $class_id = 0;
+    public static function checkPeriodsAreTaughtByCurrentTeacher($period_ids) {
+        $logged_in_teacher = Teacher::where('email', Auth::user()->email)->first();
+        
+        $subject_class_ids = [];
+        foreach($logged_in_teacher->subject_teachers as $subject_teacher) {
+            array_push($subject_class_ids, $subject_teacher->subject_class->subject_class_id);
+        }
+
         foreach($period_ids as $period_id) {
             $period = Period::find($period_id);
             $subject_class = $period->subject_class;
-            if($subject_id == 0 && $class_id == 0) {
-                $subject_id = $subject_class->subject_id;
-                $class_id = $subject_class->class_id;
+            if(!in_array($subject_class->subject_class_id, $subject_class_ids)) return false;
+        }
+
+        return true;
+    }
+
+    public static function checkPeriodsAreOfSameSubjectAndClass($period_ids) {
+        $subject_class_id = 0;
+        
+        foreach($period_ids as $period_id) {
+            $period = Period::find($period_id);
+            $subject_class = $period->subject_class;
+            if($subject_class_id == 0) {
+                $subject_class_id = $subject_class->subject_class_id;
             } else {
-                if($subject_id != $subject_class->subject_id || $class_id != $subject_class->class_id) return false;
+                if($subject_class_id != $subject_class->subject_class_id) return false;
             }
         }
         return true;
