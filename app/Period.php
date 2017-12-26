@@ -38,16 +38,16 @@ class Period extends Model
     public static function getTeacherTimetable($teacher_id, $day) {
         return DB::table('periods')
             ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
-            ->join('subject_teacher', 'subject_teacher.subject_class_id', '=', 'subject_class.subject_class_id')
+            ->join('subject_class_teacher', 'subject_class_teacher.subject_class_id', '=', 'subject_class.subject_class_id')
             ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
-            ->where('subject_teacher.teacher_id', $teacher_id)
+            ->where('subject_class_teacher.teacher_id', $teacher_id)
             ->where('periods.day', $day)
             ->select('subjects.*', 'periods.*')
             ->orderby('period_num')
             ->get();
     }
 
-    public static function checkPeriodsAreTaughtByCurrentTeacher($period_ids) {
+    public static function checkIfPeriodsAreTaughtByCurrentTeacher($period_ids) {
         $logged_in_teacher = Teacher::where('email', Auth::user()->email)->first();
         
         $subject_class_ids = [];
@@ -64,7 +64,7 @@ class Period extends Model
         return true;
     }
 
-    public static function checkPeriodsAreOfSameSubjectAndClass($period_ids) {
+    public static function checkIfPeriodsAreOfSameSubjectAndClass($period_ids) {
         $subject_class_id = 0;
         
         foreach($period_ids as $period_id) {
@@ -77,5 +77,12 @@ class Period extends Model
             }
         }
         return true;
+    }
+
+    public static function getUniquePeriodNumber($period_ids) {
+        return DB::table('periods')
+            ->whereIn('period_id', $period_ids)
+            ->select(DB::raw('count(distinct period_num) as number_of_periods'))
+            ->first()->number_of_periods;
     }
 }

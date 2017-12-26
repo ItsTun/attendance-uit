@@ -65,9 +65,11 @@ return [
 	],
 	'MSG_CODES' => [
 		'1' => 'ADDED_SUCCESSFULLY',
+		'2' => 'UPDATED_SUCCESSFULLY'
 	],
 	'MESSAGES' => [
 		'ADDED_SUCCESSFULLY' => "Attendance added successfully!",
+		'UPDATED_SUCCESSFULLY' => "Attendance updated successfully",
 	],
 
 ];
