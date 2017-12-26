@@ -11,6 +11,7 @@ use App\Student;
 use App\Period_Attendance;
 use App\Period;
 use App\Klass;
+use App\Attendance;
 
 class AttendancesController extends Controller
 {
@@ -88,7 +89,6 @@ class AttendancesController extends Controller
 
             return response($responseAry);
         } 
-
         // else
         $klassId = Period::find($periodId)->subject->class_id;
 

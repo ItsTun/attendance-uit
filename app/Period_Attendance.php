@@ -29,8 +29,6 @@ class Period_Attendance extends Model
             ORDER BY open_periods.open_period_id, periods.period_num;'
         ), array('month' => $month, 'roll_no' => $rollNo) );
         return $results;
-
-
 	}
 
 	public static function getTotalAbsence($rollNo, $month) {
@@ -115,5 +113,31 @@ class Period_Attendance extends Model
                 $periodAttendance->save();
             }
         }
+
+        foreach ($students as $value) {
+            $rollNo = $value['roll_no'];
+            $studentAttendance = Period_Attendance::getStudentAttendance($rollNo);
+            Attendance::updateStudentAttendance($rollNo, $studentAttendance);
+        }
+    }
+
+    public static function getStudentAttendance($rollNo) {
+        return DB::table('period_attendance')
+            ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
+            ->join('classes', 'classes.class_id', '=', 'students.class_id')
+            ->join('subject_class', 'subject_class.class_id', '=', 'classes.class_id')
+            ->join('periods', 'periods.subject_class_id', '=', 'subject_class.subject_class_id')
+            ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
+            ->join('open_periods', function($join) {
+                $join->on('open_periods.period_id', '=', 'periods.period_id')->on('period_attendance.open_period_id', '=', 'open_periods.open_period_id');
+            })
+            ->where('period_attendance.roll_no', $rollNo)
+            ->select('subjects.subject_id', 
+                    'subjects.subject_code', 
+                    DB::raw('COUNT(open_periods.open_period_id) as total_periods'), 
+                    DB::raw('SUM(period_attendance.present) as attended_periods'), 
+                    DB::raw('SUM(period_attendance.present)/COUNT(open_periods.open_period_id) * 100 as percent'))
+            ->groupby('subjects.subject_id')
+            ->get();
     }
 }
