@@ -16,10 +16,18 @@ class AttendancesController extends Controller
 {
     public function store() {
     	$date = Input::get('date');
-    	$presentStudents = Input::get('student');
+    	$presentStudents = [];
         $periods = Input::get('period');
 
-        Period_Attendance::saveAttendance($periods, $date, $presentStudents);
+        $period_ids = explode(',', $periods);
+
+        foreach($period_ids as $period_id) {
+            $key = $period_id . '_student';
+            $students = Input::post($key);
+            $presentStudents[$key] = explode(',', $students);
+        }
+
+        Period_Attendance::saveAttendance($period_ids, $date, $presentStudents);
 
     	return response('Successfully added!');
     }
