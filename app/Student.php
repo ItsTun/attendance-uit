@@ -25,4 +25,8 @@ class Student extends Model
             ->select('students.*')
             ->get();
     }
+
+    public function scopeEmail($query, $email) {
+        return $query->where('email', '=',$email);
+    }
 }

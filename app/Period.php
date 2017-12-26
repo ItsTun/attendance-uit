@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Facades\Auth;
+use App\Subject_Class;
 
 class Period extends Model
 {
@@ -15,26 +16,26 @@ class Period extends Model
     public function subject_class() {
     	return $this->belongsTo(Subject_Class::class, 'subject_class_id');
     }
-
-    public function getTimetable($klassId, $day) {
-
-    	$results = DB::select( DB::raw(
-    		'SELECT periods.period_id, subjects.subject_code, subjects.name subject_name, periods.duration, periods.period_num, periods.room, GROUP_CONCAT(teachers.name) teacher_name
-			FROM periods, subjects, subject_teacher, teachers
-			WHERE subjects.class_id = :class_id 
-            AND periods.subject_id = subjects.subject_id 
-            AND periods.day = :day
-            AND teachers.teacher_id = subject_teacher.teacher_id
-            AND subjects.subject_id = subject_teacher.subject_id
-            GROUP BY periods.period_id
-			ORDER BY periods.period_num;'
-    	), array('day' => $day, 'class_id' => $klassId) );
-
-    	return $results;
-
+    public function subject() {
+    	$subjectClass = Subject_Class::find($this->subject_class_id)->first();
+        return $subjectClass->subject;
     }
 
-    public function getTeacherTimetable($teacher_id, $day) {
+    public static function getTimetable($klassId, $day) {
+        return DB::table('periods')
+            ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
+            ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
+            ->join('subject_teacher', 'subject_teacher.subject_id', '=', 'subjects.subject_id')
+            ->join('teachers', 'teachers.teacher_id', '=', 'subject_teacher.teacher_id')
+            ->where('subject_class.class_id', $klassId)
+            ->where('periods.day', $day)
+            ->select('periods.period_id', 'subjects.subject_code', 'subjects.name as subject_name', 'periods.duration', 'periods.period_num', 'periods.room', DB::raw('GROUP_CONCAT(teachers.name) teacher_names'), DB::raw('GROUP_CONCAT(teachers.teacher_id) teacher_ids'))
+            ->groupby('periods.period_id')
+            ->orderby('periods.period_num')
+            ->get();
+    }
+
+    public static function getTeacherTimetable($teacher_id, $day) {
         return DB::table('periods')
             ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
             ->join('subject_teacher', 'subject_teacher.subject_class_id', '=', 'subject_class.subject_class_id')
