@@ -7,7 +7,7 @@
 #
 # Host: localhost (MySQL 5.7.19)
 # Database: uit_attendance
-# Generation Time: 2017-12-26 05:47:05 +0000
+# Generation Time: 2017-12-26 05:54:36 +0000
 # ************************************************************
 
 
@@ -47,6 +47,18 @@ CREATE TABLE `classes` (
 
 
 
+# Dump of table migrations
+# ------------------------------------------------------------
+
+CREATE TABLE `migrations` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
 # Dump of table open_periods
 # ------------------------------------------------------------
 
@@ -58,6 +70,18 @@ CREATE TABLE `open_periods` (
   KEY `period_id` (`period_id`),
   CONSTRAINT `open_periods_ibfk_1` FOREIGN KEY (`period_id`) REFERENCES `periods` (`period_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+# Dump of table password_resets
+# ------------------------------------------------------------
+
+CREATE TABLE `password_resets` (
+  `email` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  KEY `password_resets_email_index` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 
@@ -173,6 +197,25 @@ CREATE TABLE `teachers` (
   `email` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`teacher_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+# Dump of table users
+# ------------------------------------------------------------
+
+CREATE TABLE `users` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `google_user_id` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_unique` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 
