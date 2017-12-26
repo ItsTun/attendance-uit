@@ -25,7 +25,6 @@ class Utils {
 		$date = strtotime($date);
 		$today = strtotime(date("Y-m-d"));
 		$thisMonday = strtotime('monday this week');
-
 		return ($today - $date >= 0 && $thisMonday - $date <= 0);
 	}
 

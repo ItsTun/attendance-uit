@@ -33,19 +33,19 @@ Timetable
 			</div>
 		</div>
 		@else
-		@php 
+		@php  
 		$numberOfPeriods = 1; $start_time = 0; $periods = "";
 		@endphp
 			@for ($i = 0; $i < count($timetables); $i++)
 			@php 
 			if($numberOfPeriods == 1) {
 				$start_time = $timetables[$i]->start_time;
+				$numberOfPeriods = count(array_unique(array_column($timetables->toArray(), 'period_num')));
 			} 
 			@endphp
-			@if($i < count($timetables)-1 && $timetables[$i]->subject_class_id == $timetables[$i+1]->subject_class_id)
+			@if($i < count($timetables)-1 && $timetables[$i]->subject_code == $timetables[$i+1]->subject_code && $timetables[$i]->room == $timetables[$i+1]->room)
 				@php 
 					$periods .= $timetables[$i]->period_id. ",";
-					$numberOfPeriods += 1;
 				@endphp
 			@else
 			@php 
