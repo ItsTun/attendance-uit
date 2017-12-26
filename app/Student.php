@@ -17,7 +17,7 @@ class Student extends Model
     	return $this->belongsTo(Klass::class, 'class_id', 'class_id');
     }
 
-    public static function getStudentFromPeriod($period_id) {
+    public static function getStudentsFromPeriod($period_id) {
         return DB::table('periods')
             ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
             ->join('students', 'students.class_id', '=', 'subject_class.class_id')

@@ -9,8 +9,8 @@ class Subject extends Model
     protected $table = "subjects";
     protected $primaryKey = "subject_id";
 
-    public function periods() {
- 		return $this->hasMany(Period::class, 'subject_id');
+    public function subject_class() {
+ 		return $this->hasMany(Subject_Class::class, 'subject_id');
     }
 
     public function subject_teachers() {

@@ -15,8 +15,8 @@ class Klass extends Model
 	}
 
 	public function subject_class() {
-    	return $this->hasMany(Subject_Class::class, 'class_id');
-    }
+		return $this->hasMany(Subject_Class::class, 'class_id');
+	}
 
 	public static function getClassFromPeriod($period_id) {
 		return DB::table('periods')

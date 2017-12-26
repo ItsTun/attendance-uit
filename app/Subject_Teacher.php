@@ -8,8 +8,8 @@ class Subject_Teacher extends Model
 {
     protected $table = "subject_teacher";
 
-    public function subject() {
-    	return $this->belongsTo(Subject::class, 'subject_id');
+    public function subject_class() {
+    	return $this->belongsTo(Subject_Class::class, 'subject_class_id');
     }
 
     public function teacher() {
