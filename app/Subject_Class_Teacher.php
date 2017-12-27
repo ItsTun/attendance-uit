@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subject_Teacher extends Model
 {
-    protected $table = "subject_teacher";
+    protected $table = "subject_class_teacher";
 
     public function subject_class() {
     	return $this->belongsTo(Subject_Class::class, 'subject_class_id');
