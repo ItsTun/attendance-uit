@@ -7,6 +7,7 @@ use App\Teacher;
 use App\Student;
 use App\Utils;
 use App\Period_Attendance;
+use App\Open_Period;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -39,35 +40,60 @@ class TeacherController extends Controller
         return view('teacher.timetable')->with($with);
     }
 
-    public function addAttendance($period_ids) {
-        $date = Input::get('date');
-        $periods = explode(',', $period_ids);
+    private function check($date, $periods) {
         if(Utils::validateDate($date)) {
-            if(Period::checkPeriodsAreTaughtByCurrentTeacher($periods)){
-            if(Period::checkPeriodsAreOfSameSubjectAndClass($periods)){
+            if(Period::checkIfPeriodsAreTaughtByCurrentTeacher($periods)){
                 if(Utils::checkDateIsEligible($date)){
-                    if(Utils::periodIsInDate($period_ids, $date)) {
-                        $students = Student::getStudentsFromPeriod($period_ids);
-                    	return view('teacher.add_attendance')->with(['students'=>$students,'period'=>$period_ids, 'date'=>$date, 
-                            'period_ids' => $periods]);
-                    } else {
-                        return "There is no period with id $period_ids in $date";
+                    foreach($periods as $period) {
+                        if(Utils::periodIsInDate($periods, $date)) {
+                            return null;
+                        } else {
+                            return "There is no period with id $period in $date";
+                        }
                     }
                 } else {
                     return "You can't add attendance for $date. It is either because the date is ahead of current time or the period to add this attendance has expired.";
                 }
             } else {
-                return "Only periods of same subject and class can be added.";
+                return "You can only add attendance for periods you teach.";
             }
-        } else {
-            return "You can only add attendance for periods you teach.";
-        }
         } else {
             return "Invalid date format!";
         }
     }
 
-    public function saveAttendance() {
+    private function getAttendedStudentsFromPeriods($period_ids, $date) {
+        $attendedStudents = null; $students = null;
+        foreach($period_ids as $period_id) {
+            $openPeriod = Open_Period::fetch($period_id, $date);
+            if(!is_null($openPeriod)) $students = $openPeriod->attendedStudents;
+            if (!is_null($students)) {
+                if (is_null($attendedStudents)) $attendedStudents = [];
+
+                $attendedStudents[$period_id. '_student'] = $students;
+            } else {
+                if (!is_null($attendedStudents)) $attendedStudents[$period_id. '_student'] = [];
+            }
+        }
+        return $attendedStudents;
+    }
+
+    public function addAttendance($period_ids) {
+        $date = Input::get('date');
+        $periods = explode(',', $period_ids);
+        $error = $this->check($date, $periods);
+        $periodObjects = Period::find($periods);
+        $numberOfPeriods = Period::getUniquePeriodNumber($periods);
+        if(is_null($error)) {
+            $students = Student::getStudentsFromPeriod($periods);
+        	return view('teacher.add_attendance')->with(['students'=>$students,'periods'=> $periods, 'date'=>$date, 
+                'periodObjects' => $periodObjects, 'numberOfPeriods'=>$numberOfPeriods, 'attendedStudents' => $this->getAttendedStudentsFromPeriods($periods, $date)]);
+        } else {
+            return $error;
+        }
+    }
+
+    public function updateAttendance() {
         $date = Input::get('date');
         $presentStudents = [];
         $periods = Input::get('period');
@@ -76,11 +102,36 @@ class TeacherController extends Controller
 
         foreach($period_ids as $period_id) {
             $key = $period_id . '_student';
-            $presentStudents[$key] = Input::post($key);
+            $students = Input::post($key);
+            $presentStudents[$key] = (is_null($students))?[]:$students;
         }
 
-        Period_Attendance::saveAttendance($period_ids, $date, $presentStudents);
+        Period_Attendance::updateAttendance($period_ids, $date, $presentStudents);
 
-        return redirect()->action('TeacherController@timetable', ['msg_code' => '1']);
+        return redirect()->action('TeacherController@timetable', ['msg_code' => '2']);
+    }
+
+    public function saveOrEditAttendance() {
+        $date = Input::get('date');
+        $presentStudents = [];
+        $periods = Input::get('period');
+
+        $period_ids = explode(',', $periods);
+
+        foreach($period_ids as $period_id) {
+            $key = $period_id . '_student';
+            $students = Input::post($key);
+            $presentStudents[$key] = (is_null($students))?[]:$students;
+        }
+
+        $isUpdate = !is_null($this->getAttendedStudentsFromPeriods($period_ids, $date));
+
+        if(!$isUpdate) {
+            Period_Attendance::saveAttendance($period_ids, $date, $presentStudents);
+        } else {
+            Period_Attendance::updateAttendance($period_ids, $date, $presentStudents);
+        }
+
+        return redirect()->action('TeacherController@timetable', ['msg_code' => ($isUpdate) ? '2' : '1']);
     }
 }

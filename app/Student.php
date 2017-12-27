@@ -17,12 +17,13 @@ class Student extends Model
     	return $this->belongsTo(Klass::class, 'class_id', 'class_id');
     }
 
-    public static function getStudentsFromPeriod($period_id) {
+    public static function getStudentsFromPeriod($period_ids) {
         return DB::table('periods')
             ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
             ->join('students', 'students.class_id', '=', 'subject_class.class_id')
-            ->where('periods.period_id', $period_id)
+            ->orWhereIn('periods.period_id', $period_ids)
             ->select('students.*')
+            ->distinct()
             ->get();
     }
 
