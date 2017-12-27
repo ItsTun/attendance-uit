@@ -35,30 +35,18 @@ class AttendancesController extends Controller
 
     public function update() {
         $date = Input::get('date');
-        $presentStudents = Input::get('student');
+        $presentStudents = [];
         $periods = Input::get('period');
 
-        $periodAry = explode(',', $periods);
+        $period_ids = explode(',', $periods);
 
-        $presentStudentsAry = explode(',', $presentStudents);
-
-        $date = strtotime($date);
-        $date = date('Y-m-d', $date);
-
-        foreach ($periodAry as $periodId) {    
-            $openPeriod = Open_Period::where('date', $date)
-                        ->where('period_id', $periodId)
-                        ->first();
-
-            foreach ($openPeriod->attendStudents as $periodAttendance) {
-
-                $rollNo = $periodAttendance['roll_no'];
-                
-                $periodAttendance->present = in_array($rollNo, $presentStudentsAry);
-                $periodAttendance->save();
-
-            }
+        foreach ($period_ids as $period_id) {
+            $key = $period_id . '_student';
+            $students = Input::get($key);
+            $presentStudents[$key] = explode(',', $students);
         }
+
+        Period_Attendance::updateAttendance($period_ids, $date, $presentStudents);
 
         return response('Successfully updated!');
     }

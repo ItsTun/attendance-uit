@@ -111,13 +111,28 @@ class Period_Attendance extends Model
                 $periodAttendance->open_period_id = $openPeriodId;
                 $periodAttendance->present = in_array($rollNo, $presentStudents[$periodId . '_student']);
                 $periodAttendance->save();
+
+                $studentAttendance = Period_Attendance::getStudentAttendance($rollNo);
+                Attendance::updateStudentAttendance($rollNo, $studentAttendance);
             }
         }
+    }
 
-        foreach ($students as $value) {
-            $rollNo = $value['roll_no'];
-            $studentAttendance = Period_Attendance::getStudentAttendance($rollNo);
-            Attendance::updateStudentAttendance($rollNo, $studentAttendance);
+    public static function updateAttendance($period_ids, $date, $presentStudents) {
+        foreach ($period_ids as $periodId) {
+            $openPeriod = Open_Period::where('date', $date)
+                ->where('period_id', $periodId)
+                ->first();
+
+            foreach ($openPeriod->attendStudents as $periodAttendance) {
+                $rollNo = $periodAttendance['roll_no'];
+
+                $periodAttendance->present = in_array($rollNo, $presentStudents[$periodId . '_student']);
+                $periodAttendance->save();
+
+                $studentAttendance = Period_Attendance::getStudentAttendance($rollNo);
+                Attendance::updateStudentAttendance($rollNo, $studentAttendance);
+            }
         }
     }
 
@@ -139,19 +154,5 @@ class Period_Attendance extends Model
                     DB::raw('SUM(period_attendance.present)/COUNT(open_periods.open_period_id) * 100 as percent'))
             ->groupby('subjects.subject_id')
             ->get();
-    }
-
-    public static function updateAttendance($period_ids, $date, $presentStudents) {
-        foreach ($period_ids as $periodId) {
-            $openPeriod = Open_Period::where('date', $date)
-                ->where('period_id', $periodId)
-                ->first();
-
-            foreach ($openPeriod->attendStudents as $periodAttendance) {
-                $rollNo = $periodAttendance['roll_no'];
-                $periodAttendance->present = in_array($rollNo, $presentStudents[$periodId . '_student']);
-                $periodAttendance->save();
-            }
-        }
     }
 }
