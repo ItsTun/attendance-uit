@@ -61,7 +61,7 @@ class AttendancesController extends Controller
 
         // if attendance is already called
         if ($openPeriod) {
-            $attendStudents = $openPeriod->attendStudents()->orderByRaw('LENGTH(roll_no) ASC, roll_no ASC')->get();
+            $attendStudents = $openPeriod->attendedStudents()->orderByRaw('LENGTH(roll_no) ASC, roll_no ASC')->get();
 
             $responseAry = array();
 

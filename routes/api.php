@@ -33,3 +33,5 @@ Route::get('/v1/timetables/{class_id}', 'PeriodsController@timetable');
 
 Route::get('/v1/students/{student}', 'StudentsController@show');
 Route::get('/v1/students/email/{email}', 'StudentsController@findByEmail');
+
+Route::get('/v1/logs', 'InternalLogController@index');
