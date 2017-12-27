@@ -19,6 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/v1/attendance', 'AttendancesController@store');
 Route::put('/v1/attendance', 'AttendancesController@update');
+Route::get('/v1/attendance/{student}', 'AttendancesController@getStudentAttendance');
 Route::get('/v1/attendance/{date}/student-list', 'AttendancesController@index');
 Route::get('/v1/attendance/{roll_no}/detail', 'AttendancesController@detail');
 Route::get('/v1/attendance/{roll_no}/totalabsence', 'AttendancesController@totalAbsence');
