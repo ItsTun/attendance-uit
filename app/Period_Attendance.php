@@ -126,6 +126,7 @@ class Period_Attendance extends Model
                 ->where('period_id', $periodId)
                 ->first();
 
+
             $log = new InternalLog();
             $log->old_value = $openPeriod->attendedStudents;
             $log->by_user = 1;  // add user_id here
@@ -133,7 +134,7 @@ class Period_Attendance extends Model
             $log->action = 'EDIT';
             $log->message = 'EDIT blah blah blah...';
             $log->save();
-
+            
             foreach ($openPeriod->attendedStudents as $periodAttendance) {
                 $rollNo = $periodAttendance['roll_no'];
 
