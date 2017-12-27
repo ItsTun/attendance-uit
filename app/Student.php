@@ -27,6 +27,10 @@ class Student extends Model
             ->get();
     }
 
+    public static function getStudentsFromClass($class_id) {
+        return Student::where('class_id', $class_id)->get();
+    }
+
     public function scopeEmail($query, $email) {
         return $query->where('email', '=',$email);
     }
