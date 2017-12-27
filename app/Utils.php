@@ -37,4 +37,18 @@ class Utils {
 		}
 		return $dates;
 	}
+
+	public static function getDate($date) {
+		if ($date != null) {
+    		$date = strtotime($date);
+    		$date = date('Y-m-d', $date);
+    	} else {
+    		$date = date('Y-m-d');
+    	}
+    	return $date;
+	}
+
+	public static function getCurrentDateTime() {
+		return date('Y-m-d h:m:s');
+	}
 }

@@ -18,6 +18,10 @@ class Klass extends Model
 		return $this->hasMany(Subject_Class::class, 'class_id');
 	}
 
+	public function year() {
+		return $this->belongsTo(Year::class, 'year_id');
+	}
+
 	public static function getClassFromPeriod($period_id) {
 		return DB::table('periods')
             ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')

@@ -115,6 +115,8 @@ class Period_Attendance extends Model
                 $studentAttendance = Period_Attendance::getStudentAttendance($rollNo);
                 Attendance::updateStudentAttendance($rollNo, $studentAttendance);
             }
+
+            InternalLog::addLog('ADD', 'Add blah blah blah...', $openPeriod->attendedStudents, null, Utils::getCurrentDateTime(), 1); // change user_id
         }
     }
 
@@ -124,7 +126,15 @@ class Period_Attendance extends Model
                 ->where('period_id', $periodId)
                 ->first();
 
-            foreach ($openPeriod->attendStudents as $periodAttendance) {
+            $log = new InternalLog();
+            $log->old_value = $openPeriod->attendedStudents;
+            $log->by_user = 1;  // add user_id here
+            $log->created_at = Utils::getCurrentDateTime();
+            $log->action = 'EDIT';
+            $log->message = 'EDIT blah blah blah...';
+            $log->save();
+
+            foreach ($openPeriod->attendedStudents as $periodAttendance) {
                 $rollNo = $periodAttendance['roll_no'];
 
                 $periodAttendance->present = in_array($rollNo, $presentStudents[$periodId . '_student']);
@@ -133,6 +143,9 @@ class Period_Attendance extends Model
                 $studentAttendance = Period_Attendance::getStudentAttendance($rollNo);
                 Attendance::updateStudentAttendance($rollNo, $studentAttendance);
             }
+
+            $log->new_value = $openPeriod->attendedStudents;
+            $log->save();
         }
     }
 
