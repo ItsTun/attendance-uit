@@ -18,6 +18,7 @@ Add Attendance
 			<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12" style="background-color: white; padding: 0px !important; margin-left: 15px; margin-bottom: 15px;">
 				<table class="table">
 					<tr>
+						@php $index =0; @endphp
 						<th>Student</th>
 						@if( $numberOfPeriods > 1)
 							@for ($i = 1; $i <=$numberOfPeriods; $i++)
@@ -26,7 +27,6 @@ Add Attendance
 						@endif
 					</tr>
 					@foreach($students as $student)
-
 					<tr>
 						<td>
 							<b>{{ $student->roll_no }}</b><br />
@@ -36,7 +36,19 @@ Add Attendance
 								@if($periodObjects[$i]->subject_class->class_id == $student->class_id)
 									<td align="center">
 										<div class="custom-checkbox">
-											<input type="checkbox" name="{{ $periodObjects[$i]->period_id }}_student[]" id="{{ $periodObjects[$i]->period_id }}_{{ $student->roll_no }}" value="{{ $student->roll_no }}"/>
+											<input type="checkbox" name="{{ $periodObjects[$i]->period_id }}_student[]" 
+											id="{{ $periodObjects[$i]->period_id }}_{{ $student->roll_no }}" 
+											value="{{ $student->roll_no }}"
+											@php
+												if(!is_null($attendedStudents)) {
+													$tempStudents = $attendedStudents[$periodObjects[$i]->period_id.'_student'];
+													$tempStudents = $tempStudents->toArray();
+													$roll_nos = array_column($tempStudents, 'roll_no');
+													$index = array_search($student->roll_no, $roll_nos);
+													if(is_int($index) && $tempStudents[$index]['present'] == 1) echo "checked";
+												}
+											@endphp
+											/>
 											<label for="{{ $periodObjects[$i]->period_id }}_{{ $student->roll_no }}"></label>
 										</div>
 									</td>

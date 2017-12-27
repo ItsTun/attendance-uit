@@ -6,7 +6,7 @@ Route::group(['middleware' => ['teacher', 'web']], function () {
 	Route::get('timetable', 'TeacherController@timetable')->name('timetable');
 	Route::get('students', 'TeacherController@studentAttendance')->name('students_attendance');
 	Route::get('add/{period_id}', 'TeacherController@addAttendance');
-	Route::post('add/{period_id}', 'TeacherController@saveAttendance');
+	Route::post('add/{period_id}', 'TeacherController@saveOrEditAttendance');
 	Route::get('logout', 'Auth\TeacherLoginController@logout');
 });
 

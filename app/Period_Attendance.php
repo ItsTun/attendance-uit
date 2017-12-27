@@ -123,7 +123,7 @@ class Period_Attendance extends Model
                 ->where('period_id', $periodId)
                 ->first();
 
-            foreach ($openPeriod->attendStudents as $periodAttendance) {
+            foreach ($openPeriod->attendedStudents as $periodAttendance) {
                 $rollNo = $periodAttendance['roll_no'];
                 $periodAttendance->present = in_array($rollNo, $presentStudents[$periodId . '_student']);
                 $periodAttendance->save();

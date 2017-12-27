@@ -12,7 +12,7 @@ class Open_Period extends Model
 	protected $fillable = ['date', 'period_id'];
 	protected $primaryKey = "open_period_id";
 
-	public function attendStudents() {
+	public function attendedStudents() {
 		return $this->hasMany(Period_Attendance::class, 'open_period_id');
 	}
 

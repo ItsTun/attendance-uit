@@ -7,6 +7,7 @@ use App\Teacher;
 use App\Student;
 use App\Utils;
 use App\Period_Attendance;
+use App\Open_Period;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -61,6 +62,22 @@ class TeacherController extends Controller
         }
     }
 
+    private function getAttendedStudentsFromPeriods($period_ids, $date) {
+        $attendedStudents = null; $students = null;
+        foreach($period_ids as $period_id) {
+            $openPeriod = Open_Period::fetch($period_id, $date);
+            if(!is_null($openPeriod)) $students = $openPeriod->attendedStudents;
+            if (!is_null($students)) {
+                if (is_null($attendedStudents)) $attendedStudents = [];
+
+                $attendedStudents[$period_id. '_student'] = $students;
+            } else {
+                if (!is_null($attendedStudents)) $attendedStudents[$period_id. '_student'] = [];
+            }
+        }
+        return $attendedStudents;
+    }
+
     public function addAttendance($period_ids) {
         $date = Input::get('date');
         $periods = explode(',', $period_ids);
@@ -70,7 +87,7 @@ class TeacherController extends Controller
         if(is_null($error)) {
             $students = Student::getStudentsFromPeriod($periods);
         	return view('teacher.add_attendance')->with(['students'=>$students,'periods'=> $periods, 'date'=>$date, 
-                'periodObjects' => $periodObjects, 'numberOfPeriods'=>$numberOfPeriods]);
+                'periodObjects' => $periodObjects, 'numberOfPeriods'=>$numberOfPeriods, 'attendedStudents' => $this->getAttendedStudentsFromPeriods($periods, $date)]);
         } else {
             return $error;
         }
@@ -94,7 +111,7 @@ class TeacherController extends Controller
         return redirect()->action('TeacherController@timetable', ['msg_code' => '2']);
     }
 
-    public function saveAttendance() {
+    public function saveOrEditAttendance() {
         $date = Input::get('date');
         $presentStudents = [];
         $periods = Input::get('period');
@@ -107,8 +124,14 @@ class TeacherController extends Controller
             $presentStudents[$key] = (is_null($students))?[]:$students;
         }
 
-        Period_Attendance::saveAttendance($period_ids, $date, $presentStudents);
+        $isUpdate = !is_null($this->getAttendedStudentsFromPeriods($period_ids, $date));
 
-        return redirect()->action('TeacherController@timetable', ['msg_code' => '1']);
+        if(!$isUpdate) {
+            Period_Attendance::saveAttendance($period_ids, $date, $presentStudents);
+        } else {
+            Period_Attendance::updateAttendance($period_ids, $date, $presentStudents);
+        }
+
+        return redirect()->action('TeacherController@timetable', ['msg_code' => ($isUpdate) ? '2' : '1']);
     }
 }
