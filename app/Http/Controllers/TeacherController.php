@@ -8,6 +8,8 @@ use App\Student;
 use App\Utils;
 use App\Period_Attendance;
 use App\Open_Period;
+use App\Attendance;
+use App\Klass;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -38,6 +40,22 @@ class TeacherController extends Controller
         $with['msgCode'] = (!is_null($msgCode)) ? $msgCode : 0;
 
         return view('teacher.timetable')->with($with);
+    }
+
+    public function studentAttendance() {
+        $teacher_id = Teacher::where('email', Auth::user()->email)->first()->teacher_id;
+        $classes = Klass::getClassesOfTeacher($teacher_id);
+
+        $klass = Input::get('class');
+        $subject = Input::get('subject');
+
+        $attendances = [];
+
+        if (!is_null($klass) && !is_null($subject)) {
+            $attendances = Attendance::getAttendanceForSubject($klass, $subject);
+        }
+
+        return view('teacher.student_attendance')->with(['klasses'=> $classes, 'attendances'=> $attendances]);
     }
 
     private function check($date, $periods) {
@@ -93,24 +111,6 @@ class TeacherController extends Controller
         }
     }
 
-    public function updateAttendance() {
-        $date = Input::get('date');
-        $presentStudents = [];
-        $periods = Input::get('period');
-
-        $period_ids = explode(',', $periods);
-
-        foreach($period_ids as $period_id) {
-            $key = $period_id . '_student';
-            $students = Input::post($key);
-            $presentStudents[$key] = (is_null($students))?[]:$students;
-        }
-
-        Period_Attendance::updateAttendance($period_ids, $date, $presentStudents);
-
-        return redirect()->action('TeacherController@timetable', ['msg_code' => '2']);
-    }
-
     public function saveOrEditAttendance() {
         $date = Input::get('date');
         $presentStudents = [];
@@ -118,20 +118,26 @@ class TeacherController extends Controller
 
         $period_ids = explode(',', $periods);
 
-        foreach($period_ids as $period_id) {
-            $key = $period_id . '_student';
-            $students = Input::post($key);
-            $presentStudents[$key] = (is_null($students))?[]:$students;
-        }
+        $error = $this->check($date, $periods);
 
-        $isUpdate = !is_null($this->getAttendedStudentsFromPeriods($period_ids, $date));
+        if (is_null($error)) {
+            foreach($period_ids as $period_id) {
+                $key = $period_id . '_student';
+                $students = Input::post($key);
+                $presentStudents[$key] = (is_null($students))?[]:$students;
+            }
 
-        if(!$isUpdate) {
-            Period_Attendance::saveAttendance($period_ids, $date, $presentStudents);
+            $isUpdate = !is_null($this->getAttendedStudentsFromPeriods($period_ids, $date));
+
+            if(!$isUpdate) {
+                Period_Attendance::saveAttendance($period_ids, $date, $presentStudents);
+            } else {
+                Period_Attendance::updateAttendance($period_ids, $date, $presentStudents);
+            }
+
+            return redirect()->action('TeacherController@timetable', ['msg_code' => ($isUpdate) ? '2' : '1']);
         } else {
-            Period_Attendance::updateAttendance($period_ids, $date, $presentStudents);
+            return $error;
         }
-
-        return redirect()->action('TeacherController@timetable', ['msg_code' => ($isUpdate) ? '2' : '1']);
     }
 }
