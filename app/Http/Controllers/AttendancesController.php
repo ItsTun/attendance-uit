@@ -12,6 +12,7 @@ use App\Period_Attendance;
 use App\Period;
 use App\Klass;
 use App\Attendance;
+use App\Utils;
 
 class AttendancesController extends Controller
 {
@@ -173,44 +174,26 @@ class AttendancesController extends Controller
     public function dailyDetail(Request $request, Student $student) {
         $date = $request->date;
 
-        $date = strtotime($date);
-        $dayOfWeek = date('w', $date);
-        $month = date('m', $date);
-        $date = date('Y-m-d', $date);
+        $date = Utils::getDate($date);
 
-        $results = Period_Attendance::getDailyDetail($student, $date, $dayOfWeek);
+        $results = Period_Attendance::getDailyDetail($student, $date);
 
         if (!$results) return response('No data!');
 
-        $totalAbsenceResults = Period_Attendance::getTotalAbsence($student->roll_no, $month);
-
-        if (!$totalAbsenceResults) return response('No data!');
-
-        foreach ($totalAbsenceResults as $value) {
-            $totalAbsence[$value->subject_code] = $value->total_absence;
-        }
+        $response = [];
 
         foreach ($results as $key => $value) {
             $info['period_id'] = $value->period_id;
             $info['subject_code'] = $value->subject_code;
             $info['subject_name'] = $value->name;
+            $info['period_num'] = $value->period_num;
+            $info['room'] = $value->room;
+            $info['start_time'] = $value->start_time;
+            $info['end_time'] = $value->end_time;
+            $info['day'] = $value->day;
             $info['present'] = $value->present;
-            $info['total_absence'] = $totalAbsence[$value->subject_code];
 
             $response[$value->period_num] = $info;
-        }
-
-        $periodResults = Period::getTimetable($student->class_id, $dayOfWeek);
-
-        if (!$periodResults) return response('No data!');
-
-        foreach ($periodResults as $value) {
-
-            $response[$value->period_num]['subject_code'] = $value->subject_code;
-            $response[$value->period_num]['duration'] = $value->duration;
-            $response[$value->period_num]['room'] = $value->room;
-            $response[$value->period_num]['teacher_name'] = $value->teacher_name;
-
         }
 
         return response($response);
