@@ -31,11 +31,27 @@ class Utils {
 	public static function getDatesInThisWeek() {
 		$dates = [];
 		for($i = 0; $i < 5; $i++) {
-			$date = strtotime($i.' day', strtotime('monday this week'));
+			$day = date('N');
+			$date = strtotime($i.' day', ($day != 6 && $day != 7) ? strtotime('monday this week') : strtotime('next monday'));
 			$date = date('Y-m-d', $date);
 			array_push($dates, $date);
 		}
+
 		return $dates;
+	}
+
+	public static function getDefaultDate() {
+		$day = date('N');
+		$date = '';
+		if($day != 6 && $day != 7) {
+			$date = date('Y-m-d');
+		}
+		else {
+			$date = strtotime('next monday');
+			$date = date('Y-m-d', $date);
+		}
+
+		return $date;
 	}
 
 	public static function getDate($date) {

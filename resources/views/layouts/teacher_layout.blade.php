@@ -95,10 +95,11 @@
                 <!-- End Sidebar navigation -->
             </div>
             <!-- End Sidebar scroll-->
-            <!-- Bottom points-->
             <div class="sidebar-footer">
-                
+                <a href="logout" class="link" data-toggle="tooltip" title="Logout"><i class="mdi mdi-power"></i></a>
             </div>
+            <!-- Bottom points-->
+            
             <!-- End Bottom points-->
         </aside>
         <!-- ============================================================== -->

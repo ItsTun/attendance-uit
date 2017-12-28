@@ -16,4 +16,8 @@ class Subject_Class extends Model
     public function klass() {
     	return $this->belongsTo(Klass::class, 'class_id');
     }
+
+    public static function getSubjectClass($subject_id, $class_id) {
+    	return Subject_Class::where('subject_id', $subject_id)->where('class_id', $class_id)->first();
+    }
 }

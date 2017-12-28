@@ -6,6 +6,7 @@ use App\Period;
 use App\Teacher;
 use App\Student;
 use App\Utils;
+use App\Subject_Class_Teacher;
 use App\Period_Attendance;
 use App\Open_Period;
 use App\Attendance;
@@ -32,18 +33,20 @@ class TeacherController extends Controller
             return "Invalid date format!";
         }
 
-    	$teacher_id = Teacher::where('email', Auth::user()->email)->first()->teacher_id;
-    	$timetable = $period->getTeacherTimetable($teacher_id, (!is_null($date)) ? Utils::getDayFromDate($date) : date('N'));
+    	$teacher_id = Teacher::getCurrentTeacher()->teacher_id;
+        $currentDay = date('N');
+    	$timetable = $period->getTeacherTimetable($teacher_id, 
+            (!is_null($date)) ? Utils::getDayFromDate($date) : ($currentDay != 6 && $currentDay != 7) ? $currentDay : 1);
 
         $with = ['timetables' => $timetable, 'dates' => Utils::getDatesInThisWeek()];
-        $with['selectedDate'] = (!is_null($date)) ? $date : date("Y-m-d");
+        $with['selectedDate'] = (!is_null($date)) ? $date : Utils::getDefaultDate();
         $with['msgCode'] = (!is_null($msgCode)) ? $msgCode : 0;
 
         return view('teacher.timetable')->with($with);
     }
 
     public function studentAttendance() {
-        $teacher_id = Teacher::where('email', Auth::user()->email)->first()->teacher_id;
+        $teacher_id = Teacher::getCurrentTeacher()->teacher_id;
         $classes = Klass::getClassesOfTeacher($teacher_id);
 
         $klass = Input::get('class');
@@ -52,10 +55,14 @@ class TeacherController extends Controller
         $attendances = [];
 
         if (!is_null($klass) && !is_null($subject)) {
-            $attendances = Attendance::getAttendanceForSubject($klass, $subject);
+            if(Subject_Class_Teacher::checkIfSubjectClassIsOfTeacher($subject, $klass, $teacher_id))
+                $attendances = Attendance::getAttendanceForSubject($klass, $subject);
+            else
+                return "You can only check attendance of subjects you teach.";
         }
 
-        return view('teacher.student_attendance')->with(['klasses'=> $classes, 'attendances'=> $attendances]);
+        return view('teacher.student_attendance')->with(['klasses'=> $classes, 'attendances'=> $attendances, 'class_id' => ($klass)?$klass:0, 
+            'subject_id' => ($subject)?$subject:0]);
     }
 
     private function check($date, $periods) {
@@ -87,7 +94,6 @@ class TeacherController extends Controller
             if(!is_null($openPeriod)) $students = $openPeriod->attendedStudents;
             if (!is_null($students)) {
                 if (is_null($attendedStudents)) $attendedStudents = [];
-
                 $attendedStudents[$period_id. '_student'] = $students;
             } else {
                 if (!is_null($attendedStudents)) $attendedStudents[$period_id. '_student'] = [];

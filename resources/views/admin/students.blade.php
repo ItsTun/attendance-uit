@@ -9,14 +9,14 @@
     <div class="card-block">
         <div class="container">
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <div class="form-group form-material">
                         <label class="col-md-12">Search By Name</label>
                         <div class="container">
                             <div class="row">
-                                <div class="col-sm-8">
+                                <div class="col-sm-9" style="padding-right: 0px;">
                                     <input class="form-control form-control-line" type="text"></div>
-                                <div class="col-sm-4">
+                                <div class="col-sm-2" style="padding-left: 0px;">
                                     <button class="btn btn-success">Search</button></div>
                             </div>
                         </div>
@@ -37,10 +37,10 @@
                     </div>
                 </div>
                 
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="form-material">
-                        <div style="padding: 20px 0px 0px 35px;">
-                            <button class="btn btn-lg btn-success" data-toggle="modal" data-target="#addStudent">Add Student</button>
+                        <div style="padding: 20px 0px 0px 60px;">
+                            <button class="btn btn-lg btn-success" data-toggle="modal" data-target="#addStudent">Add New Student</button>
                         </div>
                     </div>
                 </div>

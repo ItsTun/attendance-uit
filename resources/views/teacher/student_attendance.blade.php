@@ -11,19 +11,13 @@ Add Attendance
 	@php $years = []; $yearKlasses = []; $classSubjects = [];@endphp
 	@foreach($klasses as $klass)
 		@php 
-			$tempKlass = [];
-			$tempKlass[$klass->class_id] = $klass->name;
-			
 			$years[$klass->year_name] = $klass->year_id;
 
-			$tempSubject = [];
-			$tempSubject[$klass->subject_id] = $klass->subject_name;
-
 			if(!array_key_exists($klass->year_id, $yearKlasses)) $yearKlasses[$klass->year_id] = [];
-			array_push($yearKlasses[$klass->year_id], $tempKlass); 
+			$yearKlasses[$klass->year_id][$klass->class_id] = $klass->name; 
 
 			if(!array_key_exists($klass->class_id, $classSubjects)) $classSubjects[$klass->class_id] = [];
-			array_push($classSubjects[$klass->class_id], $tempSubject); 
+			$classSubjects[$klass->class_id][$klass->subject_id] = $klass->subject_name; 
 		@endphp
 	@endforeach
 	<div class="container-fluid">
@@ -51,7 +45,7 @@ Add Attendance
 				</div>
 			</div>
 			<div class="row" style="margin-left: 1px;">
-				@if(!is_null($attendances))
+				@if(!is_null($attendances) && count($attendances) > 0)
 					<div class="card col-md-4" style="margin-top: 15px;">
 						<table class="table">
 							<tr>
@@ -74,6 +68,8 @@ Add Attendance
 		years = @php echo json_encode($years); @endphp;
 		yearKlasses = @php echo json_encode($yearKlasses); @endphp;
 		classSubjects = @php echo json_encode($classSubjects); @endphp;
+		class_id = @php echo $class_id; @endphp;
+		subject_id = @php echo $subject_id; @endphp;
 
 		var btn_get, yearSelect, classSelect, subjectSelect;
 
@@ -83,7 +79,28 @@ Add Attendance
 			classSelect = document.getElementById('klasses');
 			subjectSelect = document.getElementById('subjects');
 			onYearChange();
+
+			year_id = -1;
+			
+			for(var key in yearKlasses) {
+				for(var c_id in yearKlasses[key]) {
+					if(c_id == class_id) {
+						year_id = key;
+						break;
+					}
+				}
+				if(year_id != -1) break;
+			}
+
+			if(class_id != '0') { chooseSelected(year_id, class_id, subject_id); }
 		});
+
+
+		function chooseSelected(year_id, class_id, subject_id) {
+			yearSelect.selectedIndex = yearSelect.querySelector("option[value='"+ year_id +"']").index;
+			classSelect.selectedIndex = classSelect.querySelector("option[value='"+ class_id +"']").index;
+			subjectSelect.selectedIndex = subjectSelect.querySelector("option[value='"+ subject_id +"']").index;
+		}
 
 		function onYearChange() {
 			var yearValue = yearSelect.options[yearSelect.selectedIndex].value;
@@ -95,10 +112,8 @@ Add Attendance
 
 			for (var key in klassesArr) {
 			 	var opt = document.createElement('option');
-			    for (var innerKey in klassesArr[key]) {
-			    	opt.value = innerKey;
-			    	opt.innerHTML = klassesArr[key][innerKey];
-			    }
+		    	opt.value = key;
+		    	opt.innerHTML = klassesArr[key];
 			    classSelect.appendChild(opt);   
 			}
 
@@ -115,11 +130,8 @@ Add Attendance
 
 			for (var key in subjectArr) {
 			 	var opt = document.createElement('option');
-			 	console.log(subjectArr[key]);
-			    for (var innerKey in subjectArr[key]) {
-			    	opt.value = innerKey;
-			    	opt.innerHTML = subjectArr[key][innerKey];
-			    }
+		    	opt.value = key;
+		    	opt.innerHTML = subjectArr[key];
 			    subjectSelect.appendChild(opt);   
 			}
 
