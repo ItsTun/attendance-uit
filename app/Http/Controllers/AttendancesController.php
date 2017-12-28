@@ -216,4 +216,7 @@ class AttendancesController extends Controller
         return response($response);
     }
 
+    public function getStudentAttendance(Student $student) {
+        return response(Attendance::show($student->roll_no));
+    }
 }

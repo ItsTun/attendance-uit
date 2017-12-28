@@ -166,7 +166,7 @@ class Period_Attendance extends Model
                     DB::raw('COUNT(open_periods.open_period_id) as total_periods'), 
                     DB::raw('SUM(period_attendance.present) as attended_periods'), 
                     DB::raw('SUM(period_attendance.present)/COUNT(open_periods.open_period_id) * 100 as percent'))
-            ->groupby('subjects.subject_id')
+            ->groupby('subjects.subject_id', 'subjects.subject_code')
             ->get();
     }
 }
