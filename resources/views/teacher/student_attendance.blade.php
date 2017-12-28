@@ -68,6 +68,8 @@ Add Attendance
 		years = @php echo json_encode($years); @endphp;
 		yearKlasses = @php echo json_encode($yearKlasses); @endphp;
 		classSubjects = @php echo json_encode($classSubjects); @endphp;
+		class_id = @php echo $class_id; @endphp;
+		subject_id = @php echo $subject_id; @endphp;
 
 		var btn_get, yearSelect, classSelect, subjectSelect;
 
@@ -81,8 +83,8 @@ Add Attendance
 			year_id = -1;
 			
 			for(var key in yearKlasses) {
-				for(var class_id in yearKlasses[key]) {
-					if(class_id == {{ $class_id }}) {
+				for(var c_id in yearKlasses[key]) {
+					if(c_id == class_id) {
 						year_id = key;
 						break;
 					}
@@ -90,7 +92,7 @@ Add Attendance
 				if(year_id != -1) break;
 			}
 
-			chooseSelected(year_id, {{ $class_id }}, {{ $subject_id }});
+			if(class_id != '0') { chooseSelected(year_id, class_id, subject_id); }
 		});
 
 

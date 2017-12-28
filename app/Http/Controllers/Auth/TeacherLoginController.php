@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Teacher;
 use App\User;
+use App\Utils;
 
 class TeacherLoginController extends Controller
 {
@@ -80,7 +81,7 @@ class TeacherLoginController extends Controller
 
             Auth::loginUsingId($user->id);
 
-            return redirect('teacher/timetable');
+            return redirect('teacher/timetable?date='.Utils::getDefaultDate());
         } else {
             return "Your email is currently not in our database. If you are a teacher at UIT, you contact admin to register.";
         }

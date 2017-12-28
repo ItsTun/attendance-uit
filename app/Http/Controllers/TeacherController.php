@@ -34,10 +34,12 @@ class TeacherController extends Controller
         }
 
     	$teacher_id = Teacher::getCurrentTeacher()->teacher_id;
-    	$timetable = $period->getTeacherTimetable($teacher_id, (!is_null($date)) ? Utils::getDayFromDate($date) : date('N'));
+        $currentDay = date('N');
+    	$timetable = $period->getTeacherTimetable($teacher_id, 
+            (!is_null($date)) ? Utils::getDayFromDate($date) : ($currentDay != 6 && $currentDay != 7) ? $currentDay : 1);
 
         $with = ['timetables' => $timetable, 'dates' => Utils::getDatesInThisWeek()];
-        $with['selectedDate'] = (!is_null($date)) ? $date : date("Y-m-d");
+        $with['selectedDate'] = (!is_null($date)) ? $date : Utils::getDefaultDate();
         $with['msgCode'] = (!is_null($msgCode)) ? $msgCode : 0;
 
         return view('teacher.timetable')->with($with);
@@ -59,8 +61,8 @@ class TeacherController extends Controller
                 return "You can only check attendance of subjects you teach.";
         }
 
-        return view('teacher.student_attendance')->with(['klasses'=> $classes, 'attendances'=> $attendances, 'class_id' => $klass, 
-            'subject_id' => $subject]);
+        return view('teacher.student_attendance')->with(['klasses'=> $classes, 'attendances'=> $attendances, 'class_id' => ($klass)?$klass:0, 
+            'subject_id' => ($subject)?$subject:0]);
     }
 
     private function check($date, $periods) {
