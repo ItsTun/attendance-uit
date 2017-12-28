@@ -25,8 +25,8 @@
                 
                 <div class="col-md-6">
                     <div class="form-material">
-                        <div style="padding: 20px 0px 0px 60px;">
-                            <button class="btn btn-lg btn-success" data-toggle="modal" data-target="#addSubjects">Add New Subjects</button>
+                        <div style="padding: 20px 0px 0px 150px;">
+                            <button class="btn btn-lg btn-success" data-toggle="modal" data-target="#addSubjects">Add New Subject</button>
                         </div>
                     </div>
                 </div>
