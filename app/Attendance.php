@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Attendance extends Model
 {
 	public $timestamps = false;
+	public $incrementing = false;
 
 	protected $table = 'attendances';
 	protected $primaryKey = 'student_roll_no';
@@ -22,6 +23,10 @@ class Attendance extends Model
  		$attendance->save();
  	}
 
+ 	public static function show($rollNo) {
+ 		return Attendance::where('student_roll_no', '=', $rollNo)->first();
+ 	}
+ 	
  	public static function getAttendanceForSubject($class_id, $subject_id) {
  		$student = Student::getStudentsFromClass($class_id);
  		$roll_no = array_column($student->toArray(), 'roll_no');

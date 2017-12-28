@@ -10,23 +10,34 @@
 </head>
     
 <div class="card" style="margin: 7px;">
-    <div class="row">
-        <div class="col-md-2" style="padding: 30px 0px 0px 40px;">Group By Teacher</div>
-        <div class="col-md-4" style="padding: 20px 0px 0px 10px;">
-            <div class="form-group form-material" style="padding: 5px;">
-                <select class="form-control form-control-line" id="selectfaculty">
-                    <option value="0">Select Faculty</option>
-                    <option value="1">2</option>
-                    <option value="2">3</option>
-                </select>
+    <div class="card-block">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group form-material">
+                        <label class="col-md-12">Group By Faculty</label>
+                            <div class="col-md-12">
+                                <select class="form-control form-control-line">
+                                    <option>Select Faculty</option>
+                                    <option>Select Faculty</option>
+                                    <option>Select Faculty</option>
+                                </select>
+                            </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-material">
+                        <div style="padding: 20px 0px 0px 150px;">
+                            <button class="btn btn-lg btn-success" data-toggle="modal" data-target="#addTeacher">Add New Teacher</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <div class="col-md" style="padding: 20px 0px 0px 250px;">
-            <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#addTeacher">Add Teacher</button>
         </div>
     </div>
 </div>
+
 
 
 <div class="card" style="margin: 7px;">
@@ -92,7 +103,7 @@
     <!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Add Teacher</h4>
+        <h4 class="modal-title">Add New Teacher</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
