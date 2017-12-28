@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class Teacher extends Model
 {
@@ -36,6 +37,10 @@ class Teacher extends Model
             ->orderby('teacher_id')
             ->get();
     }
+
+    public static function getCurrentTeacher() {
+        return Teacher::where('email', Auth::user()->email)->first();
+    }
     
     public function addteacher($name, $email, $faculty_id, $subject_class_ids) {
         $teacher = new Teacher();
@@ -63,11 +68,9 @@ class Teacher extends Model
             ->update(['name' => $name], ['email' => $email], ['faculty_id' => $faculty_id]);
         
         foreach ($subject_class_ids as $subject_class_id){
-        DB::table('subject_class_teacher')
-            ->whereIn('teacher_id',$teacher_id ) 
-            ->update(['subject_class_id' => $subject_class_id])
-        }
-    }
-        
+            DB::table('subject_class_teacher')
+                ->whereIn('teacher_id',$teacher_id ) 
+                ->update(['subject_class_id' => $subject_class_id]);
+            }
     }
 }
