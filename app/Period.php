@@ -25,11 +25,9 @@ class Period extends Model
         return DB::table('periods')
             ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
             ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
-            ->join('subject_teacher', 'subject_teacher.subject_id', '=', 'subjects.subject_id')
-            ->join('teachers', 'teachers.teacher_id', '=', 'subject_teacher.teacher_id')
             ->where('subject_class.class_id', $klassId)
             ->where('periods.day', $day)
-            ->select('periods.period_id', 'subjects.subject_code', 'subjects.name as subject_name', 'periods.duration', 'periods.period_num', 'periods.room', DB::raw('GROUP_CONCAT(teachers.name) teacher_names'), DB::raw('GROUP_CONCAT(teachers.teacher_id) teacher_ids'))
+            ->select('periods.period_id', 'subjects.subject_code', 'subjects.name as subject_name', 'periods.start_time', 'periods.end_time','periods.period_num', 'periods.room')
             ->groupby('periods.period_id')
             ->orderby('periods.period_num')
             ->get();

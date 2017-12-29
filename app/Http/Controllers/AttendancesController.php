@@ -177,21 +177,34 @@ class AttendancesController extends Controller
         $date = Utils::getDate($date);
 
         $results = Period_Attendance::getDailyDetail($student, $date);
-
         if (!$results) return response('No data!');
+
+        $attendance = [];
+        foreach ($results as $value) {
+            $attendance[$value->period_id] = $value->present;
+        }
+
+        $day = Utils::getDayFromDate($date);
+        $timetable = Period::getTimetable($student->class_id, $day);
+        if (!$timetable) return response('No data!');
 
         $response = [];
 
-        foreach ($results as $key => $value) {
+        foreach ($timetable as $key => $value) {
             $info['period_id'] = $value->period_id;
             $info['subject_code'] = $value->subject_code;
-            $info['subject_name'] = $value->name;
+            $info['subject_name'] = $value->subject_name;
             $info['period_num'] = $value->period_num;
             $info['room'] = $value->room;
             $info['start_time'] = $value->start_time;
             $info['end_time'] = $value->end_time;
-            $info['day'] = $value->day;
-            $info['present'] = $value->present;
+            $info['day'] = $day;
+
+            if (array_key_exists($value->period_id, $attendance)) {
+                $info['present'] = $attendance[$value->period_id];
+            } else {
+                $info['present'] = -1;
+            }
 
             $response[$value->period_num] = $info;
         }

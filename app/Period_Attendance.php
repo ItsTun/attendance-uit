@@ -64,18 +64,13 @@ class Period_Attendance extends Model
 	}
 
 	public static function getDailyDetail(Student $student, $date) {
-		return DB::table('periods')
-            ->join('subject_class', 'periods.subject_class_id', '=', 'subject_class.subject_class_id')
-            ->join('students', 'subject_class.class_id', '=', 'students.class_id')
-            ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
-            ->join('period_attendance', 'students.roll_no', '=', 'period_attendance.roll_no')
-            ->join('open_periods', function($join) {
-                $join->on('period_attendance.open_period_id', '=', 'open_periods.open_period_id')
-                     ->on('open_periods.period_id', '=', 'periods.period_id');
-            })
+		return DB::table('period_attendance')
+            ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
+            ->join('open_periods', 'period_attendance.open_period_id', '=', 'open_periods.open_period_id')
+            ->join('periods', 'open_periods.period_id', '=', 'periods.period_id')
             ->where('open_periods.date', $date)
             ->where('students.roll_no', $student->roll_no)
-            ->select('periods.*', 'subjects.subject_code', 'subjects.name', 'period_attendance.present')
+            ->select('periods.period_id', 'period_attendance.present')
             ->orderby('periods.period_num')
             ->get();
 	}
