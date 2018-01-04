@@ -63,30 +63,16 @@ class Period_Attendance extends Model
         return $results;
 	}
 
-	public static function getDailyDetail(Student $student, $date, $dayOfWeek) {
-		$results = DB::select( DB::raw(
-            'SELECT B.period_id, B.subject_code, B.name,B.period_num, IFNULL(A.present, -1) present
-            FROM 
-            ( SELECT periods.period_id, subjects.subject_code, periods.period_num, period_attendance.present
-            FROM periods, subjects, open_periods, period_attendance, students 
-            WHERE subjects.class_id = students.class_id 
-            AND periods.subject_id = subjects.subject_id 
-            AND open_periods.date = :date 
-            AND period_attendance.open_period_id = open_periods.open_period_id 
-            AND students.roll_no = :roll_no 
-            AND period_attendance.roll_no = students.roll_no 
-            AND open_periods.period_id = periods.period_id
-            ORDER BY periods.period_num ) A 
-            RIGHT OUTER JOIN 
-            ( SELECT periods.period_id, subjects.subject_code, subjects.name, periods.period_num 
-            FROM periods, subjects 
-            WHERE subjects.class_id = :klass 
-            AND periods.subject_id = subjects.subject_id 
-            AND periods.day = :day ) B 
-            ON A.period_id = B.period_id
-            ORDER BY B.period_num;'
-        ), array('roll_no' => $student->roll_no, 'date' => $date, 'klass' => $student->class_id, 'day' => $dayOfWeek) );
-        return $results;
+	public static function getDailyDetail(Student $student, $date) {
+		return DB::table('period_attendance')
+            ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
+            ->join('open_periods', 'period_attendance.open_period_id', '=', 'open_periods.open_period_id')
+            ->join('periods', 'open_periods.period_id', '=', 'periods.period_id')
+            ->where('open_periods.date', $date)
+            ->where('students.roll_no', $student->roll_no)
+            ->select('periods.period_id', 'period_attendance.present')
+            ->orderby('periods.period_num')
+            ->get();
 	}
 
     public static function saveAttendance($period_ids, $date, $presentStudents) {
@@ -128,7 +114,7 @@ class Period_Attendance extends Model
 
 
             $log = new InternalLog();
-            $log->old_value = $openPeriod->attendedStudents;
+            $log->old_value = clone $openPeriod->attendedStudents->toArray();
             $log->by_user = 1;  // add user_id here
             $log->created_at = Utils::getCurrentDateTime();
             $log->action = 'EDIT';
