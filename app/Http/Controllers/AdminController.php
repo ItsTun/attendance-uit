@@ -62,7 +62,26 @@ class AdminController extends Controller
     }
 
     public function years() {
-        return view('admin.years');
+        $years = Year::getYears();
+        return view('admin.years')->with(['years' => $years]);
+    }
+
+    public function addOrUpdateYear() {
+        $name = Input::post('name');
+        $year_id = Input::post('year_id');
+
+        $year;
+
+        if(!is_null($year_id)) {
+            $year = Year::find($year_id);
+        } else {
+            $year = new Year();
+        }
+
+        $year->name = $name;
+        $year->save();
+
+        return back()->withInput();
     }
 
     public function addOrUpdatePeriods() {

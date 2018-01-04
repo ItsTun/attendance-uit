@@ -19,9 +19,11 @@ Route::group(['middleware' => ['web']], function () {
 	Route::get('subjects', 'AdminController@subjects');
 	Route::get('add_new_admin', 'AdminController@addNewAdmin');
 	Route::get('timetables', 'AdminController@timetables');
-	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods');
 	Route::get('attendance', 'AdminController@attendance');
 	Route::get('years', 'AdminController@years');
+
+	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods');
+	Route::post('addOrUpdateYear', 'AdminController@addOrUpdateYear');
 });
 
 // Password Reset Routes...

@@ -1,0 +1,7 @@
+.table td {
+	vertical-align: middle !important;
+}
+
+input[type=submit i] {
+	background-color: #26c6da !important;
+}
