@@ -13,7 +13,7 @@
     <div class="row">
         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8"></div>
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="padding: 10px;">
-          <button type="button" class="btn btn-md btn-success pull-right" data-toggle="modal" data-target="#addOrEditYear">
+          <button type="button" class="btn btn-md btn-success pull-right" data-toggle="modal" id="add-btn" data-target="#addOrEditYear">
             Add A Year
           </button>
         </div>
@@ -93,6 +93,11 @@
 
         $('.input-year-id').val(yearId);
         $('.input-year-name').val(name);
+      });
+
+      $(document).on("click", "#add-btn", function () {
+        $('.input-year-id').val('');
+        $('.input-year-name').val('');
       });
   </script>
 @endsection

@@ -20,7 +20,11 @@ class AdminController extends Controller
     }
 
     public function classes() {
-        return view('admin.classes');
+        $years = Year::all();
+
+        $klasses = Klass::getClasses();
+
+        return view('admin.classes')->with(['years' => $years, 'klasses' => $klasses]);
     }
 
     public function subjects() {
@@ -80,6 +84,28 @@ class AdminController extends Controller
 
         $year->name = $name;
         $year->save();
+
+        return back()->withInput();
+    }
+
+    public function addOrUpdateClass() {
+        $shortForm = Input::post('short_form');
+        $name = Input::post('name');
+        $year_id = Input::post('year_id');
+        $class_id = Input::post('class_id');
+
+        $klass;
+
+        if(!is_null($class_id)) {
+            $klass = Klass::find($class_id);
+        } else {
+            $klass = new Klass();
+        }
+
+        $klass->year_id = $year_id;
+        $klass->short_form = $shortForm;
+        $klass->name = $name;
+        $klass->save();
 
         return back()->withInput();
     }

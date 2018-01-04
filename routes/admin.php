@@ -24,6 +24,7 @@ Route::group(['middleware' => ['web']], function () {
 
 	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods');
 	Route::post('addOrUpdateYear', 'AdminController@addOrUpdateYear');
+	Route::post('addOrUpdateClass', 'AdminController@addOrUpdateClass');
 });
 
 // Password Reset Routes...
