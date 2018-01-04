@@ -426,10 +426,10 @@
 				    	'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 				    },
 					success: function(result){
-			        	console.log(result);
+			        	alert("Saved successfully.");
 					},
 					error: function(error) {
-						console.log(error);
+						alert("Failed to save");
 					}
 				});
 
