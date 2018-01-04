@@ -20,4 +20,16 @@ class Subject_Class extends Model
     public static function getSubjectClass($subject_id, $class_id) {
     	return Subject_Class::where('subject_id', $subject_id)->where('class_id', $class_id)->first();
     }
+
+    public static function getLunchBreakSubjectClassId($class_id) {
+        return Subject_Class::whereNull('subject_id')->where('class_id', $class_id)->first();
+    }
+
+    public static function getSubjectsFromClass($class_id) {
+        return Subject_Class::where('class_id', $class_id)->get();
+    }
+
+    public static function getSubjectClassIdsFromClass($class_id) {
+        return Subject_Class::where('class_id', $class_id)->select('subject_class_id')->get();
+    }
 }

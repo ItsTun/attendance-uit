@@ -10,7 +10,8 @@ Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');
 Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
-Route::group(['middleware' => ['admin']], function () {
+//Route::group(['middleware' => ['admin']], function () {
+Route::group(['middleware' => ['web']], function () {
 	Route::get('dashboard', 'AdminController@dashboard');
 	Route::get('teachers', 'AdminController@teachers');
 	Route::get('students', 'AdminController@students');
@@ -18,6 +19,7 @@ Route::group(['middleware' => ['admin']], function () {
 	Route::get('subjects', 'AdminController@subjects');
 	Route::get('add_new_admin', 'AdminController@addNewAdmin');
 	Route::get('timetables', 'AdminController@timetables');
+	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods');
 	Route::get('attendance', 'AdminController@attendance');
 	Route::get('years', 'AdminController@years');
 });
