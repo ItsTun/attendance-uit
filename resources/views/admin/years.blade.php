@@ -11,10 +11,11 @@
 @section('content')
 <div class="container" >
     <div class="row">
-        <div class="col-md-6"></div>
-        <div class="col-md-6 col-4 align-self-center" style="padding: 10px;">
-                <button type="button" class="btn btn-md btn-success pull-right" data-toggle="modal" data-target="#addOrEditYear">Add A Year</button>
-        
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8"></div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="padding: 10px;">
+          <button type="button" class="btn btn-md btn-success pull-right" data-toggle="modal" data-target="#addOrEditYear">
+            Add A Year
+          </button>
         </div>
     </div>
 </div>
