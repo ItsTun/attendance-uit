@@ -23,6 +23,8 @@
     <link href="{{ asset('/material-lite/css/style.css') }}" rel="stylesheet">
     <!-- You can change the theme colors from here -->
     <link href="{{ asset('/material-lite/css/colors/blue.css') }}" id="theme" rel="stylesheet">
+
+    @yield('styles')
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -160,6 +162,7 @@
     <!--c3 JavaScript -->
     <script src="{{ asset('/material-lite/plugins/d3/d3.min.js') }}"></script>
     <script src="{{ asset('/material-lite/plugins/c3-master/c3.min.js') }}"></script>
+    @yield('scripts')
 </body>
 
 </html>

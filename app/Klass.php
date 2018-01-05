@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 
 class Klass extends Model
 {
+	public $timestamps = false;
+	
 	protected $table = "classes";
 	protected $primaryKey = "class_id";
 
@@ -20,6 +22,10 @@ class Klass extends Model
 
 	public function year() {
 		return $this->belongsTo(Year::class, 'year_id');
+	}
+
+	public static function getClasses() {
+		return Klass::paginate(PaginationUtils::getDefaultPageSize());
 	}
 
 	public static function getClassesOfTeacher($teacher_id) {

@@ -10,6 +10,8 @@ use App\Subject_Class;
 
 class Period extends Model
 {
+    public $timestamps = false;
+    
     protected $table = "periods";
     protected $primaryKey = "period_id";
 
@@ -19,6 +21,14 @@ class Period extends Model
     public function subject() {
     	$subjectClass = Subject_Class::find($this->subject_class_id)->first();
         return $subjectClass->subject;
+    }
+
+    public static function getPeriodsFromSubjectClass($subject_class_ids) {
+        return Period::whereIn('subject_class_id', $subject_class_ids)->get();
+    }
+
+    public static function getPeriod($subject_class_id, $day, $period_num) {
+        return Period::where('subject_class_id', $subject_class_id)->where('day', $day)->where('period_num', $period_num)->first();
     }
 
     public static function getTimetable($klassId, $day) {

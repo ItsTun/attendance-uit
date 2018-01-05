@@ -10,7 +10,8 @@ Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');
 Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
-Route::group(['middleware' => ['admin']], function () {
+//Route::group(['middleware' => ['admin']], function () {
+Route::group(['middleware' => ['web']], function () {
 	Route::get('dashboard', 'AdminController@dashboard');
 	Route::get('teachers', 'AdminController@teachers');
 	Route::get('students', 'AdminController@students');
@@ -20,6 +21,10 @@ Route::group(['middleware' => ['admin']], function () {
 	Route::get('timetables', 'AdminController@timetables');
 	Route::get('attendance', 'AdminController@attendance');
 	Route::get('years', 'AdminController@years');
+
+	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods');
+	Route::post('addOrUpdateYear', 'AdminController@addOrUpdateYear');
+	Route::post('addOrUpdateClass', 'AdminController@addOrUpdateClass');
 });
 
 // Password Reset Routes...

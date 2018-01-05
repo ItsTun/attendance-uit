@@ -73,4 +73,7 @@ return [
 		'ADDED_SUCCESSFULLY' => "Attendance added successfully!",
 		'UPDATED_SUCCESSFULLY' => "Attendance updated successfully",
 	],
+	'PAGINATION' => [
+		'DEFAULT_PAGE_SIZE' => 10
+	]
 ];

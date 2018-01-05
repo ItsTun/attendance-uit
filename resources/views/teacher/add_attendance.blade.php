@@ -68,14 +68,3 @@ Add Attendance
 </form>
 
 @endsection
-
-{{-- <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
-					<div class="card">
-						<div class="card-block">
-							<div class="custom-checkbox">
-								<input type="checkbox" name="student" id="{{ $student->roll_no }}" value="{{ $student->roll_no }}"/>
-								<label for="{{ $student->roll_no }}">{{ $student->name }}</label>
-							</div>
-						</div>
-					</div>
-				</div> --}}

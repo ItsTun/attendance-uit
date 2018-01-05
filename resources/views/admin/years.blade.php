@@ -4,13 +4,18 @@
 	Years
 @endsection
 
+@section('styles')
+  <link rel="stylesheet" href="{{ asset('/css/years.css') }}" />
+@endsection
+
 @section('content')
 <div class="container" >
     <div class="row">
-        <div class="col-md-6"></div>
-        <div class="col-md-6 col-4 align-self-center" style="padding: 10px;">
-                <button type="button" class="btn btn-md btn-success pull-right" data-toggle="modal" data-target="#addYear">Add A Year</button>
-        
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8"></div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="padding: 10px;">
+          <button type="button" class="btn btn-md btn-success pull-right" data-toggle="modal" id="add-btn" data-target="#addOrEditYear">
+            Add A Year
+          </button>
         </div>
     </div>
 </div>
@@ -26,47 +31,26 @@
                 </tr>
             </thead>
             <tbody>
-                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td><button type="button" class="btn btn-md btn-primary" data-toggle="modal" data-target="#editStudent">Edit</button>
-                    </td>
-                </tr>
+              @foreach($years as $year)
+              <tr>
+                <td>{{ $year->year_id }}</td>
+                <td>{{ $year->name }}</td>
+                <td>
+                  <button type="button" class="btn btn-primary edit-btn" id="edit-btn" data-toggle="modal" data-id="{{ $year->year_id }}" data-name="{{ $year->name }}" data-target="#addOrEditYear">Edit</button>
+                </td>
+              </tr>
+              @endforeach
             </tbody>
         </table>
     </div>
-<!-- Pigination -->
-    <nav class="my-4">
-        <ul class="pagination pagination-circle pg-blue mb-0 justify-content-center">
-            <!--Arrow left-->
-            <li class="page-item disabled">
-                <a class="page-link" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-                <span class="sr-only">Previous</span>
-            </a>
-            </li>
-
-            <!--Numbers-->
-            <li class="page-item active"><a class="page-link">1</a></li>
-            <li class="page-item"><a class="page-link">2</a></li>
-            <li class="page-item"><a class="page-link">3</a></li>
-            <li class="page-item"><a class="page-link">4</a></li>
-            <li class="page-item"><a class="page-link">5</a></li>
-
-            <!--Arrow right-->
-            <li class="page-item">
-                <a class="page-link" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-                <span class="sr-only">Next</span>
-            </a>
-            </li>
-        </ul>
-    </nav>
+    
+    {{ $years->links('pagination.circle-pagination') }}
+    
 </div>
 
 
 <!--Add Year Modal-->
-<div id="addYear" class="modal fade" role="dialog">
+<div id="addOrEditYear" class="modal fade" role="dialog">
   <div class="modal-dialog">
 
     <!-- Modal content-->
@@ -75,81 +59,45 @@
         <h4 class="modal-title">Add A Year</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
-      <div class="modal-body">
-          <div class="container">
-                  <form class="form-horizontal form-material">
-                      <div class="form-group">
-                        <label class="col-md-12">Year Code</label>
-                          <div class="col-md-12">
-                            <input class="form-control form-control-line" type="text">
-                          </div>
-                      </div>
-                      <div class="form-group">
-                        <label class="col-md-12">Name</label>
-                          <div class="col-md-12">
-                            <input class="form-control form-control-line" type="text">
-                          </div>
-                      </div>
-                  </form>
+      <form class="form-horizontal form-material" action="addOrUpdateYear" method="post">
+        <div class="modal-body">
+            <div class="container">
+              {{ csrf_field() }}
+              <input type="hidden" type="text" name="year_id" class="input-year-id" />
+              <div class="form-group">
+                <label class="col-md-12">Name</label>
+                  <div class="col-md-12">
+                    <input class="form-control form-control-line input-year-name" type="text" name="name" required>
+                  </div>
               </div>
+            </div>
+          </div>
+        
+        <div class="modal-footer">
+          <button type="cancel" class="btn btn-default" data-dismiss="modal">Close</button>
+          <input type="submit" class="btn btn-success" id="savedata" value="Save" />
         </div>
-      
-      <div class="modal-footer">
-        <button type="cancel" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-success" data-dismiss="modal" id="savedata">Save</button>
-      </div>
+      </form>
     </div>
   </div>
 </div>
-<!--Add Year Modal -->
 
+@endsection
 
-<!--Edit Year Modal-->
-<div id="editYear" class="modal fade" role="dialog">
-  <div class="modal-dialog">
+@section('scripts')
+  <script>
+      $(document).on("click", "#edit-btn", function () {
+        console.log("clicked");
+        var yearId = $(this).data('id');
+        var name = $(this).data('name');
 
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">Add A Year</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <div class="modal-body">
-          <div class="container">
-                  <form class="form-horizontal form-material">
-                      <div class="form-group">
-                        <label class="col-md-12">Select Year Code</label>
-                          <div class="col-md-12">
-                              <select class="form-control form-control-line">
-                                  <option>1</option>
-                                  <option>2</option>
-                                  <option>3</option>
-                              </select>
-                          </div>
-                      </div>
-                      <div class="form-group">
-                        <label class="col-md-12">Year Code</label>
-                          <div class="col-md-12">
-                            <input class="form-control form-control-line" type="text">
-                          </div>
-                      </div>
-                      <div class="form-group">
-                        <label class="col-md-12">Name</label>
-                          <div class="col-md-12">
-                            <input class="form-control form-control-line" type="text">
-                          </div>
-                      </div>
-                  </form>
-              </div>
-        </div>
-      
-      <div class="modal-footer">
-        <button type="cancel" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-success" data-dismiss="modal" id="savedata">Save</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!--Edit Year Modal -->
+        $('.input-year-id').val(yearId);
+        $('.input-year-name').val(name);
+      });
 
+      $(document).on("click", "#add-btn", function () {
+        $('.input-year-id').val('');
+        $('.input-year-name').val('');
+      });
+  </script>
 @endsection
