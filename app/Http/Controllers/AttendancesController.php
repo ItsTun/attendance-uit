@@ -194,6 +194,7 @@ class AttendancesController extends Controller
             $info['period_id'] = $value->period_id;
             $info['subject_code'] = $value->subject_code;
             $info['subject_name'] = $value->subject_name;
+            $info['subject_class_id'] = $value->subject_class_id;
             $info['period_num'] = $value->period_num;
             $info['room'] = $value->room;
             $info['start_time'] = $value->start_time;

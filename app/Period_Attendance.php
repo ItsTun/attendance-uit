@@ -147,14 +147,14 @@ class Period_Attendance extends Model
                 $join->on('open_periods.period_id', '=', 'periods.period_id')->on('period_attendance.open_period_id', '=', 'open_periods.open_period_id');
             })
             ->where('period_attendance.roll_no', $rollNo)
-            ->select('subjects.subject_id', 
+            ->select('subject_class.subject_class_id', 
                     'subjects.subject_code', 
                     'subjects.name',
                     'classes.name as class_name',
                     DB::raw('COUNT(open_periods.open_period_id) as total_periods'), 
                     DB::raw('SUM(period_attendance.present) as attended_periods'), 
                     DB::raw('SUM(period_attendance.present)/COUNT(open_periods.open_period_id) * 100 as percent'))
-            ->groupby('subjects.subject_id', 'subjects.subject_code', 'classes.name')
+            ->groupby('subject_class.subject_class_id')
             ->get();
     }
 }
