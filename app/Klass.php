@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class Klass extends Model
 {
-	public $timestamps = false;
-	
 	protected $table = "classes";
 	protected $primaryKey = "class_id";
 
