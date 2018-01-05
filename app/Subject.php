@@ -16,4 +16,8 @@ class Subject extends Model
     public function subject_class() {
     	return $this->hasMany(Subject_Class::class, 'subject_id');
     }
+
+    public static function getSubjects($query) {
+    	return Subject::where('name', 'like', '%' . $query . '%')->paginate(PaginationUtils::getDefaultPageSize());
+    }
 }

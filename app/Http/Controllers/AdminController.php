@@ -6,6 +6,7 @@ use App\Year;
 use App\Klass;
 use App\Subject_Class;
 use App\Period;
+use App\Subject;
 
 use Illuminate\Support\Facades\Input;
 
@@ -28,7 +29,13 @@ class AdminController extends Controller
     }
 
     public function subjects() {
-        return view('admin.subjects');
+        $query = Input::get('q');
+
+        $subjects = Subject::getSubjects($query);
+
+        $years = Year::all();
+
+        return view('admin.subjects')->with(['subjects' => $subjects, 'years' => $years, 'query' => $query]);
     }
 
     public function timetables() {
@@ -84,6 +91,40 @@ class AdminController extends Controller
 
         $year->name = $name;
         $year->save();
+
+        return back()->withInput();
+    }
+
+    public function addOrUpdateSubject() {
+        $subjectCode = Input::post('subject_code');
+        $name = Input::post('name');
+        $klasses = Input::post('classes');
+        $subjectId = Input::post('subject_id');
+
+        $subject;
+
+        if(!is_null($subjectId)) {
+            $subject = Subject::find($subjectId);
+        } else {
+            $subject = new Subject();
+        }
+
+        $subject->subject_code = $subjectCode;
+        $subject->name = $name;
+        $subject->save();
+
+        if(sizeof($subject->subject_class) > 0) foreach($subject->subject_class as $subject_class) {
+            $existingClassId = $subject_class->klass->class_id;
+            if(!in_array($existingClassId, $klasses)) $subject_class->delete();
+            else unset($klasses[array_search($existingClassId, $klasses)]);
+        }
+
+        foreach($klasses  as $klass) {
+            $subjectClass = new Subject_Class();
+            $subjectClass->subject_id = $subject->subject_id;
+            $subjectClass->class_id = $klass;
+            $subjectClass->save();
+        }
 
         return back()->withInput();
     }
