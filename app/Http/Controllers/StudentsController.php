@@ -12,10 +12,16 @@ class StudentsController extends Controller
     }
 
     public function findByEmail($email) {
-    	$student = Student::email($email)->first();
+    	$student = Student::getStudentByEmail($email);
     	if(!$student) {
     		return response('No student found with such email!');
     	}
-    	return response($student);
+        $s = $student->first();
+        $response['roll_no'] = $s->roll_no;
+        $response['name'] = $s->name;
+        $response['email'] = $s->email;
+        $response['class_short_form'] = $s->class_short_form;
+        $response['class_name'] = $s->class_name;
+    	return response($response);
     }
 }

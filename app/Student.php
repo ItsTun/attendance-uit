@@ -31,7 +31,11 @@ class Student extends Model
         return Student::where('class_id', $class_id)->get();
     }
 
-    public function scopeEmail($query, $email) {
-        return $query->where('email', '=',$email);
+    public static function getStudentByEmail($email) {
+        return DB::table('students')
+            ->join('classes', 'classes.class_id', '=', 'students.class_id')
+            ->where('students.email', '=', $email)
+            ->select('students.roll_no', 'students.name', 'students.email', 'classes.short_form as class_short_form', 'classes.name as class_name')
+            ->get();
     }
 }

@@ -19,7 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/v1/auth/google/tokensignin', 'Auth\StudentLoginController@getStudentRecord');
 
-Route::group(['middleware' => ['client']], function () {
+// Route::group(['middleware' => ['client']], function () {
 	Route::post('/v1/attendance', 'AttendancesController@store');
 	Route::put('/v1/attendance', 'AttendancesController@update');
 	Route::get('/v1/attendance/{student}', 'AttendancesController@getStudentAttendance');
@@ -39,4 +39,4 @@ Route::group(['middleware' => ['client']], function () {
 	Route::get('/v1/students/email/{email}', 'StudentsController@findByEmail');
 
 	Route::get('/v1/logs', 'InternalLogController@index');
-});
+// });

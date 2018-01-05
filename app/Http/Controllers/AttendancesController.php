@@ -199,6 +199,8 @@ class AttendancesController extends Controller
             $info['start_time'] = $value->start_time;
             $info['end_time'] = $value->end_time;
             $info['day'] = $day;
+            $info['class_short_form'] = $value->class_short_form;
+            $info['class_name'] = $value->class_name;
 
             if (array_key_exists($value->period_id, $attendance)) {
                 $info['present'] = $attendance[$value->period_id];
@@ -206,13 +208,13 @@ class AttendancesController extends Controller
                 $info['present'] = -1;
             }
 
-            $response[$value->period_num] = $info;
+            array_push($response, $info);
         }
 
         return response($response);
     }
 
     public function getStudentAttendance(Student $student) {
-        return response(Attendance::show($student->roll_no));
+        return response(Attendance::show($student->roll_no)->attendance_json);
     }
 }
