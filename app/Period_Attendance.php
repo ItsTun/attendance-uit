@@ -157,4 +157,22 @@ class Period_Attendance extends Model
             ->groupby('subject_class.subject_class_id')
             ->get();
     }
+
+    public static function getMonthlyAttendance($roll_no, $subject_class_id) {
+        return DB::table('period_attendance')
+                    ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
+                    ->join('open_periods', 'open_periods.open_period_id', '=', 'period_attendance.open_period_id')
+                    ->join('periods', 'periods.period_id', '=', 'open_periods.period_id')
+                    ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
+                    ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
+                    ->where('students.roll_no', $roll_no)
+                    ->where('subject_class.subject_class_id', $subject_class_id)
+                    ->select(DB::raw('COUNT(period_attendance.open_period_id) AS periods'), 
+                            DB::raw('SUM(period_attendance.present) AS present'), 
+                            DB::raw('(COUNT(period_attendance.open_period_id) - SUM(period_attendance.present)) AS absent'),
+                            DB::raw('MONTH(open_periods.date) AS month'))
+                    ->groupby(DB::raw('YEAR(open_periods.date), MONTH(open_periods.date)'))
+                    ->orderby(DB::raw('YEAR(open_periods.date), MONTH(open_periods.date)'))
+                    ->get();
+    }
 }

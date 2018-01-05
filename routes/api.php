@@ -22,12 +22,12 @@ Route::post('/v1/auth/google/tokensignin', 'Auth\StudentLoginController@getStude
 // Route::group(['middleware' => ['client']], function () {
 	Route::post('/v1/attendance', 'AttendancesController@store');
 	Route::put('/v1/attendance', 'AttendancesController@update');
-	Route::get('/v1/attendance/{student}', 'AttendancesController@getStudentAttendance');
+	Route::get('/v1/attendance/{student}', 'AttendancesController@studentAttendance');
 	Route::get('/v1/attendance/{date}/student-list', 'AttendancesController@index');
-	Route::get('/v1/attendance/{roll_no}/detail', 'AttendancesController@detail');
 	Route::get('/v1/attendance/{roll_no}/totalabsence', 'AttendancesController@totalAbsence');
 	Route::get('/v1/attendance/{klass}/absentstudentlist', 'AttendancesController@absentStudentList');
 	Route::get('/v1/attendance/{student}/daily/detail', 'AttendancesController@dailyDetail');
+	Route::get('/v1/attendance/details/{student}/{subject_class_id}', 'AttendancesController@attendanceDetails');
 
 	Route::get('/v1/classes', 'KlassesController@index');
 

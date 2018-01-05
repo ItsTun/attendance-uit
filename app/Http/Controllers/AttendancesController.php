@@ -13,6 +13,7 @@ use App\Period;
 use App\Klass;
 use App\Attendance;
 use App\Utils;
+use App\Teacher;
 
 class AttendancesController extends Controller
 {
@@ -94,24 +95,6 @@ class AttendancesController extends Controller
         }
 
         return response($responseAry);
-    }
-
-    public function detail(Request $request, $rollNo) {
-        $month = $request->month;
-
-        $date = strtotime($month);
-        $month = date('m', $date);
-
-        $results = Period_Attendance::getAttendanceDetail($rollNo, $month);
-
-        if (!$results) return response('No data!');
-
-        foreach ($results as $value) {
-            $response[$value->date][$value->period_num]['subject'] = $value->subject_code;
-            $response[$value->date][$value->period_num]['present'] = $value->present;
-        }
-
-        return response($response);
     }
 
     public function totalAbsence(Request $request, $rollNo) {
@@ -215,7 +198,31 @@ class AttendancesController extends Controller
         return response($response);
     }
 
-    public function getStudentAttendance(Student $student) {
-        return response(Attendance::show($student->roll_no)->attendance_json);
+    public function studentAttendance(Student $student) {
+        $studentAttendance = json_decode(Attendance::show($student->roll_no)->attendance_json);
+        return response($studentAttendance);
+    }
+
+    public function attendanceDetails(Student $student, $subject_class_id) {
+        $studentAttendance = json_decode(Attendance::show($student->roll_no)->attendance_json);
+        $_studentAttendance = [];
+        foreach ($studentAttendance as $key => $value) {
+            if ($studentAttendance[$key]->subject_class_id == $subject_class_id) {
+                $_studentAttendance = $value;
+                break;
+            }
+        }
+
+        $teachers = Teacher::getTeachersBySubjectClass($_studentAttendance->subject_class_id);
+        $teachers_ary = [];
+        foreach ($teachers as $value) {
+            array_push($teachers_ary, $value->name);
+        }
+        $_studentAttendance->teachers = implode(', ', $teachers_ary);
+
+        $attendance = Period_Attendance::getMonthlyAttendance($student->roll_no, $subject_class_id);
+        $_studentAttendance->attendance = $attendance->toArray();
+        
+        return response(json_encode($_studentAttendance));
     }
 }

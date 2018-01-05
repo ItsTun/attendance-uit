@@ -73,4 +73,13 @@ class Teacher extends Model
                 ->update(['subject_class_id' => $subject_class_id]);
             }
     }
+
+    public static function getTeachersBySubjectClass($subject_class_id) {
+        return DB::table('teachers')
+            ->join('subject_class_teacher', 'subject_class_teacher.teacher_id', '=', 'teachers.teacher_id')
+            ->join('subject_class', 'subject_class.subject_class_id', '=', 'subject_class_teacher.subject_class_id')
+            ->where('subject_class.subject_class_id', $subject_class_id)
+            ->select('teachers.teacher_id', 'teachers.name')
+            ->get();
+    }
 }
