@@ -20,6 +20,7 @@ Route::group(['middleware' => ['admin', 'web']], function () {
 	Route::get('timetables', 'AdminController@timetables');
 	Route::get('attendance', 'AdminController@attendance');
 	Route::get('years', 'AdminController@years');
+	Route::get('getTeacherWithEmail', 'AdminController@getTeacherWithEmail');
 
 	Route::get('getStudent', 'AdminController@getStudent');
 	Route::get('getStudentWithEmail', 'AdminController@getStudentWithEmail');
@@ -29,6 +30,7 @@ Route::group(['middleware' => ['admin', 'web']], function () {
 	Route::post('addOrUpdateClass', 'AdminController@addOrUpdateClass');
 	Route::post('addOrUpdateSubject', 'AdminController@addOrUpdateSubject');
 	Route::post('addOrUpdateStudent', 'AdminController@addOrUpdateStudent');
+	Route::post('addOrUpdateTeacher', 'AdminController@addOrUpdateTeacher');
 });
 
 // Password Reset Routes...

@@ -204,7 +204,7 @@
 
     function checkEmail() {
       var email = $('.input-email').val();
-      if(isUpdate && oldEmail != email) {
+      if((isUpdate && oldEmail != email) || !isUpdate) {
         $.ajax({
           method: "GET",
           data: {
@@ -229,7 +229,7 @@
 
     function onSubmitBtnClick() {
       var roll_no = $('.prefix').val() + $('.input-roll-no').val();
-      if(isUpdate && oldRollNo != roll_no) {
+      if((isUpdate && oldRollNo != roll_no) || !isUpdate) {
         $.ajax({
           method: "GET",
           data: {
