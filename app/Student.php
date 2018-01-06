@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class Student extends Model
 {
-	public $timestamps = false;
 	public $incrementing = false;
 	
     protected $table = "students";
@@ -15,6 +14,14 @@ class Student extends Model
 
     public function klass() {
     	return $this->belongsTo(Klass::class, 'class_id', 'class_id');
+    }
+
+    public static function getStudents($query, $roll_no,$class_id) {
+        $q = Student::where('name', 'like', '%' . $query . '%');
+        if(!is_null($roll_no)) $q->where('roll_no', 'like', '%' . $roll_no . '%');
+        if(!is_null($class_id) && $class_id!=-1) $q->where('class_id', $class_id);
+        $students = $q->paginate(PaginationUtils::getDefaultPageSize());
+        return $students;
     }
 
     public static function getStudentsFromPeriod($period_ids) {

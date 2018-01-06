@@ -1,0 +1,21 @@
+.table td {
+	vertical-align: middle !important;
+}
+
+input[type=button i], input[type=submit i] {
+	background-color: #26c6da !important;
+}
+
+.form-group {
+	margin-bottom: 0px !important;
+}
+
+.af {
+	position: absolute;
+  	bottom: 0;
+  	margin-bottom: 5px;
+}
+
+.form-horizontal .form-group {
+	margin-bottom: 20px !important;
+}

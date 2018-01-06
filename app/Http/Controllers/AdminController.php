@@ -7,6 +7,7 @@ use App\Klass;
 use App\Subject_Class;
 use App\Period;
 use App\Subject;
+use App\Student;
 
 use Illuminate\Support\Facades\Input;
 
@@ -61,7 +62,14 @@ class AdminController extends Controller
     }
 
     public function students() {
-        return view('admin.students');
+        $years = Year::all();
+        $query = Input::get('q');
+        $roll_no = Input::get('r_q');
+        $c_id = Input::get('c_id');
+
+        $students = Student::getStudents($query, $roll_no, $c_id);
+
+        return view('admin.students')->with(['students' => $students, 'years' => $years, 'name_query' => $query, 'roll_no_query' => $roll_no, 'class_id' => $c_id]);
     }
 
     public function attendance() {
@@ -75,6 +83,43 @@ class AdminController extends Controller
     public function years() {
         $years = Year::getYears();
         return view('admin.years')->with(['years' => $years]);
+    }
+
+    public function getStudentWithEmail() {
+        $email = Input::get('email');
+        $student = Student::where('email', $email)->first();
+
+        return (is_null($student))?'null':$student;
+    }
+
+    public function getStudent() {
+        $roll_no = Input::get('roll_no');
+        $student = Student::find($roll_no);
+
+        return (is_null($student))?'null':$student;
+    }
+
+    public function addOrUpdateStudent() {
+        $prefix = Input::post('prefix');
+        $roll_no = Input::post('roll_no');
+        $name = Input::post('name');
+        $email = Input::post('email');
+        $class_id = Input::post('class_id');
+        $old_roll_no = Input::post('old_r');
+
+        $student = null;
+
+        if(!is_null($old_roll_no)) $student = Student::find($old_roll_no);
+
+        if(is_null($student)) {
+            $student = new Student();
+        }
+
+        $student->roll_no = $prefix.''.$roll_no;
+        $student->name = $name;
+        $student->email = $email;
+        $student->class_id = $class_id;
+        $student->save();
     }
 
     public function addOrUpdateYear() {

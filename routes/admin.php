@@ -21,10 +21,14 @@ Route::group(['middleware' => ['admin', 'web']], function () {
 	Route::get('attendance', 'AdminController@attendance');
 	Route::get('years', 'AdminController@years');
 
+	Route::get('getStudent', 'AdminController@getStudent');
+	Route::get('getStudentWithEmail', 'AdminController@getStudentWithEmail');
+
 	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods');
 	Route::post('addOrUpdateYear', 'AdminController@addOrUpdateYear');
 	Route::post('addOrUpdateClass', 'AdminController@addOrUpdateClass');
 	Route::post('addOrUpdateSubject', 'AdminController@addOrUpdateSubject');
+	Route::post('addOrUpdateStudent', 'AdminController@addOrUpdateStudent');
 });
 
 // Password Reset Routes...
