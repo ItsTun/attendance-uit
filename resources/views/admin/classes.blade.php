@@ -102,7 +102,6 @@
 @section('scripts')
   <script>
       $(document).on("click", "#edit-btn", function () {
-        console.log("clicked");
         var yearId = $(this).data('yid');
         var name = $(this).data('name');
         var classId = $(this).data('cid');
