@@ -10,8 +10,7 @@ Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');
 Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
-//Route::group(['middleware' => ['admin']], function () {
-Route::group(['middleware' => ['web']], function () {
+Route::group(['middleware' => ['admin', 'web']], function () {
 	Route::get('dashboard', 'AdminController@dashboard');
 	Route::get('teachers', 'AdminController@teachers');
 	Route::get('students', 'AdminController@students');
