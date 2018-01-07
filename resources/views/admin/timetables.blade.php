@@ -419,7 +419,7 @@
 					type: "POST",
 			        data: {
 				        "periods": periods,
-						"class_id": {{ $class_id }}
+						"class_id": {{ $class_id }}+'',
 			        },
 					url: "addOrUpdatePeriods", 
 					headers: {

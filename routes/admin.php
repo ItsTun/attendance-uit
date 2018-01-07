@@ -10,8 +10,7 @@ Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');
 Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
-//Route::group(['middleware' => ['admin']], function () {
-Route::group(['middleware' => ['web']], function () {
+// Route::group(['middleware' => ['admin', 'web']], function () {
 	Route::get('dashboard', 'AdminController@dashboard');
 	Route::get('teachers', 'AdminController@teachers');
 	Route::get('students', 'AdminController@students');
@@ -22,6 +21,10 @@ Route::group(['middleware' => ['web']], function () {
 	Route::get('timetables', 'AdminController@timetables');
 	Route::get('attendance', 'AdminController@attendance');
 	Route::get('years', 'AdminController@years');
+	Route::get('getTeacherWithEmail', 'AdminController@getTeacherWithEmail');
+
+	Route::get('getStudent', 'AdminController@getStudent');
+	Route::get('getStudentWithEmail', 'AdminController@getStudentWithEmail');
 
 	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods');
 	Route::post('addOrUpdateYear', 'AdminController@addOrUpdateYear');
@@ -29,7 +32,9 @@ Route::group(['middleware' => ['web']], function () {
 	Route::post('addOrUpdateSubject', 'AdminController@addOrUpdateSubject');
 	Route::post('students/getArrayFromCSV', 'AdminController@getArrayFromCSV');
 	Route::post('students/saveStudentsFromCSV', 'AdminController@saveStudentsFromCSV');
-});
+	Route::post('addOrUpdateStudent', 'AdminController@addOrUpdateStudent');
+	Route::post('addOrUpdateTeacher', 'AdminController@addOrUpdateTeacher');
+// });
 
 // Password Reset Routes...
 Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');

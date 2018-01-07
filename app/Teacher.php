@@ -14,6 +14,17 @@ class Teacher extends Model
     public function subject_teachers() {
     	return $this->hasMany(Subject_Class_Teacher::class, 'teacher_id');
     }
+
+    public function faculty() {
+        return $this->belongsTo(Faculty::class, 'faculty_id');
+    }
+
+    public static function getTeachers($query, $f_id) {
+        $q = Teacher::where('name', 'like', '%' . $query . '%');
+        if(!is_null($f_id) && $f_id!=-1) $q->where('faculty_id', $f_id);
+        $teachers = $q->paginate(PaginationUtils::getDefaultPageSize());
+        return $teachers;
+    }
     
     public function getallteacher(){
         return DB::table('teacher')

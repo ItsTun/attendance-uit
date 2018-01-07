@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Year;
 use App\Klass;
 use App\Subject_Class;
+use App\Subject_Class_Teacher;
 use App\Period;
 use App\Subject;
 use App\Student;
+use App\Teacher;
+use App\Faculty;
 
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
@@ -20,7 +23,13 @@ class AdminController extends Controller
     }
 
     public function teachers() {
-        return view('admin.teachers');
+        $query = Input::get('q');
+        $f_id = Input::get('f_id');
+        $faculties = Faculty::all();
+        $teachers = Teacher::getTeachers($query, $f_id);
+        $years = Year::all();
+
+        return view('admin.teachers')->with(['teachers' => $teachers, 'faculties' => $faculties, 'years' => $years, 'query' => $query, 'faculty_id' => $f_id]);
     }
 
     public function classes() {
@@ -64,7 +73,22 @@ class AdminController extends Controller
     }
 
     public function students() {
-        return view('admin.students');
+        $years = Year::all();
+        $query = Input::get('q');
+        $roll_no = Input::get('r_q');
+        $c_id = Input::get('c_id');
+
+        $students = Student::getStudents($query, $roll_no, $c_id);
+
+        return view('admin.students')->with(['students' => $students, 'years' => $years, 'name_query' => $query, 'roll_no_query' => $roll_no, 'class_id' => $c_id]);
+    }
+
+    public function getTeacherWithEmail() {
+        $email = Input::get('email');
+
+        $teacher = Teacher::where('email', $email)->first();
+
+        return (is_null($teacher))?'null':$teacher;
     }
 
     public function studentsCsv() {
@@ -163,6 +187,80 @@ class AdminController extends Controller
     public function years() {
         $years = Year::getYears();
         return view('admin.years')->with(['years' => $years]);
+    }
+
+    public function getStudentWithEmail() {
+        $email = Input::get('email');
+        $student = Student::where('email', $email)->first();
+
+        return (is_null($student))?'null':$student;
+    }
+
+    public function getStudent() {
+        $roll_no = Input::get('roll_no');
+        $student = Student::find($roll_no);
+
+        return (is_null($student))?'null':$student;
+    }
+
+    public function addOrUpdateTeacher() {
+        $name = Input::post('name');
+        $email = Input::post('email');
+        $faculty_id = Input::post('faculty_id');
+        $subject_classes = Input::post('subject_classes');
+        $teacher_id = Input::post('teacher_id');
+
+        $teacher = null;
+
+        if(!is_null($teacher_id)) $teacher = Teacher::find($teacher_id);
+        if(is_null($teacher)) $teacher = new Teacher();
+
+        $teacher->name = $name;
+        $teacher->email = $email;
+        $teacher->faculty_id = $faculty_id;
+        $teacher->save();
+
+        $teacher_id = $teacher->teacher_id;
+
+        if(sizeof($teacher->subject_teachers) > 0) foreach($teacher->subject_teachers as $subject_teacher) {
+            $existingSubjectClass = $subject_teacher->subject_class->subject_class_id;
+            if(!in_array($existingSubjectClass, $subject_classes)) {
+                Subject_Class_Teacher::deleteRecord($existingSubjectClass, $teacher_id);
+            }
+            else unset($subject_classes[array_search($existingSubjectClass, $subject_classes)]);
+        }
+
+        foreach($subject_classes as $subject_class) {
+            $subject_class_teacher = new Subject_Class_Teacher();
+            $subject_class_teacher->subject_class_id = $subject_class;
+            $subject_class_teacher->teacher_id = $teacher_id;
+            $subject_class_teacher->save();
+        }
+
+        return back()->withInput();
+    }
+
+    public function addOrUpdateStudent() {
+        $prefix = Input::post('prefix');
+        $roll_no = Input::post('roll_no');
+        $name = Input::post('name');
+        $email = Input::post('email');
+        $class_id = Input::post('class_id');
+        $old_roll_no = Input::post('old_r');
+
+        $student = null;
+
+        if(!is_null($old_roll_no)) $student = Student::find($old_roll_no);
+
+        if(is_null($student)) {
+            $student = new Student();
+        }
+
+        $student->roll_no = $prefix.''.$roll_no;
+        $student->name = $name;
+        $student->email = $email;
+        $student->class_id = $class_id;
+        $student->save();
     }
 
     public function addOrUpdateYear() {

@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Subject_Class_Teacher extends Model
 {
@@ -21,5 +22,9 @@ class Subject_Class_Teacher extends Model
 		$subject_class_teacher = Subject_Class_Teacher::where('subject_class_id', $subject_class->subject_class_id)
 									->where('teacher_id', $teacher_id)->first();
 		return !is_null($subject_class_teacher);
+    }
+
+    public static function deleteRecord($subject_class_id, $teacher_id) {
+        return DB::table('subject_class_teacher')->where('subject_class_id', '=', $subject_class_id)->where('teacher_id', '=', $teacher_id)->delete();
     }
 }

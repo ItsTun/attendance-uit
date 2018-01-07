@@ -5,7 +5,7 @@
 @endsection
 
 @section('styles')
-  <link rel="stylesheet" href="{{ asset('/css/classes.css') }}" />
+  <link rel="stylesheet" href="{{ asset('/css/subjects.css') }}" />
   <link rel="stylesheet" href="{{ asset('/select2/css/select2.min.css') }}" />
 @endsection
 
