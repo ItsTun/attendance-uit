@@ -7,8 +7,11 @@ use App\Klass;
 use App\Subject_Class;
 use App\Period;
 use App\Subject;
+use App\Student;
 
 use Illuminate\Support\Facades\Input;
+use Illuminate\Http\Request;
+use Validator;
 
 class AdminController extends Controller
 {
@@ -62,6 +65,91 @@ class AdminController extends Controller
 
     public function students() {
         return view('admin.students');
+    }
+
+    public function studentsCsv() {
+        $classes_ary = $this->getClasses();
+        return view('admin.studentscsv')->with(['classes_ary' => $classes_ary]);
+    }
+
+    function getClasses() {
+        $response = [];
+        $years = Year::all();
+        foreach ($years as $year) {
+            $klasses = $year->klasses;
+
+            $info = [];
+
+            foreach ($klasses as $klass) {
+                $data['class_id'] = $klass->class_id;
+                $data['name'] = $klass->name;
+                $data['short_form'] = $klass->short_form;
+                array_push($info, $data);
+            }
+
+            $response[$year->name] = $info;
+        }
+        return $response;
+    }
+
+    public function getArrayFromCSV(Request $request) {
+        $file = $request->file('students_csv');
+        $validator = Validator::make(
+            [
+                'file'      => $file,
+                'extension' => strtolower($file->getClientOriginalExtension()),
+            ],
+            [
+                'file'      => 'required',
+                'extension' => 'required|in:csv',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return "Only csv files are allowed!";
+        }
+
+        $stundentAry = $this->studentCsvToArray($file);
+        return $stundentAry;
+    }
+
+    function studentCsvToArray($filename = '', $delimiter = ',') {
+        if (!file_exists($filename) || !is_readable($filename))
+            return false;
+
+        $header = null;
+        $data = array();
+        if (($handle = fopen($filename, 'r')) !== false)
+        {
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false)
+            {
+                if (count($row) != 3) return false;
+
+                if (!$header) {
+                    $header = $row;
+                    if ($header[0] != 'roll_no' || $header[1] != 'name' || $header[2] != 'email')
+                        return false;
+                }
+                else {
+                    $data[] = array_combine($header, $row);
+                }
+            }
+            fclose($handle);
+        }
+        return $data;
+    }
+
+    public function saveStudentsFromCSV(Request $request) {
+        $students = json_decode($request->students);
+        foreach ($students as $value) {
+            $student = new Student();
+            $student->roll_no = $value->roll_no;
+            $student->name = $value->name;
+            $student->email = $value->email;
+            $student->class_id = $value->class_id;
+            $student->save();
+        }
+        echo "Students saved!";
     }
 
     public function attendance() {

@@ -12,6 +12,7 @@ class Student extends Model
 	
     protected $table = "students";
     protected $primaryKey = "roll_no";
+    protected $fillable = ['roll_no', 'name', 'email', 'class_id'];
 
     public function klass() {
     	return $this->belongsTo(Klass::class, 'class_id', 'class_id');

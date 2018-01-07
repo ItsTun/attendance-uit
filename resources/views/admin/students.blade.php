@@ -40,7 +40,8 @@
                 <div class="col-md-4">
                     <div class="form-material">
                         <div style="padding: 20px 0px 0px 60px;">
-                            <button class="btn btn-lg btn-success" data-toggle="modal" data-target="#addStudent">Add New Student</button>
+                            <button class="btn btn-md btn-success" data-toggle="modal" data-target="#addStudent">Add New Student</button>
+                            <button class="btn btn-md btn-success" onclick="window.location = '{{ route("students.csv") }}'">Import CSV</button>
                         </div>
                     </div>
                 </div>

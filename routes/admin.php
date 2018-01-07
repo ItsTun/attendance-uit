@@ -15,6 +15,7 @@ Route::group(['middleware' => ['web']], function () {
 	Route::get('dashboard', 'AdminController@dashboard');
 	Route::get('teachers', 'AdminController@teachers');
 	Route::get('students', 'AdminController@students');
+	Route::get('students/csv', 'AdminController@studentsCsv')->name('students.csv');
 	Route::get('classes', 'AdminController@classes');
 	Route::get('subjects', 'AdminController@subjects');
 	Route::get('add_new_admin', 'AdminController@addNewAdmin');
@@ -26,6 +27,8 @@ Route::group(['middleware' => ['web']], function () {
 	Route::post('addOrUpdateYear', 'AdminController@addOrUpdateYear');
 	Route::post('addOrUpdateClass', 'AdminController@addOrUpdateClass');
 	Route::post('addOrUpdateSubject', 'AdminController@addOrUpdateSubject');
+	Route::post('students/getArrayFromCSV', 'AdminController@getArrayFromCSV');
+	Route::post('students/saveStudentsFromCSV', 'AdminController@saveStudentsFromCSV');
 });
 
 // Password Reset Routes...

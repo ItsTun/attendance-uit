@@ -20,6 +20,7 @@ class KlassesController extends Controller
     		foreach ($klasses as $klass) {
     			$data['class_id'] = $klass->class_id;
     			$data['name'] = $klass->name;
+                $data['short_form'] = $klass->short_form;
     			array_push($info, $data);
     		}
 
