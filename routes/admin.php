@@ -22,9 +22,10 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 	Route::get('attendance', 'AdminController@attendance');
 	Route::get('years', 'AdminController@years');
 	Route::get('getTeacherWithEmail', 'AdminController@getTeacherWithEmail');
-
 	Route::get('getStudent', 'AdminController@getStudent');
 	Route::get('getStudentWithEmail', 'AdminController@getStudentWithEmail');
+	Route::get('checkIfEmailExists', 'AdminController@checkIfEmailExists');
+	Route::get('checkIfRollNoExists', 'AdminController@checkIfRollNoExists');
 
 	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods');
 	Route::post('addOrUpdateYear', 'AdminController@addOrUpdateYear');
