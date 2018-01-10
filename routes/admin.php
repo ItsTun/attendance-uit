@@ -11,17 +11,20 @@ Route::post('login', 'Auth\LoginController@login');
 Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
 // Route::group(['middleware' => ['admin', 'web']], function () {
-	Route::get('dashboard', 'AdminController@dashboard');
-	Route::get('teachers', 'AdminController@teachers');
-	Route::get('students', 'AdminController@students');
+	Route::get('dashboard', 'AdminController@dashboard')->name('admin-dashboard');
+	Route::get('teachers', 'AdminController@teachers')->name('admin-teachers');
+	Route::get('students', 'AdminController@students')->name('admin-students');
 	Route::get('students/csv', 'AdminController@studentsCsv')->name('students.csv');
-	Route::get('classes', 'AdminController@classes');
-	Route::get('subjects', 'AdminController@subjects');
+	Route::get('classes', 'AdminController@classes')->name('admin-classes');
+	Route::get('subjects', 'AdminController@subjects')->name('admin-subjects');
 	Route::get('add_new_admin', 'AdminController@addNewAdmin');
-	Route::get('timetables', 'AdminController@timetables');
-	Route::get('attendance', 'AdminController@attendance');
-	Route::get('years', 'AdminController@years');
+	Route::get('timetables', 'AdminController@timetables')->name('admin-timetables');
+	Route::get('attendance', 'AdminController@attendance')->name('admin-attendance');
+	Route::get('years', 'AdminController@years')->name('admin-years');
 	Route::get('getTeacherWithEmail', 'AdminController@getTeacherWithEmail');
+
+	Route::get('add/{period_id}', 'AdminController@addAttendance');
+	Route::post('add/{period_id}', 'AdminController@saveOrEditAttendance');
 
 	Route::get('getStudent', 'AdminController@getStudent');
 	Route::get('getStudentWithEmail', 'AdminController@getStudentWithEmail');
