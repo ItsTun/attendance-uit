@@ -22,12 +22,15 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 	Route::get('attendance', 'AdminController@attendance')->name('admin-attendance');
 	Route::get('years', 'AdminController@years')->name('admin-years');
 	Route::get('getTeacherWithEmail', 'AdminController@getTeacherWithEmail');
+	Route::get('students/batch_update', 'AdminController@batchUpdate');
 
 	Route::get('add/{period_id}', 'AdminController@addAttendance');
 	Route::post('add/{period_id}', 'AdminController@saveOrEditAttendance');
 
 	Route::get('getStudent', 'AdminController@getStudent');
 	Route::get('getStudentWithEmail', 'AdminController@getStudentWithEmail');
+	Route::get('checkIfEmailExists', 'AdminController@checkIfEmailExists');
+	Route::get('checkIfRollNoExists', 'AdminController@checkIfRollNoExists');
 
 	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods');
 	Route::post('addOrUpdateYear', 'AdminController@addOrUpdateYear');

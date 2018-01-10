@@ -50,7 +50,7 @@
 					<div class="col-md-4">
 						<form id="form" action="saveStudentsFromCSV" method="POST">
 							{{ csrf_field() }}
-							<button class="btn btn-md btn-success" onclick="saveStudents()">Save</button>
+							<button class="btn btn-md btn-success" onclick="saveStudents(); return false;">Save</button>
 						</form>
 					</div>
 				</div>
@@ -80,7 +80,6 @@
 		var students = [];
 		var classOptions = document.getElementById("classesSelect").options;
 		var selectedClass;
-		var errorIndexes = [];
 
 		window.onload = function() {
 			var studentsResult = document.getElementById("studentsResult");
@@ -131,20 +130,20 @@
 
 				var rollNoCol = row.insertCell(1);
 				rollNoCol.id = "col_" + element['roll_no'] + "_" + counter;
-				rollNoCol.innerHTML = selectedClass + "-" + "<input class='form-control form-control-line' type='text' value='" + element['roll_no'] + "' onfocusin='onFocus(" + counter + ', "roll_no", ' + element['roll_no'] + ")' onblur='onBlur(this, " + counter + ', "roll_no", ' + element['roll_no'] + ")' pattern='[A-Za-z]{3}' style='width: 100px;'>";
+				rollNoCol.innerHTML = selectedClass + "-" + "<input class='form-control form-control-line' type='text' value='" + element['roll_no'] + "' onblur='onBlur(this, " + counter + ', "roll_no", ' + element['roll_no'] + ")' pattern='[A-Za-z]{3}' style='width: 100px;'>";
 
 				var nameCol = row.insertCell(2);
 				nameCol.innerHTML = "<input class='form-control form-control-line' type='text' value='" + element['name'] + "'>";
 
 				var emailCol = row.insertCell(3);
 				emailCol.id = "col_" + element['email'] + "_" + counter;
-				emailCol.innerHTML = "<input class='form-control form-control-line' type='email' value='" + element['email'] + "' onfocusin='onFocus(" + counter + ', "email", ' + '"' +  element['email'] + '"' + ")' onblur='onBlur(this, " + counter + ', "email", ' + '"' + element['email'] + '"' + ")'>";
+				emailCol.innerHTML = "<input class='form-control form-control-line' type='email' value='" + element['email'] + "' onblur='onBlur(this, " + counter + ', "email", ' + '"' + element['email'] + '"' + ")'>";
 
 				var classCol =  row.insertCell(4);
 				classCol.innerHTML = classOptions[classOptions.selectedIndex].getAttribute('name');
 
-				showDuplicateError(counter, 'roll_no', element['roll_no']);
-				showDuplicateError(counter, 'email', element['email']);
+				showError(counter, 'roll_no', element['roll_no']);
+				showError(counter, 'email', element['email']);
 
 				counter++;
 			});
@@ -158,19 +157,12 @@
 		}
 
 		function removeRow(index, id) {
-			var foundIndexes = findOccurences(index, 'roll_no');
-			if (foundIndexes.length === 1) {
-				document.getElementById("col_" + students[foundIndexes[0]]['roll_no'] + "_" + foundIndexes[0]).className = '';
-			}
-
-			foundIndexes = findOccurences(index, 'email');
-			if (foundIndexes.length === 1) {
-				document.getElementById("col_" + students[foundIndexes[0]]['email'] + "_" + foundIndexes[0]).className = '';
-			}
-
 			var table = document.getElementById("students");
 			students[index] = null;
 			table.removeChild(document.getElementById("row_" + id + "_" + index));
+
+			markErrors('roll_no');
+			markErrors('email');
 		}
 
 		function findOccurences(index, type) {
@@ -185,45 +177,38 @@
 			return foundIndexes;
 		}
 
-		function showDuplicateError(index, type, id) {
+		function showError(index, type, id) {
 			var foundIndexes = findOccurences(index, type);
+			document.getElementById("col_" + id + "_" + index).className = '';
+
 			if (foundIndexes.length !== 0) {
 				document.getElementById("col_" + id + "_" + index).className = 'table-danger';
-			}
-		}
+			} 
 
-		function onFocus(index, type, id) {
-			errorIndexes = findOccurences(index, type);
+			if (type === 'roll_no' && !validateRollNo(id)) 
+				document.getElementById("col_" + id + "_" + index).className = 'table-danger';
+
+			if (type === 'email' && !validateEmail(id)) 
+				document.getElementById("col_" + id + "_" + index).className = 'table-danger';	
 		}
 
 		function onBlur(x, index, type, id) {
 			students[index][type] = x.value;
 			x.parentElement.id = "col_" + x.value + "_" + index;
 
-			var foundIndexes = findOccurences(index, type);
-			if (foundIndexes.length === 0) {
-				document.getElementById("col_" + x.value + "_" + index).className = '';
-			} else {
-				document.getElementById("col_" + x.value + "_" + index).className = 'table-danger';
-				for (var i = 0; i < foundIndexes.length; i++) {
-					document.getElementById("col_" + students[foundIndexes[i]][type] + "_" + foundIndexes[i]).className = 'table-danger';
-				}
-			}
-			if (errorIndexes.length === 1 && foundIndexes.length === 0) {
-				document.getElementById("col_" + students[errorIndexes[0]][type] + "_" + errorIndexes[0]).className = '';
-			}
+			markErrors(type);
+		}
 
-			if (type === 'roll_no' && !validateRollNo(x.value)) {
-				document.getElementById("col_" + x.value + "_" + index).className = 'table-danger';
-			}
-
-			if (type === 'email' && !validateEmail(x.value)) {
-				document.getElementById("col_" + x.value + "_" + index).className = 'table-danger';
+		function markErrors(type) {
+			for (var i = 0; i < students.length; i++) {
+				if (students[i] != null) {
+					showError(i, type, students[i][type]);
+				} 
 			}
 		}
 
 		function validateRollNo(rollNo) {
-			var re = /^[1-9]+$/;
+			var re = /^[1-9][0-9]*$/;
     		return re.test(rollNo);
 		}
 
@@ -237,19 +222,14 @@
 				alert("Errors must be cleaned first!");
 				return;
 			}
+
 			studentsAry = getStudents();
 			if (studentsAry.length === 0) {
 				alert("No data to save!");
+				return false;
 			}
 
-			var input = document.createElement("input");
-			input.setAttribute("type", "hidden");
-			input.setAttribute("name", "students");
-			input.setAttribute("value", JSON.stringify(studentsAry));
-
-			var form = document.getElementById('form');
-		    form.appendChild(input);
-		    form.submit();
+			checkIfRollNoExists(studentsAry);
 		}
 
 		function isErrorClean() {
@@ -261,12 +241,65 @@
 			var studentsAry = [];
 			students.forEach(function(element) {
 				if (element !== null) {
-					studentsAry.push(element);
-					studentsAry[studentsAry.length - 1]['roll_no'] = selectedClass + '-' + element['roll_no'];
-					studentsAry[studentsAry.length - 1]['class_id'] = classOptions[classOptions.selectedIndex].id;
+					var student = {};
+					student['roll_no'] = selectedClass + '-' + element['roll_no'];
+					student['name'] = element['name'];
+					student['email'] = element['email'];
+					student['class_id'] = classOptions[classOptions.selectedIndex].id;
+					studentsAry.push(student);
 				}
 			});
 			return studentsAry;
 		}
+
+		function checkIfRollNoExists(studentsAry) {
+			var roll_nos = [];
+			studentsAry.forEach(function(element) {
+				roll_nos.push(element['roll_no']);
+			});
+
+			$.get('/admin/checkIfRollNoExists', {
+				roll_nos: JSON.stringify(roll_nos)
+			}, function(data, status) {
+				if (data == null) return;
+
+				if (data.length != 0) {
+					alert("Roll No Duplication! Please check these roll no(s) : " + data);
+					return;
+				}
+				checkIfEmailExists(studentsAry);
+			});
+		}
+
+		function checkIfEmailExists(studentsAry) {
+			var emails = [];
+			studentsAry.forEach(function(element) {
+				emails.push(element['email']);
+			});
+
+			$.get('/admin/checkIfEmailExists', {
+				emails: JSON.stringify(emails)
+			}, function(data, status) {
+				if (data == null) return;
+
+				if (data.length != 0) {
+					alert("Email Duplication! Please check these emails : " + data);
+					return;
+				}
+				sendStudentsForm();
+			});
+		}
+
+		function sendStudentsForm() {
+			var input = document.createElement("input");
+			input.setAttribute("type", "hidden");
+			input.setAttribute("name", "students");
+			input.setAttribute("value", JSON.stringify(studentsAry));
+
+			var form = document.getElementById('form');
+			form.appendChild(input);
+			form.submit();
+		}
+
 	</script>
 @endsection

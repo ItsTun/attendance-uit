@@ -166,6 +166,13 @@ class AdminController extends Controller
         return $data;
     }
 
+    public function batchUpdate() {
+        $years = Year::all();
+        $year_id = Input::get('year_id');
+        $klass_id = Input::get('class_id');
+        return view('admin.student_batch_update')->with(['years' => $years, 'year_id' => $year_id, 'class_id' => $klass_id]);
+    }
+
     public function saveStudentsFromCSV(Request $request) {
         $students = json_decode($request->students);
         foreach ($students as $value) {
@@ -177,6 +184,26 @@ class AdminController extends Controller
             $student->save();
         }
         echo "Students saved!";
+    }
+
+    public function checkIfEmailExists(Request $request) {
+        $emails = json_decode($request->emails);
+        $students = Student::getStudentsWithEmails($emails);
+        $r_emails = [];
+        foreach ($students as $value) {
+            array_push($r_emails, $value->email);
+        }
+        return response($r_emails);
+    }
+
+    public function checkIfRollNoExists(Request $request) {
+        $roll_nos = json_decode($request->roll_nos);
+        $students = Student::getStudentsWithRollNos($roll_nos);
+        $r_roll_nos = [];
+        foreach ($students as $value) {
+            array_push($r_roll_nos, $value->roll_no);
+        }
+        return response($r_roll_nos);
     }
 
     public function attendance() {

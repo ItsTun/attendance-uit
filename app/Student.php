@@ -46,4 +46,16 @@ class Student extends Model
             ->select('students.roll_no', 'students.name', 'students.email', 'classes.short_form as class_short_form', 'classes.name as class_name')
             ->get();
     }
+
+    public static function getStudentsWithRollNos($roll_nos) {
+        return DB::table('students')
+                ->whereIn('roll_no', $roll_nos)
+                ->get();
+    }
+
+    public static function getStudentsWithEmails($emails) {
+        return DB::table('students')
+                ->whereIn('email', $emails)
+                ->get();
+    }
 }
