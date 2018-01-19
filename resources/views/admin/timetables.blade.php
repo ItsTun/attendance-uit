@@ -233,10 +233,10 @@
 						widgetPositioning : { vertical: 'bottom' },
 	                    format: 'LT'
 	                }).on('dp.change',function(e){
-	                	console.log(document.activeElement.className);
 	                	if (document.activeElement.className == e.target.className) {
 		                	var patt = new RegExp("\\d{1,2}");
 		                	var classNames = e.currentTarget.className;
+		                	console.log($('.time-chooser.t5').val());
 		                	var res = patt.exec(classNames);
 						    validateTimeOfPeriod(res[0], e);
 						}
@@ -247,8 +247,9 @@
 				for(var i = 0; i < periods.length; i++) {
 					var period = periods[i];
 
+					$('.r'+period.day+'.c'+period.period_num).attr('data-period-id', period.period_id);
+
 					if(period.subject_class_id != lunchBreak.subject_class_id) {
-						console.log('> ' + period.subject_class_id);
 						$('.r'+period.day+'.c'+period.period_num).html('<div data-subject-class-id="'+ period.subject_class_id +'" class="redips-drag ar" style="border-style: solid; cursor: move;" id="c'+ i +'">'+ getSubjectCode(period.subject_class_id) +'<br><input type="text" placeholder="Room" class="room" value="'+ period.room +'"required></div>');
 					} else {
 						currentValue = period.period_num;
@@ -275,7 +276,6 @@
 
 			function addOrRemoveColumnsIfNeeded() {
 				var numberOfPeriods = getNumberOfPeriods();
-				console.log(numberOfPeriods);
 				if(numberOfPeriods > 7) {
 					var columnsToBeAdded = numberOfPeriods - 7;
 					for(var i = 0; i < columnsToBeAdded; i++) {
@@ -338,19 +338,16 @@
 			}
 
 			function validateTimeOfPeriod(num, e) {
-				console.log('unparsed num' + num);
 				num = parseInt(num);
 				var input = e.target;
+				console.log(input);
 				var value = input.value;
-				console.log('num' + num);
 				var currentTime = getTimeObj(value);
 				if(num > 1) {
 					var prev = num - 1;
 					var prevKey = 't' + prev;
-					console.log(prevKey);
 					if(timeExists(prevKey) && currentTime) {
 						var prevTime = times[prevKey];	
-						console.log(prevTime);
 						if(prevTime.isAfter(currentTime)) {
 							input.value = getTimeStr(prevTime);
 							alert('Should be later than ' + getTimeStr(prevTime));
@@ -361,7 +358,6 @@
 
 				var next = num + 1;
 				var nextKey = 't' + next;
-				console.log(nextKey);
 				if(timeExists(nextKey) && currentTime) {
 					var nextTime = times[nextKey];
 					if(nextTime.isBefore(currentTime)) {
@@ -397,8 +393,11 @@
 						var period = {};
 						period['day'] = i;
 						period['period_num'] = j;
-						period['start_time'] = get24HourStr($('.time-chooser.t' + j).val()); 
+						period['start_time'] = get24HourStr($('.time-chooser.t' + ((j * 2) - 1) ).val()); 
 						period['end_time'] = get24HourStr($('.time-chooser.t' + j * 2).val());
+
+						var p_id = $('.r'+i+'.c'+j).attr('data-period-id');
+						period['period_id'] = (p_id != undefined) ? p_id : -1;
 
 						if(j != lunchBreakPeriod) {
 							var tempPeriod = $('.r'+i+'.c'+j).children()[0];
@@ -429,6 +428,7 @@
 			        	alert("Saved successfully.");
 					},
 					error: function(error) {
+						console.log(error);
 						alert("Failed to save");
 					}
 				});

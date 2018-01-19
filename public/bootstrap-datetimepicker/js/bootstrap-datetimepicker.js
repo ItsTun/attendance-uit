@@ -2464,8 +2464,8 @@
             date: 'glyphicon glyphicon-calendar',
             up: 'fa fa-caret-square-o-up',
             down: 'fa fa-caret-square-o-down',
-            previous: 'glyphicon glyphicon-chevron-left',
-            next: 'glyphicon glyphicon-chevron-right',
+            previous: 'fa fa-caret-square-o-left',
+            next: 'fa fa-caret-square-o-right',
             today: 'glyphicon glyphicon-screenshot',
             clear: 'glyphicon glyphicon-trash',
             close: 'glyphicon glyphicon-remove'

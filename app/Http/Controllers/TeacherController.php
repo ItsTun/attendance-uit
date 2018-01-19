@@ -36,7 +36,7 @@ class TeacherController extends Controller
     	$teacher_id = Teacher::getCurrentTeacher()->teacher_id;
         $currentDay = date('N');
     	$timetable = $period->getTeacherTimetable($teacher_id, 
-            (!is_null($date)) ? Utils::getDayFromDate($date) : ($currentDay != 6 && $currentDay != 7) ? $currentDay : 1);
+            (!is_null($date)) ? Utils::getDayFromDate($date) : (($currentDay != 6 && $currentDay != 7) ? $currentDay : 1));
 
         $with = ['timetables' => $timetable, 'dates' => Utils::getDatesInThisWeek()];
         $with['selectedDate'] = (!is_null($date)) ? $date : Utils::getDefaultDate();

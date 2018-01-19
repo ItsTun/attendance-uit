@@ -10,15 +10,15 @@ class Attendance extends Model
 	public $incrementing = false;
 
 	protected $table = 'attendances';
-	protected $primaryKey = 'student_roll_no';
-	protected $fillable = ['student_roll_no', 'attendance_json'];
+	protected $primaryKey = 'student_id';
+	protected $fillable = ['student_id', 'attendance_json'];
 
  	public function student() {
- 		return $this->belongsTo('Student');
+ 		return $this->belongsTo('Student', 'student_id');
  	}
 
- 	public static function updateStudentAttendance($rollNo, $studentAttendance) {
- 		$attendance = Attendance::firstOrNew(array('student_roll_no' => $rollNo));
+ 	public static function updateStudentAttendance($student_id, $studentAttendance) {
+ 		$attendance = Attendance::firstOrNew(array('student_id' => $student_id));
  		$attendance->attendance_json = $studentAttendance;
  		$attendance->save();
  	}

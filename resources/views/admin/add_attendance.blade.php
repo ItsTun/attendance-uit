@@ -1,4 +1,4 @@
-@extends('layouts.teacher_layout')
+@extends('layouts.admin_layout')
 
 @section('title')
 Add Attendance

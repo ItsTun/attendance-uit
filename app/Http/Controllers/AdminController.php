@@ -11,6 +11,9 @@ use App\Subject;
 use App\Student;
 use App\Teacher;
 use App\Faculty;
+use App\Utils;
+use App\Open_Period;
+use App\Period_Attendance;
 
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
@@ -163,6 +166,15 @@ class AdminController extends Controller
         return $data;
     }
 
+    public function batchUpdate() {
+        $years = Year::all();
+        $year_id = Input::get('year_id');
+        $klass_id = Input::get('class_id');
+        $students = [];
+        if(!is_null($year_id) && !is_null($klass_id)) $students = Student::getStudentsFromYearOrClass($year_id, $klass_id);
+        return view('admin.student_batch_update')->with(['years' => $years, 'year_id' => $year_id, 'class_id' => $klass_id, 'students' => $students]);
+    }
+
     public function saveStudentsFromCSV(Request $request) {
         $students = json_decode($request->students);
         foreach ($students as $value) {
@@ -206,7 +218,27 @@ class AdminController extends Controller
     }
 
     public function attendance() {
-        return view('admin.attendance');
+        $period = new Period();
+        $date = Input::get('date');
+        $msgCode = Input::get('msg_code');
+        $class_id = Input::get('class_id');
+
+        if(!is_null($date) && !Utils::validateDate($date)) {
+            return "Invalid date format!";
+        }
+
+        $years = Year::all();
+
+        $currentDay = date('N');
+        $timetable = $period->getTimetableInDay((!is_null($date)) ? Utils::getDayFromDate($date) : (($currentDay != 6 && $currentDay != 7) ? $currentDay : 1), $class_id);
+
+        $with = ['timetables' => $timetable, 'dates' => Utils::getDatesInThisWeek()];
+        $with['selectedDate'] = (!is_null($date)) ? $date : Utils::getDefaultDate();
+        $with['msgCode'] = (!is_null($msgCode)) ? $msgCode : 0;
+        $with['class_id'] = (!is_null($class_id))?$class_id:'';
+        $with['years'] = $years;
+
+        return view('admin.attendance')->with($with);
     }
 
     public function addNewAdmin() {
@@ -227,7 +259,7 @@ class AdminController extends Controller
 
     public function getStudent() {
         $roll_no = Input::get('roll_no');
-        $student = Student::find($roll_no);
+        $student = Student::where('roll_no', $roll_no)->first();
 
         return (is_null($student))?'null':$student;
     }
@@ -271,6 +303,7 @@ class AdminController extends Controller
 
     public function addOrUpdateStudent() {
         $prefix = Input::post('prefix');
+        $student_id = Input::post('student_id');
         $roll_no = Input::post('roll_no');
         $name = Input::post('name');
         $email = Input::post('email');
@@ -279,7 +312,7 @@ class AdminController extends Controller
 
         $student = null;
 
-        if(!is_null($old_roll_no)) $student = Student::find($old_roll_no);
+        if(!is_null($student_id)) $student = Student::find($student_id);
 
         if(is_null($student)) {
             $student = new Student();
@@ -383,8 +416,7 @@ class AdminController extends Controller
                 $periodTemp->end_time = $period['end_time'];
                 $periodTemp->save();
             } else if(array_key_exists('subject_class_id', $period)) {
-                $periodTemp = Period::getPeriod($period['subject_class_id'], $period['day'], $period['period_num']);
-                if(is_null($periodTemp)) $periodTemp = new Period();
+                $periodTemp = ($period['period_id'] != -1) ? Period::find($period['period_id']) : new Period() ;
                 $periodTemp->subject_class_id = $period['subject_class_id'];
                 $periodTemp->room = $period['room'];
                 $periodTemp->period_num = $period['period_num'];
@@ -393,6 +425,80 @@ class AdminController extends Controller
                 $periodTemp->end_time = $period['end_time'];
                 $periodTemp->save();
             }
+        }
+    }
+
+    public function addAttendance($period_ids) {
+        $date = Input::get('date');
+        $periods = explode(',', $period_ids);
+        $error = $this->check($date, $periods);
+        $periodObjects = Period::find($periods);
+        $numberOfPeriods = Period::getUniquePeriodNumber($periods);
+        if(is_null($error)) {
+            $students = Student::getStudentsFromPeriod($periods);
+            return view('admin.add_attendance')->with(['students'=>$students,'periods'=> $periods, 'date'=>$date, 
+                'periodObjects' => $periodObjects, 'numberOfPeriods'=>$numberOfPeriods, 'attendedStudents' => $this->getAttendedStudentsFromPeriods($periods, $date)]);
+        } else {
+            return $error;
+        }
+    }
+
+    private function check($date, $periods) {
+        if(Utils::validateDate($date)) {
+            foreach($periods as $period) {
+                if(Utils::periodIsInDate($periods, $date)) {
+                    return null;
+                } else {
+                    return "There is no period with id $period in $date";
+                }
+            }
+        } else {
+            return "Invalid date format!";
+        }
+    }
+
+    private function getAttendedStudentsFromPeriods($period_ids, $date) {
+        $attendedStudents = null; $students = null;
+        foreach($period_ids as $period_id) {
+            $openPeriod = Open_Period::fetch($period_id, $date);
+            if(!is_null($openPeriod)) $students = $openPeriod->attendedStudents;
+            if (!is_null($students)) {
+                if (is_null($attendedStudents)) $attendedStudents = [];
+                $attendedStudents[$period_id. '_student'] = $students;
+            } else {
+                if (!is_null($attendedStudents)) $attendedStudents[$period_id. '_student'] = [];
+            }
+        }
+        return $attendedStudents;
+    }
+
+    public function saveOrEditAttendance() {
+        $date = Input::get('date');
+        $presentStudents = [];
+        $periods = Input::get('period');
+
+        $period_ids = explode(',', $periods);
+
+        $error = $this->check($date, $period_ids);
+
+        if (is_null($error)) {
+            foreach($period_ids as $period_id) {
+                $key = $period_id . '_student';
+                $students = Input::post($key);
+                $presentStudents[$key] = (is_null($students))?[]:$students;
+            }
+
+            $isUpdate = !is_null($this->getAttendedStudentsFromPeriods($period_ids, $date));
+
+            if(!$isUpdate) {
+                Period_Attendance::saveAttendance($period_ids, $date, $presentStudents);
+            } else {
+                Period_Attendance::updateAttendance($period_ids, $date, $presentStudents);
+            }
+
+            return redirect()->action('AdminController@attendance', ['msg_code' => ($isUpdate) ? '2' : '1']);
+        } else {
+            return $error;
         }
     }
 

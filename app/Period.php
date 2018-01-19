@@ -44,6 +44,20 @@ class Period extends Model
             ->get();
     }
 
+    public static function getTimetableInDay($day, $class_id) {
+        $sql = DB::table('periods')
+            ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
+            ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
+            ->join('classes', 'classes.class_id', '=', 'subject_class.class_id')
+            ->where('periods.day', $day)
+            ->select('periods.period_id', 'subjects.subject_code', 'subjects.name as subject_name', 'subject_class.subject_class_id','periods.start_time', 'periods.end_time','periods.period_num', 'periods.room', 'classes.short_form as class_short_form', 'classes.name as class_name')
+            ->groupby('periods.period_id')
+            ->orderby('periods.period_num')
+            ->orderby('periods.subject_class_id');
+        if(!is_null($class_id) && $class_id!=-1) $sql->where('subject_class.class_id', $class_id);
+        return $sql->get();
+    }
+
     public static function getTeacherTimetable($teacher_id, $day) {
         return DB::table('periods')
             ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')

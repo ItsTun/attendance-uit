@@ -4,13 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Klass;
 
 class Student extends Model
 {
 	public $incrementing = false;
 	
     protected $table = "students";
-    protected $primaryKey = "roll_no";
+    protected $primaryKey = "student_id";
     protected $fillable = ['roll_no', 'name', 'email', 'class_id'];
 
     public function klass() {
@@ -33,6 +34,15 @@ class Student extends Model
             ->select('students.*')
             ->distinct()
             ->get();
+    }
+
+    public static function getStudentsFromYearOrClass($year_id, $class_id) {
+        if(!is_null($class_id) && $class_id!=-1) {
+            return Student::where('class_id', $class_id)->get();
+        } else {
+            $classes = Klass::where('year_id', $year_id)->get();
+            return Student::whereIn('class_id', $classes)->orderBy('roll_no')->get();
+        }
     }
 
     public static function getStudentsFromClass($class_id) {
