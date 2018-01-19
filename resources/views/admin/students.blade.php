@@ -80,7 +80,7 @@
                     <td>{{ $student->name }}</td>
                     <td>{{ $student->email }}</td>
                     <td>
-                      <button type="button" id="edit-btn" class="btn btn-primary" data-toggle="modal" data-target="#addOrEditStudent" data-roll-no="{{ $student->roll_no }}" data-name="{{ $student->name }}" data-email="{{ $student->email }}" data-class-id="{{ $student->class_id }}">Edit</button>
+                      <button type="button" id="edit-btn" class="btn btn-primary" data-toggle="modal" data-target="#addOrEditStudent" data-student-id="{{ $student->student_id }}" data-roll-no="{{ $student->roll_no }}" data-name="{{ $student->name }}" data-email="{{ $student->email }}" data-class-id="{{ $student->class_id }}">Edit</button>
                     </td>
                 </tr>
                 @endforeach
@@ -108,7 +108,22 @@
       </div>
       <form onsubmit="return onSubmitBtnClick()" class="form-horizontal form-material">
       <div class="modal-body">
-          <div class="container">            
+          <input type="hidden" name="student_id" id="student_id" />
+          <div class="container">        
+                <div class="form-group">
+                  <label class="col-md-12">Class</label>
+                    <div class="col-md-12" style="margin-top: 10px;">
+                      <select class="class-select form-control form-control-line" name="class_id" onchange="onClassChange()" style="width: 100%;" name="c_id">
+                        @foreach($years as $year)
+                          <optgroup label="{{ $year->name }}">
+                            @foreach($year->klasses as $klass)
+                              <option value="{{ $klass->class_id }}" data-short-form="{{ $klass->short_form }}" @if($klass->class_id==$class_id) selected="selected" @endif>{{ $klass->name }}</option>
+                            @endforeach
+                          </optgroup>
+                        @endforeach
+                      </select>
+                    </div>
+                </div>    
                 <div class="form-group">
                   <label class="col-md-12">Roll No</label>
                     <div class="col-md-12" style="margin-top: 5px;">
@@ -131,20 +146,6 @@
                   <label class="col-md-12">Email</label>
                     <div class="col-md-12">
                       <input class="form-control form-control-line input-email" name="email" type="email" required/>
-                    </div>
-                </div>
-                <div class="form-group">
-                  <label class="col-md-12">Class</label>
-                    <div class="col-md-12" style="margin-top: 10px;">
-                      <select class="class-select form-control form-control-line" name="class_id" onchange="onClassChange()" style="width: 100%;" name="c_id">
-                        @foreach($years as $year)
-                          <optgroup label="{{ $year->name }}">
-                            @foreach($year->klasses as $klass)
-                              <option value="{{ $klass->class_id }}" data-short-form="{{ $klass->short_form }}" @if($klass->class_id==$class_id) selected="selected" @endif>{{ $klass->name }}</option>
-                            @endforeach
-                          </optgroup>
-                        @endforeach
-                      </select>
                     </div>
                 </div>
             </div>
@@ -176,9 +177,11 @@
     });
 
     function postRecord() {
+      var student_id = $('#student_id').val();
       $.ajax({
         type: "POST",
         data: {
+          "student_id": student_id,
           "old_r": oldRollNo,
           "prefix": $('.prefix').val(),
           "roll_no": $('.input-roll-no').val(),
@@ -263,6 +266,7 @@
 
     $(document).on("click", "#edit-btn", function () {
       isUpdate = true;
+      var student_id = $(this).data('student-id');
       var roll_no = $(this).data('roll-no');
       var name = $(this).data('name');
       var email = $(this).data('email');
@@ -273,6 +277,7 @@
 
       var splitted = roll_no.split('-');
 
+      $('#student_id').val(student_id);
       $('.prefix').val(splitted[0].trim());
       $('.input-roll-no').val(splitted[1].trim());
       $('.input-name').val(name);
@@ -286,6 +291,7 @@
       oldRollNo = '';
       oldEmail = '';
 
+      $('#student_id').val('');
       $('.prefix').val('');
       $('.input-roll-no').val('');
       $('.input-name').val('');

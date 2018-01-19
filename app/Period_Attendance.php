@@ -87,22 +87,22 @@ class Period_Attendance extends Model
 
             $openPeriodId = $openPeriod->open_period_id;
             
-            $students = Student::select('roll_no')->where('class_id', $klass->class_id)->get();
+            $students = Student::where('class_id', $klass->class_id)->get();
 
             foreach ($students as $value) {
-                $rollNo = $value['roll_no'];
+                $student_id = $value['student_id'];
 
                 $periodAttendance = new Period_Attendance();
-                $periodAttendance->roll_no = $rollNo;
+                $periodAttendance->student_id = $student_id;
                 $periodAttendance->open_period_id = $openPeriodId;
-                $periodAttendance->present = in_array($rollNo, $presentStudents[$periodId . '_student']);
+                $periodAttendance->present = in_array($student_id, $presentStudents[$periodId . '_student']);
                 $periodAttendance->save();
 
-                $studentAttendance = Period_Attendance::getStudentAttendance($rollNo);
-                Attendance::updateStudentAttendance($rollNo, $studentAttendance);
+                $studentAttendance = Period_Attendance::getStudentAttendance($student_id);
+                Attendance::updateStudentAttendance($student_id, $studentAttendance);
             }
 
-            InternalLog::addLog('ADD', 'Add blah blah blah...', $openPeriod->attendedStudents, null, Utils::getCurrentDateTime(), 1); // change user_id
+            //InternalLog::addLog('ADD', 'Add blah blah blah...', $openPeriod->attendedStudents, null, Utils::getCurrentDateTime(), 1);
         }
     }
 
@@ -111,6 +111,8 @@ class Period_Attendance extends Model
             $openPeriod = Open_Period::where('date', $date)
                 ->where('period_id', $periodId)
                 ->first();
+
+            print_r($openPeriod);
 
 
             // $log = new InternalLog();
@@ -122,13 +124,13 @@ class Period_Attendance extends Model
             // $log->save();
             
             foreach ($openPeriod->attendedStudents as $periodAttendance) {
-                $rollNo = $periodAttendance['roll_no'];
+                $student_id = $periodAttendance['student_id'];
 
-                $periodAttendance->present = in_array($rollNo, $presentStudents[$periodId . '_student']);
+                $periodAttendance->present = in_array($student_id, $presentStudents[$periodId . '_student']);
                 $periodAttendance->save();
 
-                $studentAttendance = Period_Attendance::getStudentAttendance($rollNo);
-                Attendance::updateStudentAttendance($rollNo, $studentAttendance);
+                $studentAttendance = Period_Attendance::getStudentAttendance($student_id);
+                Attendance::updateStudentAttendance($student_id, $studentAttendance);
             }
 
             // $log->new_value = $openPeriod->attendedStudents;
@@ -136,9 +138,9 @@ class Period_Attendance extends Model
         }
     }
 
-    public static function getStudentAttendance($rollNo) {
+    public static function getStudentAttendance($student_id) {
         return DB::table('period_attendance')
-            ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
+            ->join('students', 'students.student_id', '=', 'period_attendance.student_id')
             ->join('classes', 'classes.class_id', '=', 'students.class_id')
             ->join('subject_class', 'subject_class.class_id', '=', 'classes.class_id')
             ->join('periods', 'periods.subject_class_id', '=', 'subject_class.subject_class_id')
@@ -146,7 +148,7 @@ class Period_Attendance extends Model
             ->join('open_periods', function($join) {
                 $join->on('open_periods.period_id', '=', 'periods.period_id')->on('period_attendance.open_period_id', '=', 'open_periods.open_period_id');
             })
-            ->where('period_attendance.roll_no', $rollNo)
+            ->where('period_attendance.student_id', $student_id)
             ->select('subject_class.subject_class_id', 
                     'subjects.subject_code', 
                     'subjects.name',

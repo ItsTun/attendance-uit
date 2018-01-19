@@ -37,19 +37,19 @@ Add Attendance
 									<td align="center">
 										<div class="custom-checkbox">
 											<input type="checkbox" name="{{ $periodObjects[$i]->period_id }}_student[]" 
-											id="{{ $periodObjects[$i]->period_id }}_{{ $student->roll_no }}" 
-											value="{{ $student->roll_no }}"
+											id="{{ $periodObjects[$i]->period_id }}_{{ $student->student_id }}" 
+											value="{{ $student->student_id }}"
 											@php
 												if(!is_null($attendedStudents)) {
 													$tempStudents = $attendedStudents[$periodObjects[$i]->period_id.'_student'];
 													$tempStudents = $tempStudents->toArray();
-													$roll_nos = array_column($tempStudents, 'roll_no');
-													$index = array_search($student->roll_no, $roll_nos);
+													$student_ids = array_column($tempStudents, 'student_id');
+													$index = array_search($student->student_id, $student_ids);
 													if(is_int($index) && $tempStudents[$index]['present'] == 1) echo "checked";
 												}
 											@endphp
 											/>
-											<label for="{{ $periodObjects[$i]->period_id }}_{{ $student->roll_no }}"></label>
+											<label for="{{ $periodObjects[$i]->period_id }}_{{ $student->student_id }}"></label>
 										</div>
 									</td>
 								@endif

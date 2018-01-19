@@ -170,7 +170,9 @@ class AdminController extends Controller
         $years = Year::all();
         $year_id = Input::get('year_id');
         $klass_id = Input::get('class_id');
-        return view('admin.student_batch_update')->with(['years' => $years, 'year_id' => $year_id, 'class_id' => $klass_id]);
+        $students = [];
+        if(!is_null($year_id) && !is_null($klass_id)) $students = Student::getStudentsFromYearOrClass($year_id, $klass_id);
+        return view('admin.student_batch_update')->with(['years' => $years, 'year_id' => $year_id, 'class_id' => $klass_id, 'students' => $students]);
     }
 
     public function saveStudentsFromCSV(Request $request) {
@@ -248,7 +250,7 @@ class AdminController extends Controller
 
     public function getStudent() {
         $roll_no = Input::get('roll_no');
-        $student = Student::find($roll_no);
+        $student = Student::where('roll_no', $roll_no)->first();
 
         return (is_null($student))?'null':$student;
     }
@@ -292,6 +294,7 @@ class AdminController extends Controller
 
     public function addOrUpdateStudent() {
         $prefix = Input::post('prefix');
+        $student_id = Input::post('student_id');
         $roll_no = Input::post('roll_no');
         $name = Input::post('name');
         $email = Input::post('email');
@@ -300,7 +303,7 @@ class AdminController extends Controller
 
         $student = null;
 
-        if(!is_null($old_roll_no)) $student = Student::find($old_roll_no);
+        if(!is_null($student_id)) $student = Student::find($student_id);
 
         if(is_null($student)) {
             $student = new Student();

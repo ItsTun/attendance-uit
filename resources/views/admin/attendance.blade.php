@@ -125,9 +125,7 @@
 		(function() {
 			$('#datepicker').datetimepicker({
 		        format: 'YYYY-MM-DD'
-		    }).on('dp.change',function(e){
-            	//dateChange();
-			});;
+		    });
 			setTimeout(function () {
 		        document.getElementById('message').style.display='none';
 		    }, 3000);
