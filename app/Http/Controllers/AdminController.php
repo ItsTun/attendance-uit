@@ -178,11 +178,20 @@ class AdminController extends Controller
 
     public function checkIfEmailExists(Request $request) {
         $emails = json_decode($request->emails);
-        $students = Student::getStudentsWithEmails($emails);
         $r_emails = [];
+
+        $students = Student::getStudentsWithEmails($emails);
         foreach ($students as $value) {
             array_push($r_emails, $value->email);
         }
+
+        $teachers = Teacher::getTeachersWithEmails($emails);
+        foreach ($teachers as $value) {
+            if (!in_array($value->email, $r_emails)) {
+                array_push($r_emails, $value->email);
+            }
+        }
+
         return response($r_emails);
     }
 
