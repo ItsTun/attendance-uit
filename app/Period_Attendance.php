@@ -15,20 +15,22 @@ class Period_Attendance extends Model
 	protected $table = "period_attendance";
 	protected $primaryKey = "period_attendance_id";
 
-	public static function getAttendanceDetail($rollNo, $month) {
-		$results =  DB::select( DB::raw(
-            'SELECT open_periods.open_period_id, open_periods.date, periods.period_num, subjects.subject_code, period_attendance.present 
-            FROM open_periods, students, subjects, periods, period_attendance 
-            WHERE MONTH(open_periods.date) = :month
-            AND students.roll_no = :roll_no 
-            AND subjects.class_id = students.class_id 
-            AND periods.subject_id = subjects.subject_id 
-            AND open_periods.period_id = periods.period_id 
-            AND period_attendance.roll_no = students.roll_no 
-            AND period_attendance.open_period_id = open_periods.open_period_id
-            ORDER BY open_periods.open_period_id, periods.period_num;'
-        ), array('month' => $month, 'roll_no' => $rollNo) );
-        return $results;
+	public static function getAttendanceDetails($roll_no, $from, $to) {
+	   return DB::table('period_attendance')
+            ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
+            ->join('open_periods', 'open_periods.open_period_id', '=', 'period_attendance.open_period_id')
+            ->join('periods', 'periods.period_id', '=', 'open_periods.period_id')
+            ->join('subject_class', function($join) {
+                $join->on('periods.subject_class_id', '=', 'subject_class.subject_class_id')
+                     ->on('students.class_id', '=', 'subject_class.class_id');
+            })
+            ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
+            ->whereBetween('open_periods.date', [$from, $to])
+            ->where('students.roll_no', $roll_no)
+            ->select('open_periods.open_period_id', 'open_periods.date', 'periods.period_num', 'subjects.subject_code', 'period_attendance.present')
+            ->orderby('open_periods.date')
+            ->orderby('periods.period_num')
+            ->get();
 	}
 
 	public static function getTotalAbsence($rollNo, $month) {

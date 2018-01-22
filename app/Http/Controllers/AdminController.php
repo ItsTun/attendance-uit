@@ -104,7 +104,6 @@ class AdminController extends Controller
         $years = Year::all();
         foreach ($years as $year) {
             $klasses = $year->klasses;
-
             $info = [];
 
             foreach ($klasses as $klass) {
@@ -166,15 +165,6 @@ class AdminController extends Controller
         return $data;
     }
 
-    public function batchUpdate() {
-        $years = Year::all();
-        $year_id = Input::get('year_id');
-        $klass_id = Input::get('class_id');
-        $students = [];
-        if(!is_null($year_id) && !is_null($klass_id)) $students = Student::getStudentsFromYearOrClass($year_id, $klass_id);
-        return view('admin.student_batch_update')->with(['years' => $years, 'year_id' => $year_id, 'class_id' => $klass_id, 'students' => $students]);
-    }
-
     public function saveStudentsFromCSV(Request $request) {
         $students = json_decode($request->students);
         foreach ($students as $value) {
@@ -215,6 +205,79 @@ class AdminController extends Controller
             array_push($r_roll_nos, $value->roll_no);
         }
         return response($r_roll_nos);
+    }
+
+    public function studentsAttendanceDetails() {
+        $classes_ary = $this->getClasses();
+        return view('admin.student_attendance_details')->with(['classes_ary' => $classes_ary]);
+    }
+
+    public function getStudentAttendanceDetails(Request $request) {
+        $roll_no = $request->roll_no;
+        $from = $request->from;
+        $to = $request->to;
+
+        $student = Student::where('roll_no', $roll_no)->first();
+        if (!$student) {
+            return response(null, '204');
+        }
+        $class = Student::where('roll_no', $roll_no)->first()->klass;
+        $class_id = $class->class_id;
+
+        $result = Period_Attendance::getAttendanceDetails($roll_no, $from, $to);
+
+        $response = [];
+        $last_date = '';
+        $attendances = [];
+        foreach ($result as $value) { 
+            if ($last_date != $value->date) {
+                $attendances = [];
+                $last_date = $value->date;
+                array_push($response, []);
+            }
+
+            $data = new \stdClass();
+            $data->subject_code = $value->subject_code;
+            $data->present = $value->present;
+            $data->period_num = $value->period_num;
+            $attendances[$value->period_num] = $data;
+
+            $response[count($response) - 1]['date'] = $value->date;
+            $response[count($response) - 1]['attendances'] = $attendances;
+        }
+
+        $timetables = [];
+        foreach ($response as $key => $value) {
+            $date = $value['date'];
+            $attendances = $value['attendances'];
+            $day = Utils::getDayFromDate($date);
+
+            if (!array_key_exists($day, $timetables)) {
+                $timetable = Period::getTimetable($class_id, $day);
+                $timetables[$day] = $timetable->toArray();
+            }
+
+            foreach ($timetables[$day] as $timetable) {
+                if (!array_key_exists($timetable->period_num, $value['attendances'])) {
+                    $data = new \stdClass();
+                    $data->subject_code = $timetable->subject_code;
+                    $data->period_num = $timetable->period_num;
+                    $data->present = -1;
+                    $response[$key]['attendances'][$timetable->period_num] = $data;
+                }
+            }
+        }
+
+        return response(json_encode($response), '200');
+    }
+
+    public function batchUpdate() {
+        $years = Year::all();
+        $year_id = Input::get('year_id');
+        $klass_id = Input::get('class_id');
+        $students = [];
+        if(!is_null($year_id) && !is_null($klass_id)) $students = Student::getStudentsFromYearOrClass($year_id, $klass_id);
+        return view('admin.student_batch_update')->with(['years' => $years, 'year_id' => $year_id, 'class_id' => $klass_id, 'students' => $students]);
     }
 
     public function attendance() {
