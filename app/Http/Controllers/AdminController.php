@@ -18,6 +18,7 @@ use App\Period_Attendance;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use Validator;
+use DateTime;
 
 class AdminController extends Controller
 {
@@ -268,6 +269,46 @@ class AdminController extends Controller
             }
         }
 
+        return response(json_encode($response), '200');
+    }
+
+    public function studentsAbsentList() {
+        $classes_ary = $this->getClasses();
+        return view('admin.students_absent_list')->with(['classes_ary' => $classes_ary]);
+    }
+
+    public function getStudentsAbsentList(Request $request) {
+        $class_id = $request->class_id;
+        $from = $request->from;
+        $to = $request->to;
+
+        $absent_list = Period_Attendance::getStudentsAbsentList($class_id, $from, $to);
+        $list = [];
+        foreach ($absent_list as $value) {
+            $list[$value->date] = $value->absent_students;
+        }
+
+        $response = [];
+        $date = new DateTime($from);
+        $end_date = new DateTime($to);
+        while($date <= $end_date) {
+            $data = [];
+            $data['date'] = $date->format('Y-m-d');
+            if (array_key_exists($date->format('Y-m-d'), $list)) {
+                $data['absent_students'] = $list[$date->format('Y-m-d')];
+                array_push($response, $data);
+            } else {
+                $day = Utils::getDayFromDate($date->format('Y-m-d'));
+                if ($day != 0 && $day != 6) {
+                    $is_open = Open_Period::isOpen($class_id, $date->format('Y-m-d'))->is_open;
+                    if ($is_open == 1) {
+                        $data['absent_students'] = null;
+                        array_push($response, $data);
+                    }
+                }
+            }
+            $date->modify('+1 day');
+        }
         return response(json_encode($response), '200');
     }
 
