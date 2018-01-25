@@ -5,7 +5,7 @@
 @endsection
 
 @section ('styles')
-	
+
 @endsection
 
 @section ('content')
@@ -57,6 +57,41 @@
 		<div id="results" class="card" style="margin: 7px;">
 			<div class="card-block" style="padding: 30px;">
 				<table class="table"></table>
+			</div>
+		</div>
+	</div>
+
+	<div id="studentDetailsModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title"></h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div>
+							<label>Roll No</label>
+							<br>
+							<span id="student_roll_no"></span>
+						</div>
+						<br>
+						<div>
+							<label>Name</label>
+							<br>
+							<span id="student_name"></span>
+						</div>
+						<br>
+						<div>
+							<label>Email</label>
+							<br>
+							<span id="student_email"></span>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -120,7 +155,7 @@
 		}
 
 		function showTable(data) {
-			showHeader();
+			showTableHeader();
 			data.forEach(function(element) {
 				var date = element['date'];
 				var absent_students = element['absent_students'];
@@ -137,16 +172,35 @@
 					$('<span></span>').text(student)
 									.addClass('label label-danger')
 									.css('margin-right', '10px')
+									.on('click', {
+										roll_no: student,
+										date: date
+									}, showStudentDetialsDialog)
+									.attr({
+										'data-toggle': 'modal',
+										'data-target': '#studentDetailsModal'
+									})
 									.appendTo(col);
 				});
 			});
 			$('#results').show();
 		}
 
-		function showHeader() {
+		function showTableHeader() {
 			var row = $('<tr></tr>').appendTo($('table'));
 			$('<th></th>').text('Date').appendTo(row);
 			$('<th></th>').text('Absent Students').appendTo(row);
+		}
+
+		function showStudentDetialsDialog(event) {
+			var roll_no = event.data.roll_no;
+			var date = event.data.date;
+			$('.modal-title').text(date);
+			$.get('/admin/getStudent', { roll_no: roll_no }, function(student, status) {
+				$('#student_roll_no').text(student['roll_no']);
+				$('#student_name').text(student['name']);
+				$('#student_email').text(student['email']);
+			});
 		}
 	</script>
 @endsection

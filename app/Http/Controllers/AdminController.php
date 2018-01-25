@@ -365,7 +365,7 @@ class AdminController extends Controller
         $roll_no = Input::get('roll_no');
         $student = Student::where('roll_no', $roll_no)->first();
 
-        return (is_null($student))?'null':$student;
+        return (is_null($student)) ? 'null' : $student;
     }
 
     public function addOrUpdateTeacher() {
