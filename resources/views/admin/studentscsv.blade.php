@@ -1,7 +1,7 @@
 @extends ('layouts.admin_layout')
 
 @section ('title')
-	Students
+	Import Students With CSV
 @endsection
 
 @section ('content')
@@ -10,7 +10,7 @@
 			<div class="container">
 				<div class="row">
 					<div class="col-md-4">
-						Select class
+						<label><strong>Select Class</strong></label>
 						<select id="classesSelect" class="form-control form-control-line" style="margin-top: 5px;" onchange="showStudents()">
 							@foreach ($classes_ary as $key => $value) 
 								<optgroup label="{{ $key }}">
@@ -25,13 +25,13 @@
 						<form action="/admin/students/csv" class="csv-upload-form" 
 							enctype="multipart/form-data" method="POST" onsubmit="return upload()">
 							{{ csrf_field() }}
-							Select csv file to import
+							<label>Select csv file to import</label>
 							<div class="row">
 								<div class="col-md-6">
 									<input type="file" name="students_csv" accept=".csv" class="form-control" style="margin-top: 2px;">	
 								</div>	
 								<div class="col-md-6">
-									<button class="btn btn-md btn-success" type="submit">Import File</button>	
+									<button class="btn btn-success" type="submit" style="margin-top: 6px;">Import File</button>	
 								</div>
 							</div>
 						</form>
@@ -50,20 +50,20 @@
 					<div class="col-md-4">
 						<form id="form" action="saveStudentsFromCSV" method="POST">
 							{{ csrf_field() }}
-							<button class="btn btn-md btn-success" onclick="saveStudents(); return false;">Save</button>
+							<button class="btn btn-success" onclick="saveStudents(); return false;">Save</button>
 						</form>
 					</div>
 				</div>
-				<br>
+				<hr>
 				<div class="row">
-					<table class="table table-bordered">
+					<table class="table">
 						<thead>
 							<tr>
-								<td></td>
-								<td><strong>Roll No</strong></td>
-								<td><strong>Name</strong></td>
-								<td><strong>Email</strong></td>
-								<td><strong>Class</strong></td>
+								<th>Options</th>
+								<th>Roll No</th>
+								<th>Name</th>
+								<th>Email</th>
+								<th>Class</th>
 							</tr>
 						</thead>
 						<tbody id="students">
@@ -300,6 +300,5 @@
 			form.appendChild(input);
 			form.submit();
 		}
-
 	</script>
 @endsection

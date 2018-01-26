@@ -15,6 +15,8 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 	Route::get('teachers', 'AdminController@teachers')->name('admin-teachers');
 	Route::get('students', 'AdminController@students')->name('admin-students');
 	Route::get('students/csv', 'AdminController@studentsCsv')->name('students.csv');
+	Route::get('students/attendance_details', 'AdminController@studentsAttendanceDetails')->name('students.attendance_details');
+	Route::get('students/absent_list', 'AdminController@studentsAbsentList')->name('students.absent_list');
 	Route::get('classes', 'AdminController@classes')->name('admin-classes');
 	Route::get('subjects', 'AdminController@subjects')->name('admin-subjects');
 	Route::get('add_new_admin', 'AdminController@addNewAdmin');
@@ -25,15 +27,15 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 	Route::get('students/batch_update', 'AdminController@batchUpdate');
 
 	Route::get('getStudentsFromClass', 'AdminController@getStudentsFromClass');
-
 	Route::get('add/{period_id}', 'AdminController@addAttendance');
-	Route::post('add/{period_id}', 'AdminController@saveOrEditAttendance');
-
 	Route::get('getStudent', 'AdminController@getStudent');
 	Route::get('getStudentWithEmail', 'AdminController@getStudentWithEmail');
 	Route::get('checkIfEmailExists', 'AdminController@checkIfEmailExists');
 	Route::get('checkIfRollNoExists', 'AdminController@checkIfRollNoExists');
+	Route::get('getStudentAttendanceDetails', 'AdminController@getStudentAttendanceDetails');
+	Route::get('getStudentsAbsentList', 'AdminController@getStudentsAbsentList');
 
+	Route::post('add/{period_id}', 'AdminController@saveOrEditAttendance');
 	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods');
 	Route::post('addOrUpdateYear', 'AdminController@addOrUpdateYear');
 	Route::post('addOrUpdateClass', 'AdminController@addOrUpdateClass');

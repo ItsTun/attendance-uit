@@ -15,20 +15,22 @@ class Period_Attendance extends Model
 	protected $table = "period_attendance";
 	protected $primaryKey = "period_attendance_id";
 
-	public static function getAttendanceDetail($rollNo, $month) {
-		$results =  DB::select( DB::raw(
-            'SELECT open_periods.open_period_id, open_periods.date, periods.period_num, subjects.subject_code, period_attendance.present 
-            FROM open_periods, students, subjects, periods, period_attendance 
-            WHERE MONTH(open_periods.date) = :month
-            AND students.roll_no = :roll_no 
-            AND subjects.class_id = students.class_id 
-            AND periods.subject_id = subjects.subject_id 
-            AND open_periods.period_id = periods.period_id 
-            AND period_attendance.roll_no = students.roll_no 
-            AND period_attendance.open_period_id = open_periods.open_period_id
-            ORDER BY open_periods.open_period_id, periods.period_num;'
-        ), array('month' => $month, 'roll_no' => $rollNo) );
-        return $results;
+	public static function getAttendanceDetails($roll_no, $from, $to) {
+	   return DB::table('period_attendance')
+            ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
+            ->join('open_periods', 'open_periods.open_period_id', '=', 'period_attendance.open_period_id')
+            ->join('periods', 'periods.period_id', '=', 'open_periods.period_id')
+            ->join('subject_class', function($join) {
+                $join->on('periods.subject_class_id', '=', 'subject_class.subject_class_id')
+                     ->on('students.class_id', '=', 'subject_class.class_id');
+            })
+            ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
+            ->whereBetween('open_periods.date', [$from, $to])
+            ->where('students.roll_no', $roll_no)
+            ->select('open_periods.open_period_id', 'open_periods.date', 'periods.period_num', 'subjects.subject_code', 'period_attendance.present')
+            ->orderby('open_periods.date')
+            ->orderby('periods.period_num')
+            ->get();
 	}
 
 	public static function getTotalAbsence($rollNo, $month) {
@@ -44,22 +46,6 @@ class Period_Attendance extends Model
             AND MONTH(open_periods.date) = :month 
             GROUP BY subjects.subject_code;'
         ), array('roll_no' => $rollNo, 'month' => $month) );
-        return $results;
-	}
-
-	public static function getAbsentStudentList($klass, $month) {
-		$results = DB::select( DB::raw(
-            'SELECT students.roll_no, students.name,subjects.subject_code, count(open_periods.open_period_id) - sum(period_attendance.present) as total_absence 
-            FROM subjects, periods, open_periods, period_attendance, students
-            WHERE periods.subject_id = subjects.subject_id 
-            AND open_periods.period_id = periods.period_id 
-            AND period_attendance.open_period_id = open_periods.open_period_id 
-            AND period_attendance.roll_no = students.roll_no 
-            AND subjects.class_id = :klass
-            AND MONTH(open_periods.date) = :month 
-            GROUP BY students.roll_no, subjects.subject_code
-            ORDER BY LENGTH(students.roll_no) ASC, students.roll_no ASC;'
-        ), array('klass' => $klass, 'month' => $month) );
         return $results;
 	}
 
@@ -176,5 +162,25 @@ class Period_Attendance extends Model
                     ->groupby(DB::raw('YEAR(open_periods.date), MONTH(open_periods.date)'))
                     ->orderby(DB::raw('YEAR(open_periods.date), MONTH(open_periods.date)'))
                     ->get();
+    }
+
+    public static function getStudentsAbsentList($class_id, $from, $to) {
+        return DB::select( DB::raw(
+            "SELECT t1.date, GROUP_CONCAT(t1.roll_no) AS absent_students FROM (
+                SELECT open_periods.date, SUM(period_attendance.present) AS total, students.roll_no
+                FROM open_periods, period_attendance, students, classes, subject_class, periods
+                WHERE period_attendance.open_period_id = open_periods.open_period_id
+                AND period_attendance.roll_no = students.roll_no
+                AND classes.class_id = :class_id
+                AND open_periods.date BETWEEN :from_date AND :to_date
+                AND students.class_id = classes.class_id
+                AND subject_class.class_id = classes.class_id
+                AND periods.subject_class_id = subject_class.subject_class_id
+                AND open_periods.period_id = periods.period_id
+                GROUP BY period_attendance.roll_no, open_periods.date) AS t1
+            WHERE t1.total = 0
+            GROUP BY t1.date
+            ORDER BY t1.date;"
+        ), array('class_id' => $class_id, 'from_date' => $from, 'to_date' => $to));
     }
 }

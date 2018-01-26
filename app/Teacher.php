@@ -93,4 +93,10 @@ class Teacher extends Model
             ->select('teachers.teacher_id', 'teachers.name')
             ->get();
     }
+
+    public static function getTeachersWithEmails($emails) {
+        return DB::table('teachers')
+                ->whereIn('email', $emails)
+                ->get();
+    }
 }
