@@ -24,6 +24,8 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 	Route::get('getTeacherWithEmail', 'AdminController@getTeacherWithEmail');
 	Route::get('students/batch_update', 'AdminController@batchUpdate');
 
+	Route::get('getStudentsFromClass', 'AdminController@getStudentsFromClass');
+
 	Route::get('add/{period_id}', 'AdminController@addAttendance');
 	Route::post('add/{period_id}', 'AdminController@saveOrEditAttendance');
 
@@ -40,6 +42,9 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 	Route::post('students/saveStudentsFromCSV', 'AdminController@saveStudentsFromCSV');
 	Route::post('addOrUpdateStudent', 'AdminController@addOrUpdateStudent');
 	Route::post('addOrUpdateTeacher', 'AdminController@addOrUpdateTeacher');
+
+	Route::get('migration-tool', 'AdminController@migrationTool');
+	Route::post('migrateStudents', 'AdminController@migrateStudents');
 // });
 
 // Password Reset Routes...

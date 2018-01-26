@@ -35,6 +35,12 @@ class AdminController extends Controller
         return view('admin.teachers')->with(['teachers' => $teachers, 'faculties' => $faculties, 'years' => $years, 'query' => $query, 'faculty_id' => $f_id]);
     }
 
+    public function migrationTool() {
+        $years = Year::all();
+
+        return view('admin.migration-tool')->with(['years' => $years]);
+    }
+
     public function classes() {
         $years = Year::all();
 
@@ -84,6 +90,14 @@ class AdminController extends Controller
         $students = Student::getStudents($query, $roll_no, $c_id);
 
         return view('admin.students')->with(['students' => $students, 'years' => $years, 'name_query' => $query, 'roll_no_query' => $roll_no, 'class_id' => $c_id]);
+    }
+
+    public function getStudentsFromClass() {
+        $class_id = Input::get('class_id');
+
+        $students = Student::getStudentsFromClass($class_id);
+
+        return $students;
     }
 
     public function getTeacherWithEmail() {
@@ -491,6 +505,22 @@ class AdminController extends Controller
         } else {
             return $error;
         }
+    }
+
+    public function migrateStudents() {
+        $class_id = Input::get('to_class_id');
+        $students = Input::get('students');
+
+        $klass = Klass::find($class_id);
+
+        foreach ($students as $stu) {
+            $student = Student::find($stu['student_id']);
+            $student->class_id = $class_id;
+            $student->roll_no = $klass->short_form . $stu['new_roll_no'];
+            $student->save();
+        }
+
+        return "Save successfully";
     }
 
 
