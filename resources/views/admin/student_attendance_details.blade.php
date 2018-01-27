@@ -74,7 +74,7 @@
 @endsection
 
 @section ('scripts')
-	<script src="{{ asset('/js/student_attendance_details.js') }}"></script>
+	<script src="{{ asset('/js/utils.js') }}"></script>
 	<script src="{{ asset('/jquery-ui/jquery.ui.js') }}"></script>
 
 	<script>
