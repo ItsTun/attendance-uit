@@ -5,6 +5,7 @@
 @endsection
 
 @section('styles')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('/css/teachers.css') }}"/>
     <link rel="stylesheet" href="{{ asset('/select2/css/select2.min.css') }}"/>
 @endsection

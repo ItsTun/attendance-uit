@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use App\Year;
 use App\Klass;
 use App\Subject_Class;
@@ -14,6 +15,7 @@ use App\Faculty;
 use App\Utils;
 use App\Open_Period;
 use App\Period_Attendance;
+use App\PaginationUtils;
 
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
@@ -54,7 +56,8 @@ class AdminController extends Controller
         return view('admin.classes')->with(['years' => $years, 'klasses' => $klasses]);
     }
 
-    public function departments() {
+    public function departments()
+    {
         return view('admin.departments');
     }
 
@@ -206,6 +209,15 @@ class AdminController extends Controller
             $student->save();
         }
         echo "Students saved!";
+    }
+
+    public function checkIfUserEmailExists()
+    {
+        $email = Input::get('email');
+
+        $user = User::where('email', $email)->first();
+
+        return (is_null($user)) ? 'false' : 'true';
     }
 
     public function checkIfEmailExists(Request $request)
@@ -382,9 +394,10 @@ class AdminController extends Controller
         return view('admin.attendance')->with($with);
     }
 
-    public function addNewAdmin()
+    public function admins()
     {
-        return view('admin.add_new');
+        $admins = User::where('role', 'admin')->paginate(PaginationUtils::getDefaultPageSize());
+        return view('admin.admins')->with(['admins' => $admins]);
     }
 
     public function years()
@@ -661,6 +674,27 @@ class AdminController extends Controller
         } else {
             return $error;
         }
+    }
+
+    public function addOrUpdateUser()
+    {
+        $userId = Input::post('user_id');
+        $name = Input::post('name');
+        $email = Input::post('email');
+        $password = Input::post('password');
+
+        $user = User::find($userId);
+        if (is_null($user)) {
+            $user = new User();
+        }
+
+        $user->name = $name;
+        $user->email = $email;
+        $user->role = 'admin';
+        if (!is_null($password)) $user->password = bcrypt($password);
+        $user->save();
+
+        return redirect('admin/admins');
     }
 
     public function migrateStudents()
