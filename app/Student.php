@@ -46,7 +46,7 @@ class Student extends Model
     }
 
     public static function getStudentsFromClass($class_id) {
-        return Student::where('class_id', $class_id)->get();
+        return Student::where('class_id', $class_id)->groupBy('updated_at')->groupBy('roll_no')->orderBy(DB::raw('length(roll_no)'), 'ASC')->orderBy('roll_no')->get();
     }
 
     public static function getStudentByEmail($email) {

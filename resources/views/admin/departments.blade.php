@@ -1,9 +1,17 @@
 @extends('layouts.admin_layout')
 
 @section('title')
-	Add new admin
+    Departments
+@endsection
+
+@section('styles')
+
 @endsection
 
 @section('content')
-	Add new admin
+
+@endsection
+
+@section('scripts')
+    
 @endsection

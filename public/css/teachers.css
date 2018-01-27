@@ -6,6 +6,15 @@ input[type=button i], input[type=submit i] {
 	background-color: #26c6da !important;
 }
 
+select {
+	width: 100% !important;
+}
+
+label {
+	padding-left: 0px !important;
+	margin-right: 15px;
+}
+
 .form-group {
 	margin-bottom: 0px !important;
 }

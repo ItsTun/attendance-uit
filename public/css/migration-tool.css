@@ -1,0 +1,39 @@
+.container {
+	padding-top: 20px !important;
+}
+
+input[type=submit i] {
+	background-color: #26c6da !important;
+	margin-top: 8px;
+}
+
+table {
+	background: white;
+	width: 100%;
+}
+
+
+#prefix {
+	padding-left: 5px !important;
+	font-size: 0.9em;
+}
+
+.table-container {
+	margin-top: 20px;
+	max-height: 500px;
+	height: 500px;
+	background: white;
+	overflow-y: scroll;
+}
+
+td {
+	padding: 10px;
+}
+
+tr {
+	border-bottom: solid 0.5px #ebebeb;
+}
+
+.input-roll-no {
+	width: 55px;
+}

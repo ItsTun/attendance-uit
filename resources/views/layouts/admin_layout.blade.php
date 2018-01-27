@@ -75,7 +75,7 @@
                         <!-- Profile -->
                         <!-- ============================================================== -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{{ asset('/material-lite/images/users/1.jpg') }}" alt="user" class="profile-pic m-r-10" />John Doe</a>
+                            <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add user's name here</a>
                         </li>
                     </ul>
                 </div>
@@ -101,6 +101,8 @@
                         </li>
                         <li> <a class="waves-effect waves-dark" href="{{ route('admin-years') }}" aria-expanded="false"><i class="mdi mdi-help-circle"></i><span class="hide-menu">Years</span></a>
                         </li>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-departments') }}" aria-expanded="false"><i class="mdi mdi-emoticon"></i><span class="hide-menu">Departments</span></a>
+                        </li>
                         <li> <a class="waves-effect waves-dark" href="{{ route('admin-classes') }}" aria-expanded="false"><i class="mdi mdi-emoticon"></i><span class="hide-menu">Classes</span></a>
                         </li>
                         <li> <a class="waves-effect waves-dark" href="{{ route('admin-subjects') }}" aria-expanded="false"><i class="mdi mdi-earth"></i><span class="hide-menu">Subjects</span></a>
@@ -108,6 +110,8 @@
                         <li> <a class="waves-effect waves-dark" href="{{ route('admin-timetables') }}" aria-expanded="false"><i class="mdi mdi-book-open-variant"></i><span class="hide-menu">Timetables</span></a>
                         </li>
                         <li> <a class="waves-effect waves-dark" href="{{ route('admin-attendance') }}" aria-expanded="false"><i class="mdi mdi-help-circle"></i><span class="hide-menu">Attendance</span></a>
+                        </li>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-admins') }}" aria-expanded="false"><i class="mdi mdi-help-circle"></i><span class="hide-menu">Admins</span></a>
                         </li>
                     </ul>
                 </nav>
