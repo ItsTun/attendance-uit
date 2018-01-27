@@ -400,10 +400,16 @@
 						period['period_id'] = (p_id != undefined) ? p_id : -1;
 
 						if(j != lunchBreakPeriod) {
-							var tempPeriod = $('.r'+i+'.c'+j).children()[0];
-							if(tempPeriod != undefined) {
-								period['subject_class_id'] = tempPeriod.getAttribute('data-subject-class-id');
-								period['room'] = tempPeriod.getElementsByClassName('room')[0].value;
+						    var children = $('.r'+i+'.c'+j).children();
+						    if(children.length != 0) {
+                                var tempPeriod = $('.r' + i + '.c' + j).children()[0];
+                                if (tempPeriod != undefined) {
+                                    period['subject_class_id'] = tempPeriod.getAttribute('data-subject-class-id');
+                                    period['room'] = tempPeriod.getElementsByClassName('room')[0].value;
+                                }
+                            } else {
+                                period['subject_class_id'] = -1;
+                                period['room'] = '';
 							}
 						} else {
 							period['is_lunch_break'] = 1;

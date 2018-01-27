@@ -586,7 +586,7 @@ class AdminController extends Controller
                 $periodTemp->save();
             } else if (array_key_exists('subject_class_id', $period)) {
                 $periodTemp = ($period['period_id'] != -1) ? Period::find($period['period_id']) : new Period();
-                $periodTemp->subject_class_id = $period['subject_class_id'];
+                $periodTemp->subject_class_id = ($period['subject_class_id'] != -1) ? $period['subject_class_id'] : null;
                 $periodTemp->room = $period['room'];
                 $periodTemp->period_num = $period['period_num'];
                 $periodTemp->day = $period['day'];
@@ -712,6 +712,10 @@ class AdminController extends Controller
         }
 
         return "Save successfully";
+    }
+
+    public function attendancePercentage() {
+        return view('admin.attendance-percentage');
     }
 
 
