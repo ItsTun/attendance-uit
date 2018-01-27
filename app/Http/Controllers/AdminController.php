@@ -119,8 +119,7 @@ class AdminController extends Controller
         return $response;
     }
 
-    public function getArrayFromCSV(Request $request) {
-        $file = $request->file('students_csv');
+    function validateCsvFile($file) {
         $validator = Validator::make(
             [
                 'file'      => $file,
@@ -131,11 +130,57 @@ class AdminController extends Controller
                 'extension' => 'required|in:csv',
             ]
         );
-
         if ($validator->fails()) {
-            return "Only csv files are allowed!";
+            return false;
         }
+        return true;
+    }
 
+    public function getTeacherArrayFromCsv(Request $request) {
+        $file = $request->file('teachers_csv');
+        if ($file == null) {
+            return response('File is null!', 400);
+        }
+        $is_valid_file = $this->validateCsvFile($file);
+        if (!$is_valid_file) {
+            return response('Only csv files are allowed!', 400);
+        }
+        $teacherAry = $this->teacherCsvToArray($file);
+        return $teacherAry;
+    }
+
+    function teacherCsvToArray($filename = '', $delimiter = ',') {
+        if (!file_exists($filename) || !is_readable($filename))
+            return false;
+        $header = null;
+        $data = array();
+        if (($handle = fopen($filename, 'r')) !== false)
+        {
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false)
+            {
+                if (count($row) != 2) {
+                    return false;
+                }   
+                if (!$header) {
+                    $header = $row;
+                    if ($header[0] != 'name' || $header[1] != 'email')
+                        return false;
+                }
+                else {
+                    $data[] = array_combine($header, $row);
+                }
+            }
+            fclose($handle);
+        }
+        return $data;
+    }
+
+    public function getStudentArrayFromCSV(Request $request) {
+        $file = $request->file('students_csv');
+        $is_valid_file = $this->validateCsvFile($file);
+        if (!$is_valid_file) {
+            return response('Only csv files are allowed!', 400);
+        }
         $stundentAry = $this->studentCsvToArray($file);
         return $stundentAry;
     }
@@ -143,7 +188,6 @@ class AdminController extends Controller
     function studentCsvToArray($filename = '', $delimiter = ',') {
         if (!file_exists($filename) || !is_readable($filename))
             return false;
-
         $header = null;
         $data = array();
         if (($handle = fopen($filename, 'r')) !== false)
@@ -310,6 +354,11 @@ class AdminController extends Controller
             $date->modify('+1 day');
         }
         return response(json_encode($response), '200');
+    }
+
+    public function teachersCsv() {
+        $faculties = Faculty::all();
+        return view('admin.teachers_csv')->with(['faculties' => $faculties]);
     }
 
     public function batchUpdate() {

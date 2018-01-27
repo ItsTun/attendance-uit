@@ -15,6 +15,7 @@
   <div class="form-material">
       <div style="padding: 20px 0px 0px 150px;">
           <button class="btn btn-success" data-toggle="modal" data-target="#addOrEditTeacher" id="add-btn">Add New Teacher</button>
+          <button class="btn btn-success" onclick="window.location='{{ route("teachers.csv") }}'">Import with csv</button>
       </div>
   </div>
 </div>

@@ -17,7 +17,7 @@ class Period_Attendance extends Model
 
 	public static function getAttendanceDetails($roll_no, $from, $to) {
 	   return DB::table('period_attendance')
-            ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
+            ->join('students', 'students.student_id', '=', 'period_attendance.student_id')
             ->join('open_periods', 'open_periods.open_period_id', '=', 'period_attendance.open_period_id')
             ->join('periods', 'periods.period_id', '=', 'open_periods.period_id')
             ->join('subject_class', function($join) {
@@ -26,7 +26,7 @@ class Period_Attendance extends Model
             })
             ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
             ->whereBetween('open_periods.date', [$from, $to])
-            ->where('students.roll_no', $roll_no)
+            ->where('students.roll_no', '=',$roll_no)
             ->select('open_periods.open_period_id', 'open_periods.date', 'periods.period_num', 'subjects.subject_code', 'period_attendance.present')
             ->orderby('open_periods.date')
             ->orderby('periods.period_num')
@@ -170,14 +170,14 @@ class Period_Attendance extends Model
                 SELECT open_periods.date, SUM(period_attendance.present) AS total, students.roll_no
                 FROM open_periods, period_attendance, students, classes, subject_class, periods
                 WHERE period_attendance.open_period_id = open_periods.open_period_id
-                AND period_attendance.roll_no = students.roll_no
+                AND period_attendance.student_id = students.student_id
                 AND classes.class_id = :class_id
                 AND open_periods.date BETWEEN :from_date AND :to_date
                 AND students.class_id = classes.class_id
                 AND subject_class.class_id = classes.class_id
                 AND periods.subject_class_id = subject_class.subject_class_id
                 AND open_periods.period_id = periods.period_id
-                GROUP BY period_attendance.roll_no, open_periods.date) AS t1
+                GROUP BY period_attendance.student_id, open_periods.date) AS t1
             WHERE t1.total = 0
             GROUP BY t1.date
             ORDER BY t1.date;"
