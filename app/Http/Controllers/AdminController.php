@@ -54,6 +54,10 @@ class AdminController extends Controller
         return view('admin.classes')->with(['years' => $years, 'klasses' => $klasses]);
     }
 
+    public function departments() {
+        return view('admin.departments');
+    }
+
     public function subjects()
     {
         $query = Input::get('q');

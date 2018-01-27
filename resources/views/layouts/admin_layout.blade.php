@@ -101,6 +101,8 @@
                         </li>
                         <li> <a class="waves-effect waves-dark" href="{{ route('admin-years') }}" aria-expanded="false"><i class="mdi mdi-help-circle"></i><span class="hide-menu">Years</span></a>
                         </li>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-departments') }}" aria-expanded="false"><i class="mdi mdi-emoticon"></i><span class="hide-menu">Departments</span></a>
+                        </li>
                         <li> <a class="waves-effect waves-dark" href="{{ route('admin-classes') }}" aria-expanded="false"><i class="mdi mdi-emoticon"></i><span class="hide-menu">Classes</span></a>
                         </li>
                         <li> <a class="waves-effect waves-dark" href="{{ route('admin-subjects') }}" aria-expanded="false"><i class="mdi mdi-earth"></i><span class="hide-menu">Subjects</span></a>

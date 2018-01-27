@@ -18,6 +18,7 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 	Route::get('students/attendance_details', 'AdminController@studentsAttendanceDetails')->name('students.attendance_details');
 	Route::get('students/absent_list', 'AdminController@studentsAbsentList')->name('students.absent_list');
 	Route::get('classes', 'AdminController@classes')->name('admin-classes');
+	Route::get('departments', 'AdminController@departments')->name('admin-departments');
 	Route::get('subjects', 'AdminController@subjects')->name('admin-subjects');
 	Route::get('add_new_admin', 'AdminController@addNewAdmin');
 	Route::get('timetables', 'AdminController@timetables')->name('admin-timetables');
