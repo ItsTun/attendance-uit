@@ -18,6 +18,6 @@ class Subject extends Model
     }
 
     public static function getSubjects($query) {
-    	return Subject::where('name', 'like', '%' . $query . '%')->paginate(PaginationUtils::getDefaultPageSize());
+    	return Subject::where('name', 'like', '%' . $query . '%')->where('subject_code','<>','000')->paginate(PaginationUtils::getDefaultPageSize());
     }
 }
