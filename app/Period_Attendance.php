@@ -104,4 +104,52 @@ class Period_Attendance extends Model
             ORDER BY t1.date;"
         ), array('class_id' => $class_id, 'from_date' => $from, 'to_date' => $to));
     }
+
+    public static function saveAttendance($period_ids, $date, $presentStudents) {
+        $date = strtotime($date);
+        $date = date('Y-m-d', $date);
+
+        foreach ($period_ids as $periodId) {
+            $klass = Klass::getClassFromPeriod($periodId);
+            
+            $openPeriod = Open_Period::firstOrNew(array('date' => $date, 'period_id' => $periodId));
+            $openPeriod->save();
+
+            $openPeriodId = $openPeriod->open_period_id;
+            
+            $students = Student::where('class_id', $klass->class_id)->get();
+
+            foreach ($students as $value) {
+                $student_id = $value['student_id'];
+
+                $periodAttendance = new Period_Attendance();
+                $periodAttendance->student_id = $student_id;
+                $periodAttendance->open_period_id = $openPeriodId;
+                $periodAttendance->present = in_array($student_id, $presentStudents[$periodId . '_student']);
+                $periodAttendance->save();
+
+                $studentAttendance = Period_Attendance::getStudentAttendance($student_id);
+                Attendance::updateStudentAttendance($student_id, $studentAttendance);
+            }
+        }
+    }
+
+    public static function updateAttendance($period_ids, $date, $presentStudents) {
+        foreach ($period_ids as $periodId) {
+            $openPeriod = Open_Period::where('date', $date)
+                ->where('period_id', $periodId)
+                ->first();
+            
+            foreach ($openPeriod->attendedStudents as $periodAttendance) {
+                $student_id = $periodAttendance['student_id'];
+
+                $periodAttendance->present = in_array($student_id, $presentStudents[$periodId . '_student']);
+                $periodAttendance->save();
+
+                $studentAttendance = Period_Attendance::getStudentAttendance($student_id);
+                Attendance::updateStudentAttendance($student_id, $studentAttendance);
+            }
+        }
+    }
+
 }

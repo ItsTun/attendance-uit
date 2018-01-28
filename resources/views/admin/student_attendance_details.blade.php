@@ -152,6 +152,8 @@
 				var date = element['date'];
 				var attendances = element['attendances'];
 
+				console.log(attendances);
+
 				var row = $('<tr></tr>').appendTo($('table'));
 				$('<td></td>').text(date).appendTo(row);
 				for (var key in attendances) {
