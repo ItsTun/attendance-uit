@@ -767,23 +767,17 @@ class AdminController extends Controller
     {
         $years = Year::all();
         $class_id = Input::get('class_id');
-        if (is_null($class_id)) {
-            $attendanceRecords = [];
-        } else {
+        $studentsAttendance = [];
+        if (!is_null($class_id)) {
             $student_ids = Student::where('class_id', $class_id)->select('student_id')->get();
             $attendanceRecords = Attendance::whereIn('student_id', $student_ids)->get();
-            $studentsAttendance = [];
             foreach ($attendanceRecords as $attendanceRecord) {
                 $tempAttendance = [];
-                $tempAttendance['student_roll_no'] = $attendanceRecord->student->roll_no;
-                $tempAttendance['student_name'] = $attendanceRecord->student->name;
+                $tempAttendance['Roll No'] = $attendanceRecord->student->roll_no;
+                $tempAttendance['Name'] = $attendanceRecord->student->name;
                 $attendanceJson = json_decode($attendanceRecord->attendance_json);
                 foreach ($attendanceJson as $key => $subject) {
-                    $tempAttendance['attendance_percentage'] = [];
-                    $tempAttendance['attendance_percentage'][$subject->subject_code] = ['name' => $subject->name,
-                        'total_periods' => $subject->total_periods,
-                        'attended_periods' => $subject->attended_periods,
-                        'percent' => $subject->percent];
+                    $tempAttendance[$subject->subject_code . '##'] = number_format("$subject->percent",2);
                 }
                 array_push($studentsAttendance, $tempAttendance);
             }

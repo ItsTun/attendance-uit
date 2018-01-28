@@ -14,7 +14,7 @@ class Attendance extends Model
 	protected $fillable = ['student_id', 'attendance_json'];
 
  	public function student() {
- 		return $this->belongsTo('Student', 'student_id');
+ 		return $this->belongsTo(Student::class, 'student_id');
  	}
 
  	public static function updateStudentAttendance($student_id, $studentAttendance) {

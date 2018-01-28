@@ -53,7 +53,7 @@ class Klass extends Model
             foreach ($years as $year) {
                 if (!is_null($classTeacherOf)) {
                     $flag = 0;
-                    foreach ($year->klasses as $key=>$klass) {
+                    foreach ($year->klasses as $key => $klass) {
                         if ($klass->class_id != $classTeacherOf) {
                             unset($year->klasses[$key]);
                         } else {
