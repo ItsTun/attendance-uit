@@ -199,7 +199,7 @@
             var roll_no = event.data.roll_no;
             var date = event.data.date;
             $('.modal-title').text(date);
-            $.get('/admin/getStudent', {roll_no: roll_no}, function (student, status) {
+            $.get("{{ route('admin.getStudent') }}", {roll_no: roll_no}, function (student, status) {
                 $('#student_roll_no').text(student['roll_no']);
                 $('#student_name').text(student['name']);
                 $('#student_email').text(student['email']);

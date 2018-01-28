@@ -76,7 +76,7 @@
                 data: {
                     "class_id": $('.class-select-from').val(),
                 },
-                url: "getStudentsFromClass",
+                url: "{{ route('admin.getStudentsFromClass') }}",
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
@@ -115,7 +115,7 @@
                     "to_class_id": $('.class-select-to').val(),
                     "students": students
                 },
-                url: "migrateStudents",
+                url: "{{ route('admin.migrateStudents') }}",
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
