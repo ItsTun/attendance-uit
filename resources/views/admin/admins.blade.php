@@ -161,7 +161,7 @@
                         "email": email,
                     },
                     async: false,
-                    url: "checkIfUserEmailExists",
+                    url: "{{ route('admin.checkIfUserEmailExists') }}",
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }

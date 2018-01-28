@@ -191,7 +191,7 @@
           "email": $('.input-email').val(),
           "class_id": $('.class-select').val(),
         },
-        url: "addOrUpdateStudent", 
+        url: "{{ route('admin.addOrUpdateStudent') }}",
         headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },

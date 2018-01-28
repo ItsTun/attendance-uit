@@ -90,7 +90,7 @@
 			var form = $('.csv-upload-form')[0];
 			var fd = new FormData(form);    
 			$.ajax({
-			  url: 'getStudentArrayFromCSV',
+			  url: "{{ route('admin.getStudentArrayFromCSV') }}",
 			  data: fd,
 			  processData: false,
 			  contentType: false,
@@ -261,7 +261,7 @@
 				roll_nos.push(element['roll_no']);
 			});
 
-			$.get('/admin/checkIfRollNoExists', {
+			$.get("{{ route('admin.checkIfRollNoExists') }}", {
 				roll_nos: JSON.stringify(roll_nos)
 			}, function(data, status) {
 				if (data == null) return;
@@ -280,7 +280,7 @@
 				emails.push(element['email']);
 			});
 
-			$.get('/admin/checkIfEmailExists', {
+			$.get("{{ route('admin.checkIfEmailExists') }}", {
 				emails: JSON.stringify(emails)
 			}, function(data, status) {
 				if (data == null) return;

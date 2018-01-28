@@ -243,7 +243,7 @@
                                 "email": email,
                             },
                             async: false,
-                            url: "getTeacherWithEmail",
+                            url: "{{ route('admin.getTeacherWithEmail') }}",
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             }

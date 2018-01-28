@@ -475,12 +475,13 @@
                     "periods": periods,
                     "class_id": {{ $class_id }}+'',
                 },
-                url: "addOrUpdatePeriods",
+                url: "{{ route('admin.addOrUpdatePeriods') }}",
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function (result) {
                     alert("Saved successfully.");
+                    location.reload();
                 },
                 error: function (error) {
                     console.log(error);

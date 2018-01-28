@@ -26,32 +26,32 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 	Route::get('attendance', 'AdminController@attendance')->name('admin-attendance');
 	Route::get('attendance/percentage', 'AdminController@attendancePercentage');
 	Route::get('years', 'AdminController@years')->name('admin-years');
-	Route::get('getTeacherWithEmail', 'AdminController@getTeacherWithEmail');
+	Route::get('getTeacherWithEmail', 'AdminController@getTeacherWithEmail')->name('admin.getTeacherWithEmail');
 
-	Route::get('getStudentsFromClass', 'AdminController@getStudentsFromClass');
+	Route::get('getStudentsFromClass', 'AdminController@getStudentsFromClass')->name('admin.getStudentsFromClass');
 	Route::get('add/{period_id}', 'AdminController@addAttendance');
-	Route::get('getStudent', 'AdminController@getStudent');
+	Route::get('getStudent', 'AdminController@getStudent')->name('admin.getStudent');
 	Route::get('getStudentWithEmail', 'AdminController@getStudentWithEmail');
-	Route::get('checkIfEmailExists', 'AdminController@checkIfEmailExists');
-    Route::get('checkIfUserEmailExists', 'AdminController@checkIfUserEmailExists');
-	Route::get('checkIfRollNoExists', 'AdminController@checkIfRollNoExists');
+	Route::get('checkIfEmailExists', 'AdminController@checkIfEmailExists')->name('admin.checkIfEmailExists');
+    Route::get('checkIfUserEmailExists', 'AdminController@checkIfUserEmailExists')->name('admin.checkIfUserEmailExists');
+	Route::get('checkIfRollNoExists', 'AdminController@checkIfRollNoExists')->name('admin.checkIfRollNoExists');
 	Route::get('getStudentAttendanceDetails', 'AdminController@getStudentAttendanceDetails')->name('admin.getStudentAttendanceDetails');
 	Route::get('getStudentsAbsentList', 'AdminController@getStudentsAbsentList')->name('admin.getStudentsAbsentList');
 
 	Route::post('add/{period_id}', 'AdminController@saveOrEditAttendance');
-	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods');
+	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods')->name('admin.addOrUpdatePeriods');
 	Route::post('addOrUpdateYear', 'AdminController@addOrUpdateYear');
 	Route::post('addOrUpdateClass', 'AdminController@addOrUpdateClass');
 	Route::post('addOrUpdateSubject', 'AdminController@addOrUpdateSubject');
-	Route::post('students/getStudentArrayFromCSV', 'AdminController@getStudentArrayFromCSV');
+	Route::post('students/getStudentArrayFromCSV', 'AdminController@getStudentArrayFromCSV')->name('admin.getStudentArrayFromCSV');
 	Route::post('students/saveStudentsFromCSV', 'AdminController@saveStudentsFromCSV');
 	Route::post('teachers/getTeacherArrayFromCSV', 'AdminController@getTeacherArrayFromCSV');
-	Route::post('addOrUpdateStudent', 'AdminController@addOrUpdateStudent');
+	Route::post('addOrUpdateStudent', 'AdminController@addOrUpdateStudent')->name('admin.addOrUpdateStudent');
 	Route::post('addOrUpdateTeacher', 'AdminController@addOrUpdateTeacher');
 	Route::post('addOrUpdateUser', 'AdminController@addOrUpdateUser');
 
 	Route::get('migration-tool', 'AdminController@migrationTool');
-	Route::post('migrateStudents', 'AdminController@migrateStudents');
+	Route::post('migrateStudents', 'AdminController@migrateStudents')->name('admin.migrateStudents');
 // });
 
 // Password Reset Routes...
