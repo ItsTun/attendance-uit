@@ -2,6 +2,8 @@
 
 namespace App;
 
+use DateTime;
+
 class Utils {
 	public static function validateDate($date, $format = 'Y-m-d')
 	{
@@ -66,5 +68,17 @@ class Utils {
 
 	public static function getCurrentDateTime() {
 		return date('Y-m-d h:m:s');
+	}
+
+	public static function getAssociatedPeriod($period_ary, $date_str) {
+		$period = $period_ary[0];
+		$date = new DateTime($date_str);
+		for ($i = 1; $i < count($period_ary); $i++) {
+			$deleted_date = new DateTime($period_ary[$i]->deleted_at);
+			if ($date < $deleted_date) {
+				$period = $period_ary[$i];
+			}
+		}
+		return $period;
 	}
 }
