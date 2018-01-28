@@ -80,20 +80,28 @@ class AdminController extends Controller
 
         $years = Year::all();
 
-        $subject_classes = Subject_Class::getSubjectsFromClass($klass_id);
+        if (!is_null($klass_id)) {
+            $subject_classes = Subject_Class::getSubjectsFromClass($klass_id);
 
-        $subject_class_ids = Subject_Class::getSubjectClassIdsFromClass($klass_id);
+            $subject_class_ids = Subject_Class::getSubjectClassIdsFromClass($klass_id);
 
-        $lunch_break_subject_class_id = Subject_Class::getLunchBreakSubjectClassId($klass_id);
+            $lunch_break_subject_class_id = Subject_Class::getLunchBreakSubjectClassId($klass_id);
 
-        $periods = Period::getPeriodsFromSubjectClass($subject_class_ids);
+            $periods = Period::getPeriodsFromSubjectClass($subject_class_ids);
 
+            return view('admin.timetables')->with(['years' => $years,
+                'year_id' => $year_id,
+                'class_id' => $klass_id,
+                'subject_classes' => $subject_classes,
+                'periods' => $periods,
+                'lunch_break_subject_class_id' => $lunch_break_subject_class_id]);
+        }
         return view('admin.timetables')->with(['years' => $years,
             'year_id' => $year_id,
             'class_id' => $klass_id,
-            'subject_classes' => $subject_classes,
-            'periods' => $periods,
-            'lunch_break_subject_class_id' => $lunch_break_subject_class_id]);
+            'subject_classes' => '',
+            'periods' => [],
+            'lunch_break_subject_class_id' => -1]);
     }
 
     public function students()
@@ -152,7 +160,22 @@ class AdminController extends Controller
         return $response;
     }
 
-    function validateCsvFile($file) {
+    public function getTeacherArrayFromCsv(Request $request)
+    {
+        $file = $request->file('teachers_csv');
+        if ($file == null) {
+            return response('File is null!', 400);
+        }
+        $is_valid_file = $this->validateCsvFile($file);
+        if (!$is_valid_file) {
+            return response('Only csv files are allowed!', 400);
+        }
+        $teacherAry = $this->teacherCsvToArray($file);
+        return $teacherAry;
+    }
+
+    function validateCsvFile($file)
+    {
         $validator = Validator::make(
             [
                 'file' => $file,
@@ -169,37 +192,22 @@ class AdminController extends Controller
         return true;
     }
 
-    public function getTeacherArrayFromCsv(Request $request) {
-        $file = $request->file('teachers_csv');
-        if ($file == null) {
-            return response('File is null!', 400);
-        }
-        $is_valid_file = $this->validateCsvFile($file);
-        if (!$is_valid_file) {
-            return response('Only csv files are allowed!', 400);
-        }
-        $teacherAry = $this->teacherCsvToArray($file);
-        return $teacherAry;
-    }
-
-    function teacherCsvToArray($filename = '', $delimiter = ',') {
+    function teacherCsvToArray($filename = '', $delimiter = ',')
+    {
         if (!file_exists($filename) || !is_readable($filename))
             return false;
         $header = null;
         $data = array();
-        if (($handle = fopen($filename, 'r')) !== false)
-        {
-            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false)
-            {
+        if (($handle = fopen($filename, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
                 if (count($row) != 2) {
                     return false;
-                }   
+                }
                 if (!$header) {
                     $header = $row;
                     if ($header[0] != 'name' || $header[1] != 'email')
                         return false;
-                }
-                else {
+                } else {
                     $data[] = array_combine($header, $row);
                 }
             }
@@ -208,7 +216,8 @@ class AdminController extends Controller
         return $data;
     }
 
-    public function getStudentArrayFromCSV(Request $request) {
+    public function getStudentArrayFromCSV(Request $request)
+    {
         $file = $request->file('students_csv');
         $is_valid_file = $this->validateCsvFile($file);
         if (!$is_valid_file) {
@@ -414,7 +423,8 @@ class AdminController extends Controller
         return response(json_encode($response), '200');
     }
 
-    public function teachersCsv() {
+    public function teachersCsv()
+    {
         $faculties = Faculty::all();
         return view('admin.teachers_csv')->with(['faculties' => $faculties]);
     }
@@ -630,9 +640,10 @@ class AdminController extends Controller
         return back()->withInput();
     }
 
-    public function addLunchBreakSubjectClassIfNotExists($class_id) {
+    public function addLunchBreakSubjectClassIfNotExists($class_id)
+    {
         $lunch_break_subject_class = Subject_Class::whereNull('subject_id')->where('class_id', $class_id)->first();
-        if(is_null($lunch_break_subject_class)) {
+        if (is_null($lunch_break_subject_class)) {
             $lunch_break_subject_class = new Subject_Class();
             $lunch_break_subject_class->subject_id = null;
             $lunch_break_subject_class->class_id = $class_id;
@@ -640,10 +651,11 @@ class AdminController extends Controller
         }
     }
 
-    public function addFreeSubjectClassIfNotExists($class_id) {
+    public function addFreeSubjectClassIfNotExists($class_id)
+    {
         $free_subject = Subject::where('subject_code', '000')->first();
         $free_subject_class = Subject_Class::where('subject_id', $free_subject->subject_id)->where('class_id', $class_id)->first();
-        if(is_null($free_subject_class)) {
+        if (is_null($free_subject_class)) {
             $free_subject_class = new Subject_Class();
             $free_subject_class->class_id = $class_id;
             $free_subject_class->subject_id = $free_subject->subject_id;
@@ -813,7 +825,7 @@ class AdminController extends Controller
                 $tempAttendance['Name'] = $attendanceRecord->student->name;
                 $attendanceJson = json_decode($attendanceRecord->attendance_json);
                 foreach ($attendanceJson as $key => $subject) {
-                    $tempAttendance[$subject->subject_code . '##'] = number_format("$subject->percent",2);
+                    $tempAttendance[$subject->subject_code . '##'] = number_format("$subject->percent", 2);
                 }
                 array_push($studentsAttendance, $tempAttendance);
             }
