@@ -348,13 +348,22 @@ class AdminController extends Controller
             }
 
             foreach ($timetables[$day] as $period) {
-                // dd($period->subject_class->subject->subject_code);
                 if (!array_key_exists($period->period_num, $value['attendances'])) {
+                    $free_period = Subject_Class::getFreeSubjectClass($class_id);
+                    $lunch_period = Subject_Class::getLunchBreakSubjectClassId($class_id);
+
                     $data = new \stdClass();
-                    $data->subject_code = $timetable['subject_code'];
+                    if ($period->subject_class_id == $free_period->subject_class_id) {
+                        $data->subject_code = '';
+                    } else if ($period->subject_class_id == $lunch_period->subject_class_id) {
+                        continue;
+                    } else {
+                        $data->subject_code = $period->subject_class->subject->subject_code;
+                    }
                     $data->period_num = $period->period_num;
                     $data->present = -1;
-                    $response[$key]['attendances'][$timetable->period_num] = $data;
+
+                    $response[$key]['attendances'][$period->period_num] = $data;
                 }
             }
 

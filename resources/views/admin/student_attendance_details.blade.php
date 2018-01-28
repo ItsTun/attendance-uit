@@ -67,7 +67,11 @@
 		</div>
 		<div id="results" class="card" style="margin: 7px;">
 			<div class="card-block" style="padding: 30px;">
-				<table class="table table-bordered"></table>
+				<div class="row">
+					<div class="col-md-12">
+						<table class="table table-bordered"></table>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -152,18 +156,16 @@
 				var date = element['date'];
 				var attendances = element['attendances'];
 
-				console.log(attendances);
-
 				var row = $('<tr></tr>').appendTo($('table'));
 				$('<td></td>').text(date).appendTo(row);
 				for (var key in attendances) {
 					if (attendances.hasOwnProperty(key)) {
 						if (attendances[key]['present'] == 0) {
-							$('<td></td>').attr({ class: ['table-danger'] }).text(attendances[key]['subject_code']).appendTo(row);
+							$('<td></td>').attr({ class: 'table-danger fixed-cell' }).text(attendances[key]['subject_code']).appendTo(row);
 						} else if (attendances[key]['present'] == 1) {
-							$('<td></td>').attr({ class: ['table-success'] }).text(attendances[key]['subject_code']).appendTo(row);
+							$('<td></td>').attr({ class: 'table-success fixed-cell' }).text(attendances[key]['subject_code']).appendTo(row);
 						} else {
-							$('<td></td>').text(attendances[key]['subject_code']).appendTo(row);
+							$('<td></td>').attr({ class: 'fixed-cell' }).text(attendances[key]['subject_code']).appendTo(row);
 						}
 					}
 				}
