@@ -19,13 +19,13 @@
                                 <label>Class</label>
                                 <br>
                                 <select id="classesSelect" class="form-control">
-                                    @foreach ($classes_ary as $key => $value)
-                                        <optgroup label="{{ $key }}">
-                                            @foreach ($value as $v)
-                                                <option id="{{ $v['class_id'] }}"
-                                                        value="{{ $v['short_form'] }}"
-                                                        name="{{ $v['name'] }}">
-                                                    {{ $v['name'] }}
+                                    @foreach ($years as $year) 
+                                        <optgroup label="{{ $year->name }}">
+                                            @foreach ($year->klasses as $v)
+                                                <option id="{{ $v->class_id }}" 
+                                                        value="{{ $v->short_form }}" 
+                                                        name="{{ $v->name }}">
+                                                    {{ $v->name }}
                                                 </option>
                                             @endforeach
                                         </optgroup>

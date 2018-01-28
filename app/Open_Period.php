@@ -20,14 +20,7 @@ class Open_Period extends Model
 	public function period() {
 		return $this->belongsTo(Period::class, 'period_id');
 	}
-
-	public static function fetch($periodId, $date) {
-		$openPeriod = Open_Period::where('period_id', $periodId)
-                                ->where('date', $date)
-                                ->first();
-        return $openPeriod;
-	}
-
+	
 	public static function isOpen($class_id, $date) {
 		return DB::table('open_periods')
 					->join('periods', 'open_periods.period_id', '=', 'periods.period_id')

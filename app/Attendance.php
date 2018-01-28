@@ -23,8 +23,8 @@ class Attendance extends Model
  		$attendance->save();
  	}
 
- 	public static function show($rollNo) {
- 		return Attendance::where('student_roll_no', '=', $rollNo)->first();
+ 	public static function show($student_id) {
+ 		return Attendance::where('student_id', '=', $student_id)->first();
  	}
  	
  	public static function getAttendanceForSubject($class_id, $subject_id) {

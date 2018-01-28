@@ -296,8 +296,8 @@ class AdminController extends Controller
 
     public function studentsAttendanceDetails()
     {
-        $classes_ary = $this->getClasses();
-        return view('admin.student_attendance_details')->with(['classes_ary' => $classes_ary]);
+        $years = Year::all();
+        return view('admin.student_attendance_details')->with(['years' => $years]);
     }
 
     public function getStudentAttendanceDetails(Request $request)
@@ -342,7 +342,7 @@ class AdminController extends Controller
             $day = Utils::getDayFromDate($date);
 
             if (!array_key_exists($day, $timetables)) {
-                $timetable = Period::getTimetable($class_id, $day);
+                $timetable = Period::getTimetableInDay($day, $class_id);
                 $timetables[$day] = $timetable->toArray();
             }
 
@@ -362,8 +362,8 @@ class AdminController extends Controller
 
     public function studentsAbsentList()
     {
-        $classes_ary = $this->getClasses();
-        return view('admin.students_absent_list')->with(['classes_ary' => $classes_ary]);
+        $years = Year::all();
+        return view('admin.students_absent_list')->with(['years' => $years]);
     }
 
     public function getStudentsAbsentList(Request $request)
@@ -765,6 +765,4 @@ class AdminController extends Controller
     public function attendancePercentage() {
         return view('admin.attendance-percentage');
     }
-
-
 }
