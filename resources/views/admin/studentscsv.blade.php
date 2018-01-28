@@ -22,7 +22,7 @@
 						</select>
 					</div>
 					<div class="col-md-8">
-						<form action="/admin/students/csv" class="csv-upload-form" 
+						<form class="csv-upload-form" 
 							enctype="multipart/form-data" method="POST" onsubmit="return upload()">
 							{{ csrf_field() }}
 							<label>Select csv file to import</label>
@@ -90,16 +90,19 @@
 			var form = $('.csv-upload-form')[0];
 			var fd = new FormData(form);    
 			$.ajax({
-			  url: 'getArrayFromCSV',
+			  url: 'getStudentArrayFromCSV',
 			  data: fd,
 			  processData: false,
 			  contentType: false,
 			  type: 'POST',
-			  success: function(data){
+			  success: function(data) {
 			    students = data;
 
 			    showStudentResultDiv();
 			    showStudents();
+			  },
+			  error: function(data, status) {
+			  	alert(data['responseText']);
 			  }
 			});
 			return false;
