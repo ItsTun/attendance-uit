@@ -23,6 +23,7 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 	Route::get('admins', 'AdminController@admins')->name('admin-admins');
 	Route::get('timetables', 'AdminController@timetables')->name('admin-timetables');
 	Route::get('attendance', 'AdminController@attendance')->name('admin-attendance');
+	Route::get('attendance/percentage', 'AdminController@attendancePercentage');
 	Route::get('years', 'AdminController@years')->name('admin-years');
 	Route::get('getTeacherWithEmail', 'AdminController@getTeacherWithEmail');
 
