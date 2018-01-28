@@ -6,12 +6,14 @@ use App\Period;
 use App\Teacher;
 use App\Student;
 use App\Utils;
+use App\Subject_Class;
 use App\Subject_Class_Teacher;
 use App\Period_Attendance;
 use App\Open_Period;
 use App\Attendance;
 use App\Klass;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 
@@ -23,6 +25,125 @@ class TeacherController extends Controller
             Auth::logout();
         }
         return view('teacher.login');
+    }
+
+    public function attendanceDetails()
+    {
+        $years = Klass::getAssociatedClass(Teacher::getCurrentTeacher()->teacher_id);
+        return view('teacher.student_attendance_details')->with(['years' => $years]);
+    }
+
+    public function absentList()
+    {
+        $years = Klass::getAssociatedClass(Teacher::getCurrentTeacher()->teacher_id);
+        return view('teacher.students_absent_list')->with(['years' => $years]);
+    }
+
+    public function getStudentAttendanceDetails(Request $request)
+    {
+        $roll_no = $request->roll_no;
+        $from = $request->from;
+        $to = $request->to;
+
+        $student = Student::where('roll_no', $roll_no)->first();
+        if (!$student) {
+            return response(null, '204');
+        }
+        $class = Student::where('roll_no', $roll_no)->first()->klass;
+        $class_id = $class->class_id;
+
+        $result = Period_Attendance::getAttendanceDetails($roll_no, $from, $to);
+
+        $response = [];
+        $last_date = '';
+        $attendances = [];
+        foreach ($result as $value) {
+            if ($last_date != $value->date) {
+                $attendances = [];
+                $last_date = $value->date;
+                array_push($response, []);
+            }
+
+            $data = new \stdClass();
+            $data->subject_code = $value->subject_code;
+            $data->present = $value->present;
+            $data->period_num = $value->period_num;
+            $attendances[$value->period_num] = $data;
+
+            $response[count($response) - 1]['date'] = $value->date;
+            $response[count($response) - 1]['attendances'] = $attendances;
+        }
+
+        $timetables = [];
+        foreach ($response as $key => $value) {
+            $date = $value['date'];
+            $attendances = $value['attendances'];
+            $day = Utils::getDayFromDate($date);
+
+            if (!array_key_exists($day, $timetables)) {
+                $timetable = Period::getTimetable($day, $class_id);
+                $timetables[$day] = $timetable;
+            }
+
+            foreach ($timetables[$day] as $period) {
+                if (!array_key_exists($period->period_num, $value['attendances'])) {
+                    $free_period = Subject_Class::getFreeSubjectClass($class_id);
+                    $lunch_period = Subject_Class::getLunchBreakSubjectClassId($class_id);
+
+                    $data = new \stdClass();
+                    if ($period->subject_class_id == $free_period->subject_class_id) {
+                        $data->subject_code = '';
+                    } else if ($period->subject_class_id == $lunch_period->subject_class_id) {
+                        continue;
+                    } else {
+                        $data->subject_code = $period->subject_class->subject->subject_code;
+                    }
+                    $data->period_num = $period->period_num;
+                    $data->present = -1;
+
+                    $response[$key]['attendances'][$period->period_num] = $data;
+                }
+            }
+
+        }
+
+        return response(json_encode($response), '200');
+    }
+
+    public function getStudentsAbsentList(Request $request)
+    {
+        $class_id = $request->class_id;
+        $from = $request->from;
+        $to = $request->to;
+
+        $absent_list = Period_Attendance::getStudentsAbsentList($class_id, $from, $to);
+        $list = [];
+        foreach ($absent_list as $value) {
+            $list[$value->date] = $value->absent_students;
+        }
+
+        $response = [];
+        $date = new DateTime($from);
+        $end_date = new DateTime($to);
+        while ($date <= $end_date) {
+            $data = [];
+            $data['date'] = $date->format('Y-m-d');
+            if (array_key_exists($date->format('Y-m-d'), $list)) {
+                $data['absent_students'] = $list[$date->format('Y-m-d')];
+                array_push($response, $data);
+            } else {
+                $day = Utils::getDayFromDate($date->format('Y-m-d'));
+                if ($day != 0 && $day != 6) {
+                    $is_open = Open_Period::isOpen($class_id, $date->format('Y-m-d'))->is_open;
+                    if ($is_open == 1) {
+                        $data['absent_students'] = null;
+                        array_push($response, $data);
+                    }
+                }
+            }
+            $date->modify('+1 day');
+        }
+        return response(json_encode($response), '200');
     }
 
     public function timetable()

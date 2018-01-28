@@ -43,7 +43,11 @@ class Attendance extends Model
 
             foreach ($attendance_arr as $key => $value) {
                 if ($subject_class->subject_class_id != $value->subject_class_id) unset($attendance_arr[$key]);
-                else $attendanceForSubject[$attendance->student_id] = $value;
+                else {
+                    $attendanceForSubject[$attendance->student->roll_no] = [];
+                    $attendanceForSubject[$attendance->student->roll_no]['name'] = $attendance->student->name;
+                    $attendanceForSubject[$attendance->student->roll_no]['percent'] = number_format($value->percent,2);
+                }
             }
         }
 
