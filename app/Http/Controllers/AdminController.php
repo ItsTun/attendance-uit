@@ -343,19 +343,21 @@ class AdminController extends Controller
             $day = Utils::getDayFromDate($date);
 
             if (!array_key_exists($day, $timetables)) {
-                $timetable = Period::getTimetableInDay($day, $class_id);
-                $timetables[$day] = $timetable->toArray();
+                $timetable = Period::getTimetable($day, $class_id);
+                $timetables[$day] = $timetable;
             }
 
-            foreach ($timetables[$day] as $timetable) {
-                if (!array_key_exists($timetable->period_num, $value['attendances'])) {
+            foreach ($timetables[$day] as $period) {
+                // dd($period->subject_class->subject->subject_code);
+                if (!array_key_exists($period->period_num, $value['attendances'])) {
                     $data = new \stdClass();
-                    $data->subject_code = $timetable->subject_code;
-                    $data->period_num = $timetable->period_num;
+                    $data->subject_code = $timetable['subject_code'];
+                    $data->period_num = $period->period_num;
                     $data->present = -1;
                     $response[$key]['attendances'][$timetable->period_num] = $data;
                 }
             }
+
         }
 
         return response(json_encode($response), '200');

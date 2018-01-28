@@ -18,6 +18,7 @@ class Period extends Model
     public function subject_class() {
     	return $this->belongsTo(Subject_Class::class, 'subject_class_id');
     }
+    
     public function subject() {
     	$subjectClass = Subject_Class::find($this->subject_class_id)->first();
         return $subjectClass->subject;
@@ -29,6 +30,12 @@ class Period extends Model
 
     public static function getPeriod($subject_class_id, $day, $period_num) {
         return Period::where('subject_class_id', $subject_class_id)->where('day', $day)->where('period_num', $period_num)->first();
+    }
+
+    public static function getTimetable($day, $klassId) {
+        $subject_classes = Subject_Class::where('class_id', $klassId)->get();
+        $periods = Period::where('day', $day)->orWhereIn('subject_class_id', $subject_classes)->whereNull('subject_class_id')->orderby('period_num')->get();
+        return $periods;
     }
 
     public static function getTimetableInDay($day, $class_id) {

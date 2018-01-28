@@ -142,7 +142,7 @@
 					alert('No data!');
 					return;
 				}
-				my_json = JSON.parse(data)
+				my_json = JSON.parse(data);
 				showTable(my_json);
 			});
 		}
