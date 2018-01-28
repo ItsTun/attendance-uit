@@ -5,7 +5,7 @@
 @endsection
 
 @section ('styles')
-	<link rel="stylesheet" href="{{ asset('/jquery-ui/jquery.ui.css') }}">
+	<link rel="stylesheet" href="{{ asset('/jquery-ui/jquery.ui.css') }}"> 
 @endsection
 
 @section ('content')
