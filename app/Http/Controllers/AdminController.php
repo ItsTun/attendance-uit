@@ -615,7 +615,31 @@ class AdminController extends Controller
         $klass->name = $name;
         $klass->save();
 
+        $this->addLunchBreakSubjectClassIfNotExists($klass->class_id);
+        $this->addFreeSubjectClassIfNotExists($klass->class_id);
+
         return back()->withInput();
+    }
+
+    public function addLunchBreakSubjectClassIfNotExists($class_id) {
+        $lunch_break_subject_class = Subject_Class::whereNull('subject_id')->where('class_id', $class_id)->first();
+        if(is_null($lunch_break_subject_class)) {
+            $lunch_break_subject_class = new Subject_Class();
+            $lunch_break_subject_class->subject_id = null;
+            $lunch_break_subject_class->class_id = $class_id;
+            $lunch_break_subject_class->save();
+        }
+    }
+
+    public function addFreeSubjectClassIfNotExists($class_id) {
+        $free_subject = Subject::where('subject_code', '000')->first();
+        $free_subject_class = Subject_Class::where('subject_id', $free_subject->subject_id)->where('class_id', $class_id)->first();
+        if(is_null($free_subject_class)) {
+            $free_subject_class = new Subject_Class();
+            $free_subject_class->class_id = $class_id;
+            $free_subject_class->subject_id = $free_subject->subject_id;
+            $free_subject_class->save();
+        }
     }
 
     public function addOrUpdatePeriods()
@@ -624,6 +648,7 @@ class AdminController extends Controller
         $class_id = Input::post('class_id');
 
         $lunchBreakSubjectClassId = Subject_Class::getLunchBreakSubjectClassId($class_id);
+        $freeSubjectClassId = Subject_Class::getFreeSubjectClass($class_id)->subject_class_id;
 
         foreach ($periods as $period) {
             if (array_key_exists('is_lunch_break', $period) && $period['is_lunch_break'] == 1) {
@@ -637,7 +662,7 @@ class AdminController extends Controller
                 $periodTemp->save();
             } else if (array_key_exists('subject_class_id', $period)) {
                 $periodTemp = ($period['period_id'] != -1) ? Period::find($period['period_id']) : new Period();
-                $periodTemp->subject_class_id = ($period['subject_class_id'] != -1) ? $period['subject_class_id'] : null;
+                $periodTemp->subject_class_id = ($period['subject_class_id'] != -1) ? $period['subject_class_id'] : $freeSubjectClassId;
                 $periodTemp->room = $period['room'];
                 $periodTemp->period_num = $period['period_num'];
                 $periodTemp->day = $period['day'];

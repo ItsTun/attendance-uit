@@ -299,7 +299,7 @@
                 $('.r' + period.day + '.c' + period.period_num).attr('data-period-id', period.period_id);
 
                 if (period.subject_class_id != lunchBreak.subject_class_id) {
-                    if (period.subject_class_id != undefined) $('.r' + period.day + '.c' + period.period_num).html('<div data-subject-class-id="' + period.subject_class_id + '" class="redips-drag ar" style="border-style: solid; cursor: move;" id="c' + i + '">' + getSubjectCode(period.subject_class_id) + '<br><input type="text" placeholder="Room" class="room" value="' + period.room + '"required></div>');
+                    if (period.room != undefined) $('.r' + period.day + '.c' + period.period_num).html('<div data-subject-class-id="' + period.subject_class_id + '" class="redips-drag ar" style="border-style: solid; cursor: move;" id="c' + i + '">' + getSubjectCode(period.subject_class_id) + '<br><input type="text" placeholder="Room" class="room" value="' + period.room + '"required></div>');
                 } else {
                     currentValue = period.period_num;
                     $('#lt' + currentValue).prop('checked', true);
