@@ -93,25 +93,25 @@
                 <!-- Sidebar navigation-->
                 <nav class="sidebar-nav">
                     <ul id="sidebarnav">
-                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-dashboard') }}" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Dashboard</span></a>
+                        {{--<li> <a class="waves-effect waves-dark" href="{{ route('admin-dashboard') }}" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Dashboard</span></a>--}}
+                        {{--</li>--}}
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-students') }}" aria-expanded="false"><i class="mdi mdi-account"></i><span class="hide-menu">Students</span></a>
                         </li>
-                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-students') }}" aria-expanded="false"><i class="mdi mdi-account-check"></i><span class="hide-menu">Students</span></a>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-teachers') }}" aria-expanded="false"><i class="mdi mdi-account-multiple"></i><span class="hide-menu">Teachers</span></a>
                         </li>
-                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-teachers') }}" aria-expanded="false"><i class="mdi mdi-table"></i><span class="hide-menu">Teachers</span></a>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-years') }}" aria-expanded="false"><i class="mdi mdi-calendar"></i><span class="hide-menu">Years</span></a>
                         </li>
-                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-years') }}" aria-expanded="false"><i class="mdi mdi-help-circle"></i><span class="hide-menu">Years</span></a>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-departments') }}" aria-expanded="false"><i class="mdi mdi-home-modern"></i><span class="hide-menu">Departments</span></a>
                         </li>
-                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-departments') }}" aria-expanded="false"><i class="mdi mdi-emoticon"></i><span class="hide-menu">Departments</span></a>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-classes') }}" aria-expanded="false"><i class="mdi mdi-home"></i><span class="hide-menu">Classes</span></a>
                         </li>
-                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-classes') }}" aria-expanded="false"><i class="mdi mdi-emoticon"></i><span class="hide-menu">Classes</span></a>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-subjects') }}" aria-expanded="false"><i class="mdi mdi-library-books"></i><span class="hide-menu">Subjects</span></a>
                         </li>
-                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-subjects') }}" aria-expanded="false"><i class="mdi mdi-earth"></i><span class="hide-menu">Subjects</span></a>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-timetables') }}" aria-expanded="false"><i class="mdi mdi-table"></i><span class="hide-menu">Timetables</span></a>
                         </li>
-                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-timetables') }}" aria-expanded="false"><i class="mdi mdi-book-open-variant"></i><span class="hide-menu">Timetables</span></a>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-attendance') }}" aria-expanded="false"><i class="mdi mdi-account-check"></i><span class="hide-menu">Attendance</span></a>
                         </li>
-                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-attendance') }}" aria-expanded="false"><i class="mdi mdi-help-circle"></i><span class="hide-menu">Attendance</span></a>
-                        </li>
-                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-admins') }}" aria-expanded="false"><i class="mdi mdi-help-circle"></i><span class="hide-menu">Admins</span></a>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-admins') }}" aria-expanded="false"><i class="mdi mdi-account-star"></i><span class="hide-menu">Admins</span></a>
                         </li>
                     </ul>
                 </nav>
