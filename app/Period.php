@@ -34,11 +34,12 @@ class Period extends Model
 
     public static function getTimetable($day, $klassId) {
         $subject_classes = Subject_Class::where('class_id', $klassId)->get();
-        $periods = Period::where('day', $day)->orWhereIn('subject_class_id', $subject_classes)->whereNull('subject_class_id')->orderby('period_num')->get();
+        $periods = Period::where('day', $day)->orWhereIn('subject_class_id', $subject_classes)->whereNull('subject_class_id')->orderby('period_num')->orderby('deleted_at')->get();
         return $periods;
     }
 
     public static function getTimetableInDay($day, $class_id) {
+        $free_subject_class_ids = Subject_Class::getFreeSubjectClasses();
         $sql = DB::table('periods')
             ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
             ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
@@ -49,6 +50,7 @@ class Period extends Model
             ->orderby('periods.period_num')
             ->orderby('periods.subject_class_id');
         if(!is_null($class_id) && $class_id!=-1) $sql->where('subject_class.class_id', $class_id);
+        if(!is_null($class_id)) $sql->whereNotIn('periods.subject_class_id', $free_subject_class_ids);
         return $sql->get();
     }
 

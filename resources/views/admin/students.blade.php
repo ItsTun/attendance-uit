@@ -13,7 +13,7 @@
 @section('content')
 <div class="container">
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-12" style="text-align: right;">
       <div style="padding: 20px 0px 0px 60px;">
           <button class="btn btn-success" data-toggle="modal" id="add-btn" data-target="#addOrEditStudent">Add New Student</button>
           <button class="btn btn-success" onclick="window.location='{{ route("students.csv") }}'">Import CSV</button>
@@ -94,7 +94,7 @@
           </div>
         @endif
     </div>
-    {{ $students->links() }}
+    {{ $students->links('pagination.circle-pagination') }}
 </div>
 
 

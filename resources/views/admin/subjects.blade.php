@@ -30,7 +30,7 @@
                   </form>
                 </div>
                 
-                <div class="col-md-6">
+                <div class="col-md-6" style="text-align: right;">
                     <div class="form-material">
                         <div style="padding: 20px 0px 0px 150px;">
                             <button class="btn btn-md btn-success" id="add-btn" data-toggle="modal" data-target="#addOrEditSubject">Add New Subject</button>

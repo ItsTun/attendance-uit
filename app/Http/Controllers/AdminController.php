@@ -359,14 +359,26 @@ class AdminController extends Controller
             if (!array_key_exists($day, $timetables)) {
                 $timetable = Period::getTimetable($day, $class_id);
                 $timetables[$day] = $timetable;
+
+                $timetable = [];
+                foreach ($timetables[$day] as $period) {
+                    $period_num = $period->period_num;
+                    if (!array_key_exists($period_num, $timetable)) {
+                        $timetable[$period_num] = [];
+                    }
+                    array_push($timetable[$period_num], $period);
+                }
+                $timetables[$day] = $timetable;
             }
 
-            foreach ($timetables[$day] as $period) {
-                if (!array_key_exists($period->period_num, $value['attendances'])) {
-                    $free_period = Subject_Class::getFreeSubjectClass($class_id);
-                    $lunch_period = Subject_Class::getLunchBreakSubjectClassId($class_id);
+            $free_period = Subject_Class::getFreeSubjectClass($class_id);
+            $lunch_period = Subject_Class::getLunchBreakSubjectClassId($class_id);
 
-                    $data = new \stdClass();
+            foreach ($timetables[$day] as $period_ary) {
+                $period = Utils::getAssociatedPeriod($period_ary, $date);
+                $data = new \stdClass();
+
+                if (!array_key_exists($period->period_num, $attendances)) {
                     if ($period->subject_class_id == $free_period->subject_class_id) {
                         $data->subject_code = '';
                     } else if ($period->subject_class_id == $lunch_period->subject_class_id) {
@@ -376,13 +388,14 @@ class AdminController extends Controller
                     }
                     $data->period_num = $period->period_num;
                     $data->present = -1;
-
-                    $response[$key]['attendances'][$period->period_num] = $data;
+                } else {
+                    $data->subject_code = $period->subject_class->subject->subject_code;
+                    $data->period_num = $period->period_num;
+                    $data->present = $attendances[$period->period_num]->present;
                 }
+                $response[$key]['attendances'][$period->period_num] = $data;
             }
-
         }
-
         return response(json_encode($response), '200');
     }
 
