@@ -134,7 +134,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-12" style="margin-bottom: 10px;">Subjects</label>
+                                        <label class="col-md-12" style="margin-bottom: 10px;">Department</label>
                                         <div class="col-md-12">
                                             <select class="col-md-12 form-control form-control-line faculty-select"
                                                     style="width: 100%;" required name="faculty_id">
@@ -248,8 +248,10 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             }
                         }).responseText;
-                        if (responseText != null) {
+                        if (responseText != 'null') {
+                            console.log(responseText);
                             alert("Another teacher with email address," + email + ", already existed");
+                            return false;
                         }
                         return (responseText == 'null');
                     }

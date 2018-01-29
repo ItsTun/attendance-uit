@@ -29,9 +29,14 @@
                             </select>
                         </div>
                         <div class="col-md-1 col-lg-1 col-sm-12 col-xs-12">
-                            <label for="go-btn">-</label>
+                            <label for="go-btn" style="color: white;">-</label>
                             <input type="submit" href="#" class="btn btn-info form-control"
                                    style="background-color:#1e88e5 !important" id="go-btn" value="Go"/>
+                        </div>
+                        <div class="col-md-2 col-lg-2 col-sm-12 col-xs-12">
+                            <label for="export-csv" style="color: white;">-</label>
+                            <input type="button" class="btn btn-info form-control"
+                                   style="background-color:#1e88e5 !important" id="export-csv" value="Export CSV"/>
                         </div>
                     </div>
                 </form>
@@ -94,5 +99,45 @@
             return (a['Roll No'].length - b['Roll No'].length) || (a['Roll No'].localeCompare(b['Roll No']));
         });
         $('.results').html((buildHtmlTable(arr)));
+
+        if (arr != null && arr.length != 0) {
+            $('#export-csv').show();
+        } else {
+            $('#export-csv').hide();
+        }
+
+        $('#export-csv').click(function() {
+            if (arr == null || arr.length == 0) {
+                alert('No data to export!');
+                return;
+            }
+            var file_name = prompt('Enter File Name', '.csv');
+            if (file_name == null) 
+                return;
+            exportCSV(arr, file_name);
+        });
+
+        function exportCSV(data, file_name) {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            var header_ary = Object.keys(data[0]);
+            let header_str = "";
+            for (var i in header_ary) {
+                header_str += header_ary[i].replace('##', '') + ',';
+            }
+            header_str = header_str.slice(0, -1);
+            csvContent += header_str + "\r\n";
+
+            data.forEach(function(obj) {
+                var arr = Object.values(obj);
+                let row = arr.join(',');
+                csvContent += row + "\r\n";
+            });
+
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", file_name);
+            link.click();
+        }
     </script>
 @endsection
