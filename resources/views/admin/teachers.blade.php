@@ -238,7 +238,6 @@
         var isUpdate = false;
         var oldEmail = '';
 
-
         function onFormSubmit() {
             var email = $('.input-teacher-email').val();
             if (!$('#class-teacher-of').prop('checked')) {
