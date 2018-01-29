@@ -248,8 +248,9 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             }
                         }).responseText;
-                        if (responseText != null) {
+                        if (responseText != 'null') {
                             alert("Another teacher with email address," + email + ", already existed");
+                            return false;
                         }
                         return (responseText == 'null');
                     }

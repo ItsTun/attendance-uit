@@ -25,7 +25,7 @@ class Period extends Model
     }
 
     public static function getPeriodsFromSubjectClass($subject_class_ids) {
-        return Period::whereIn('subject_class_id', $subject_class_ids)->get();
+        return Period::whereIn('subject_class_id', $subject_class_ids)->whereNull('deletedAt')->get();
     }
 
     public static function getPeriod($subject_class_id, $day, $period_num) {

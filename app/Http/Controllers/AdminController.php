@@ -20,6 +20,7 @@ use App\PaginationUtils;
 
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Validator;
 use DateTime;
 
@@ -87,6 +88,8 @@ class AdminController extends Controller
 
             $lunch_break_subject_class_id = Subject_Class::getLunchBreakSubjectClassId($klass_id);
 
+            $free_subject_class_id = Subject_Class::getFreeSubjectClass($klass_id);
+
             $periods = Period::getPeriodsFromSubjectClass($subject_class_ids);
 
             return view('admin.timetables')->with(['years' => $years,
@@ -94,13 +97,15 @@ class AdminController extends Controller
                 'class_id' => $klass_id,
                 'subject_classes' => $subject_classes,
                 'periods' => $periods,
-                'lunch_break_subject_class_id' => $lunch_break_subject_class_id]);
+                'free_subject_class_id' => $free_subject_class_id->subject_class_id,
+                'lunch_break_subject_class_id' => $lunch_break_subject_class_id->subject_class_id]);
         }
         return view('admin.timetables')->with(['years' => $years,
             'year_id' => $year_id,
             'class_id' => $klass_id,
             'subject_classes' => '',
             'periods' => [],
+            'free_subject_class_id' => -1,
             'lunch_break_subject_class_id' => -1]);
     }
 
@@ -673,7 +678,13 @@ class AdminController extends Controller
 
         foreach ($periods as $period) {
             if (array_key_exists('is_lunch_break', $period) && $period['is_lunch_break'] == 1) {
-                $periodTemp = Period::getPeriod($lunchBreakSubjectClassId->subject_class_id, $period['day'], $period['period_num']);
+                $periodTemp = ($period['period_id'] != -1) ? Period::find($period['period_id']) : null;
+                if (!is_null($periodTemp) && ($periodTemp->subject_class_id != $lunchBreakSubjectClassId->subject_class_id)) {
+                    $periodTemp->deleted = 1;
+                    $periodTemp->deleted_at = Carbon::now()->toDateTimeString();
+                    $periodTemp->save();
+                    $periodTemp = new Period();
+                }
                 if (is_null($periodTemp)) $periodTemp = new Period();
                 $periodTemp->subject_class_id = $lunchBreakSubjectClassId->subject_class_id;
                 $periodTemp->period_num = $period['period_num'];
@@ -681,10 +692,18 @@ class AdminController extends Controller
                 $periodTemp->start_time = $period['start_time'];
                 $periodTemp->end_time = $period['end_time'];
                 $periodTemp->save();
+
             } else if (array_key_exists('subject_class_id', $period)) {
-                $periodTemp = ($period['period_id'] != -1) ? Period::find($period['period_id']) : new Period();
-                $periodTemp->subject_class_id = ($period['subject_class_id'] != -1) ? $period['subject_class_id'] : $freeSubjectClassId;
+                $periodTemp = ($period['period_id'] != -1) ? Period::find($period['period_id']) : null;
+                if (!is_null($periodTemp) && ($periodTemp->subject_class_id != $period['subject_class_id'])) {
+                    $periodTemp->deleted = 1;
+                    $periodTemp->deleted_at = Carbon::now()->toDateTimeString();
+                    $periodTemp->save();
+                    $periodTemp = new Period();
+                }
+                if (is_null($periodTemp)) $periodTemp = new Period();
                 $periodTemp->room = $period['room'];
+                $periodTemp->subject_class_id = ($period['subject_class_id'] != $freeSubjectClassId) ? $period['subject_class_id'] : $freeSubjectClassId;
                 $periodTemp->period_num = $period['period_num'];
                 $periodTemp->day = $period['day'];
                 $periodTemp->start_time = $period['start_time'];
