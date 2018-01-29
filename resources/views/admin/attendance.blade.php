@@ -82,6 +82,7 @@
                     @php
                         $periods .= $timetables[$i]->period_id;
                     @endphp
+                    @if($timetables[$i]->subject_code != '000')
                     <div class="col-12">
                         <a href="add/{{ $periods }}?date={{ $selectedDate }}" style="color:#67757c;">
                             <div class="card" style="cursor: pointer; margin-bottom: 10px !important;">
@@ -107,6 +108,7 @@
                             $numberOfPeriods = 1; $start_time = 0; $periods = "";
                         @endphp
                     </div>
+                    @endif
                 @endif
             @endfor
         @endif

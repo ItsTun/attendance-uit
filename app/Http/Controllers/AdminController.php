@@ -468,10 +468,28 @@ class AdminController extends Controller
             return "Invalid date format!";
         }
 
+        if(is_null($date)) $date = date("Y-m-d");
+
         $years = Year::all();
 
         $currentDay = date('N');
-        $timetable = $period->getTimetableInDay((!is_null($date)) ? Utils::getDayFromDate($date) : (($currentDay != 6 && $currentDay != 7) ? $currentDay : 1), $class_id);
+        $tempTimetable = $period->getTimetableInDay((!is_null($date)) ? Utils::getDayFromDate($date) : (($currentDay != 6 && $currentDay != 7) ? $currentDay : 1), $class_id);
+
+        $timetable = [];
+        $tempArray = [];
+
+        if (!is_null($tempTimetable) && sizeof($tempTimetable) > 0) {
+            $lastPeriod = $tempTimetable[0];
+            foreach ($tempTimetable as $period) {
+                if ($period->period_num != $lastPeriod->period_num) {
+                    array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
+                    $tempArray = [];
+                }
+                array_push($tempArray, $period);
+                $lastPeriod = $period;
+            }
+        }
+        array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
 
         $with = ['timetables' => $timetable, 'dates' => Utils::getDatesInThisWeek()];
         $with['selectedDate'] = (!is_null($date)) ? $date : Utils::getDefaultDate();
