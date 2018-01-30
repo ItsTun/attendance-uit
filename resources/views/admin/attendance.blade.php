@@ -75,39 +75,43 @@
                 @endphp
                 @if($i < count($timetables)-1 && $timetables[$i]->subject_code == $timetables[$i+1]->subject_code && $timetables[$i]->room == $timetables[$i+1]->room)
                     @php
-                        $periods .= $timetables[$i]->period_id. ",";
-                        $numberOfPeriods+=1;
+                        if($timetables[$i]->subject_code != '000') {
+                            $periods .= $timetables[$i]->period_id. ",";
+                            $numberOfPeriods+=1;
+                        }
                     @endphp
                 @else
                     @php
-                        $periods .= $timetables[$i]->period_id;
+                        if($timetables[$i]->subject_code != '000') {
+                            $periods .= $timetables[$i]->period_id;
+                        }
                     @endphp
                     @if($timetables[$i]->subject_code != '000')
-                    <div class="col-12">
-                        <a href="add/{{ $periods }}?date={{ $selectedDate }}" style="color:#67757c;">
-                            <div class="card" style="cursor: pointer; margin-bottom: 10px !important;">
-                                <div class="card-block">
-                                    <div class="col-md-3 col-sm-12" style="float: left;">
-                                        {{ date("g:i a", strtotime($start_time)) }}
-                                        -
-                                        {{ date("g:i a", strtotime($timetables[$i]->end_time)) }}
-                                    </div>
-                                    <div class="col-md-6" style="float: left;">
-                                        <b>{{ $timetables[$i]->subject_name }}</b>
-                                        <br/>
-                                        Room - {{ $timetables[$i]->room }}
-                                    </div>
-                                    <div class="col-md-2" style="float: left;">
-                                        @if($numberOfPeriods > 1)<span
-                                                class="label label-info">{{ $numberOfPeriods." Periods" }}</span>@endif
+                        <div class="col-12">
+                            <a href="add/{{ $periods }}?date={{ $selectedDate }}" style="color:#67757c;">
+                                <div class="card" style="cursor: pointer; margin-bottom: 10px !important;">
+                                    <div class="card-block">
+                                        <div class="col-md-3 col-sm-12" style="float: left;">
+                                            {{ date("g:i a", strtotime($start_time)) }}
+                                            -
+                                            {{ date("g:i a", strtotime($timetables[$i]->end_time)) }}
+                                        </div>
+                                        <div class="col-md-6" style="float: left;">
+                                            <b>{{ $timetables[$i]->subject_name }}</b>
+                                            <br/>
+                                            Room - {{ $timetables[$i]->room }}
+                                        </div>
+                                        <div class="col-md-2" style="float: left;">
+                                            @if($numberOfPeriods > 1)<span
+                                                    class="label label-info">{{ $numberOfPeriods." Periods" }}</span>@endif
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
-                        @php
-                            $numberOfPeriods = 1; $start_time = 0; $periods = "";
-                        @endphp
-                    </div>
+                            </a>
+                            @php
+                                $numberOfPeriods = 1; $start_time = 0; $periods = "";
+                            @endphp
+                        </div>
                     @endif
                 @endif
             @endfor
