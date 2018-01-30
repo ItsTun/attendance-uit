@@ -60,7 +60,8 @@ class AdminController extends Controller
 
     public function departments()
     {
-        return view('admin.departments');
+        $faculties = Faculty::getFaculty();
+        return view('admin.departments')->with(['faculties' => $faculties]);
     }
 
     public function subjects()
@@ -611,6 +612,25 @@ class AdminController extends Controller
 
         $year->name = $name;
         $year->save();
+
+        return back()->withInput();
+    }
+
+    public function addOrUpdateFaculty()
+    {
+        $faculty_id=Input::post('faculty_id');
+        $name=Input::post('name');
+
+        $faculty;
+
+        if(!is_null($year_id)) {
+            $faculty = Faculty::find($faculty_id);
+        }else{
+            $faculty = new faculty();
+        }
+
+        $faculty->name = $name;
+        $faculty->save();
 
         return back()->withInput();
     }

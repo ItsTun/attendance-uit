@@ -6,12 +6,100 @@
 
 @section('styles')
 
-@endsection
 
+@endsection
 @section('content')
+
+<div class="container" >
+    <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8"></div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="padding: 10px;">
+          <button type="button" class="btn btn-md btn-success pull-right" data-toggle="modal" id="add-btn" data-target="#addOrEditDepartment">
+            Add New Department
+          </button>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="margin:10px;">
+    <div class="row" style="padding: 30px;">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Department No</th>
+                    <th>Department name</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach($faculties as $faculty)
+              <tr>
+                <td>{{ $faculty->faculty_id}}</td>
+                <td>{{ $faculty->name}}</td>
+                <td>
+                  <button type="button" class="btn btn-primary edit-btn" id="edit-btn" data-toggle="modal" data-target="#addOrEditDepartment">Edit</button>
+                </td>
+              </tr>
+            @endforeach
+            </tbody>
+        </table>
+    </div>
+    {{ $faculties->links('pagination.circle-pagination') }}
+</div>
+
+
+<!--Add Department Modal-->
+<div id="addOrEditDepartment" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Add New Department</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <form class="form-horizontal form-material" action="addOrUpdateFaculty" method="post">
+        <div class="modal-body">
+            <div class="container">
+              {{ csrf_field() }}
+              <input type="hidden" type="text" name="department_id" class="input-department-id" />
+              <div class="form-group">
+                <label class="col-md-12">Name</label>
+                  <div class="col-md-12">
+                    <input class="form-control form-control-line input-department-name" type="text" name="name" required>
+                  </div>
+              </div>
+            </div>
+          </div>
+        
+        <div class="modal-footer">
+          <button type="cancel" class="btn btn-default" data-dismiss="modal">Close</button>
+          <input type="submit" class="btn btn-success" id="savedata" value="Save" />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
 @endsection
 
 @section('scripts')
     
+<script>
+      $(document).on("click", "#edit-btn", function () {
+        console.log("clicked");
+        var departmentId = $(this).data('id');
+        var name = $(this).data('name');
+
+        $('.input-department-id').val(departmentId);
+        $('.input-department-name').val(name);
+      });
+
+      $(document).on("click", "#add-btn", function () {
+        $('.input-department-id').val('');
+        $('.input-department-name').val('');
+      });
+  </script>
+
 @endsection
