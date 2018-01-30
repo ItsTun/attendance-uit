@@ -28,6 +28,7 @@ class Open_Period extends Model
         return $openPeriod;
 	}
 
+	
 	public static function isOpen($class_id, $date) {
 		return DB::table('open_periods')
 					->join('periods', 'open_periods.period_id', '=', 'periods.period_id')

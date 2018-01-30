@@ -1,11 +1,11 @@
-@extends ('layouts.admin_layout')
+@extends ('layouts.teacher_layout')
 
 @section ('title')
 	Student Attendance Details
 @endsection
 
 @section ('styles')
-	<link rel="stylesheet" href="{{ asset('/jquery-ui/jquery.ui.css') }}"> 
+	<link rel="stylesheet" href="{{ asset('/jquery-ui/jquery.ui.css') }}">
 @endsection
 
 @section ('content')
@@ -67,11 +67,7 @@
 		</div>
 		<div id="results" class="card" style="margin: 7px;">
 			<div class="card-block" style="padding: 30px;">
-				<div class="row">
-					<div class="col-md-12">
-						<table class="table table-bordered"></table>
-					</div>
-				</div>
+				<table class="table table-bordered"></table>
 			</div>
 		</div>
 	</div>
@@ -137,7 +133,7 @@
 		});
 
 		function getData(cl, roll_no, from_date, to_date) {
-			$.get('{{ route('admin.getStudentAttendanceDetails') }}', {
+			$.get('{{ route('teacher.getStudentAttendanceDetails') }}', {
 				roll_no: cl + '-' + roll_no,
 				from: from_date,
 				to: to_date
@@ -146,7 +142,7 @@
 					alert('No data!');
 					return;
 				}
-				my_json = JSON.parse(data);
+				my_json = JSON.parse(data)
 				showTable(my_json);
 			});
 		}
@@ -156,16 +152,18 @@
 				var date = element['date'];
 				var attendances = element['attendances'];
 
+				console.log(attendances);
+
 				var row = $('<tr></tr>').appendTo($('table'));
 				$('<td></td>').text(date).appendTo(row);
 				for (var key in attendances) {
 					if (attendances.hasOwnProperty(key)) {
 						if (attendances[key]['present'] == 0) {
-							$('<td></td>').attr({ class: 'table-danger fixed-cell' }).text(attendances[key]['subject_code']).appendTo(row);
+							$('<td></td>').attr({ class: ['table-danger'] }).text(attendances[key]['subject_code']).appendTo(row);
 						} else if (attendances[key]['present'] == 1) {
-							$('<td></td>').attr({ class: 'table-success fixed-cell' }).text(attendances[key]['subject_code']).appendTo(row);
+							$('<td></td>').attr({ class: ['table-success'] }).text(attendances[key]['subject_code']).appendTo(row);
 						} else {
-							$('<td></td>').attr({ class: 'fixed-cell' }).text(attendances[key]['subject_code']).appendTo(row);
+							$('<td></td>').text(attendances[key]['subject_code']).appendTo(row);
 						}
 					}
 				}

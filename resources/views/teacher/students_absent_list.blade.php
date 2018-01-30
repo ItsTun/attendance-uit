@@ -1,4 +1,4 @@
-@extends ('layouts.admin_layout')
+@extends ('layouts.teacher_layout')
 
 @section ('title')
     Students Absent List

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Attendance;
 use App\User;
 use App\Year;
 use App\Klass;
@@ -19,6 +20,7 @@ use App\PaginationUtils;
 
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Validator;
 use DateTime;
 
@@ -80,20 +82,32 @@ class AdminController extends Controller
 
         $years = Year::all();
 
-        $subject_classes = Subject_Class::getSubjectsFromClass($klass_id);
+        if (!is_null($klass_id)) {
+            $subject_classes = Subject_Class::getSubjectsFromClass($klass_id);
 
-        $subject_class_ids = Subject_Class::getSubjectClassIdsFromClass($klass_id);
+            $subject_class_ids = Subject_Class::getSubjectClassIdsFromClass($klass_id);
 
-        $lunch_break_subject_class_id = Subject_Class::getLunchBreakSubjectClassId($klass_id);
+            $lunch_break_subject_class_id = Subject_Class::getLunchBreakSubjectClassId($klass_id);
 
-        $periods = Period::getPeriodsFromSubjectClass($subject_class_ids);
+            $free_subject_class_id = Subject_Class::getFreeSubjectClass($klass_id);
 
+            $periods = Period::getPeriodsFromSubjectClass($subject_class_ids);
+
+            return view('admin.timetables')->with(['years' => $years,
+                'year_id' => $year_id,
+                'class_id' => $klass_id,
+                'subject_classes' => $subject_classes,
+                'periods' => $periods,
+                'free_subject_class_id' => $free_subject_class_id->subject_class_id,
+                'lunch_break_subject_class_id' => $lunch_break_subject_class_id->subject_class_id]);
+        }
         return view('admin.timetables')->with(['years' => $years,
             'year_id' => $year_id,
             'class_id' => $klass_id,
-            'subject_classes' => $subject_classes,
-            'periods' => $periods,
-            'lunch_break_subject_class_id' => $lunch_break_subject_class_id]);
+            'subject_classes' => '',
+            'periods' => [],
+            'free_subject_class_id' => -1,
+            'lunch_break_subject_class_id' => -1]);
     }
 
     public function students()
@@ -152,7 +166,22 @@ class AdminController extends Controller
         return $response;
     }
 
-    function validateCsvFile($file) {
+    public function getTeacherArrayFromCsv(Request $request)
+    {
+        $file = $request->file('teachers_csv');
+        if ($file == null) {
+            return response('File is null!', 400);
+        }
+        $is_valid_file = $this->validateCsvFile($file);
+        if (!$is_valid_file) {
+            return response('Only csv files are allowed!', 400);
+        }
+        $teacherAry = $this->teacherCsvToArray($file);
+        return $teacherAry;
+    }
+
+    function validateCsvFile($file)
+    {
         $validator = Validator::make(
             [
                 'file' => $file,
@@ -169,37 +198,22 @@ class AdminController extends Controller
         return true;
     }
 
-    public function getTeacherArrayFromCsv(Request $request) {
-        $file = $request->file('teachers_csv');
-        if ($file == null) {
-            return response('File is null!', 400);
-        }
-        $is_valid_file = $this->validateCsvFile($file);
-        if (!$is_valid_file) {
-            return response('Only csv files are allowed!', 400);
-        }
-        $teacherAry = $this->teacherCsvToArray($file);
-        return $teacherAry;
-    }
-
-    function teacherCsvToArray($filename = '', $delimiter = ',') {
+    function teacherCsvToArray($filename = '', $delimiter = ',')
+    {
         if (!file_exists($filename) || !is_readable($filename))
             return false;
         $header = null;
         $data = array();
-        if (($handle = fopen($filename, 'r')) !== false)
-        {
-            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false)
-            {
+        if (($handle = fopen($filename, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
                 if (count($row) != 2) {
                     return false;
-                }   
+                }
                 if (!$header) {
                     $header = $row;
                     if ($header[0] != 'name' || $header[1] != 'email')
                         return false;
-                }
-                else {
+                } else {
                     $data[] = array_combine($header, $row);
                 }
             }
@@ -208,7 +222,8 @@ class AdminController extends Controller
         return $data;
     }
 
-    public function getStudentArrayFromCSV(Request $request) {
+    public function getStudentArrayFromCSV(Request $request)
+    {
         $file = $request->file('students_csv');
         $is_valid_file = $this->validateCsvFile($file);
         if (!$is_valid_file) {
@@ -297,8 +312,8 @@ class AdminController extends Controller
 
     public function studentsAttendanceDetails()
     {
-        $classes_ary = $this->getClasses();
-        return view('admin.student_attendance_details')->with(['classes_ary' => $classes_ary]);
+        $years = Year::all();
+        return view('admin.student_attendance_details')->with(['years' => $years]);
     }
 
     public function getStudentAttendanceDetails(Request $request)
@@ -343,28 +358,52 @@ class AdminController extends Controller
             $day = Utils::getDayFromDate($date);
 
             if (!array_key_exists($day, $timetables)) {
-                $timetable = Period::getTimetable($class_id, $day);
-                $timetables[$day] = $timetable->toArray();
+                $timetable = Period::getTimetable($day, $class_id);
+                $timetables[$day] = $timetable;
+
+                $timetable = [];
+                foreach ($timetables[$day] as $period) {
+                    $period_num = $period->period_num;
+                    if (!array_key_exists($period_num, $timetable)) {
+                        $timetable[$period_num] = [];
+                    }
+                    array_push($timetable[$period_num], $period);
+                }
+                $timetables[$day] = $timetable;
             }
 
-            foreach ($timetables[$day] as $timetable) {
-                if (!array_key_exists($timetable->period_num, $value['attendances'])) {
-                    $data = new \stdClass();
-                    $data->subject_code = $timetable->subject_code;
-                    $data->period_num = $timetable->period_num;
+            $free_period = Subject_Class::getFreeSubjectClass($class_id);
+            $lunch_period = Subject_Class::getLunchBreakSubjectClassId($class_id);
+
+            foreach ($timetables[$day] as $period_ary) {
+                $period = Utils::getAssociatedPeriod($period_ary, $date);
+                $data = new \stdClass();
+
+                if (!array_key_exists($period->period_num, $attendances)) {
+                    if ($period->subject_class_id == $free_period->subject_class_id) {
+                        $data->subject_code = '';
+                    } else if ($period->subject_class_id == $lunch_period->subject_class_id) {
+                        continue;
+                    } else {
+                        $data->subject_code = $period->subject_class->subject->subject_code;
+                    }
+                    $data->period_num = $period->period_num;
                     $data->present = -1;
-                    $response[$key]['attendances'][$timetable->period_num] = $data;
+                } else {
+                    $data->subject_code = $period->subject_class->subject->subject_code;
+                    $data->period_num = $period->period_num;
+                    $data->present = $attendances[$period->period_num]->present;
                 }
+                $response[$key]['attendances'][$period->period_num] = $data;
             }
         }
-
         return response(json_encode($response), '200');
     }
 
     public function studentsAbsentList()
     {
-        $classes_ary = $this->getClasses();
-        return view('admin.students_absent_list')->with(['classes_ary' => $classes_ary]);
+        $years = Year::all();
+        return view('admin.students_absent_list')->with(['years' => $years]);
     }
 
     public function getStudentsAbsentList(Request $request)
@@ -403,7 +442,8 @@ class AdminController extends Controller
         return response(json_encode($response), '200');
     }
 
-    public function teachersCsv() {
+    public function teachersCsv()
+    {
         $faculties = Faculty::all();
         return view('admin.teachers_csv')->with(['faculties' => $faculties]);
     }
@@ -429,10 +469,28 @@ class AdminController extends Controller
             return "Invalid date format!";
         }
 
+        if(is_null($date)) $date = date("Y-m-d");
+
         $years = Year::all();
 
         $currentDay = date('N');
-        $timetable = $period->getTimetableInDay((!is_null($date)) ? Utils::getDayFromDate($date) : (($currentDay != 6 && $currentDay != 7) ? $currentDay : 1), $class_id);
+        $tempTimetable = $period->getTimetableInDay((!is_null($date)) ? Utils::getDayFromDate($date) : (($currentDay != 6 && $currentDay != 7) ? $currentDay : 1), $class_id);
+
+        $timetable = [];
+        $tempArray = [];
+
+        if (!is_null($tempTimetable) && sizeof($tempTimetable) > 0) {
+            $lastPeriod = $tempTimetable[0];
+            foreach ($tempTimetable as $period) {
+                if ($period->period_num != $lastPeriod->period_num) {
+                    array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
+                    $tempArray = [];
+                }
+                array_push($tempArray, $period);
+                $lastPeriod = $period;
+            }
+        }
+        array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
 
         $with = ['timetables' => $timetable, 'dates' => Utils::getDatesInThisWeek()];
         $with['selectedDate'] = (!is_null($date)) ? $date : Utils::getDefaultDate();
@@ -632,7 +690,33 @@ class AdminController extends Controller
         $klass->name = $name;
         $klass->save();
 
+        $this->addLunchBreakSubjectClassIfNotExists($klass->class_id);
+        $this->addFreeSubjectClassIfNotExists($klass->class_id);
+
         return back()->withInput();
+    }
+
+    public function addLunchBreakSubjectClassIfNotExists($class_id)
+    {
+        $lunch_break_subject_class = Subject_Class::whereNull('subject_id')->where('class_id', $class_id)->first();
+        if (is_null($lunch_break_subject_class)) {
+            $lunch_break_subject_class = new Subject_Class();
+            $lunch_break_subject_class->subject_id = null;
+            $lunch_break_subject_class->class_id = $class_id;
+            $lunch_break_subject_class->save();
+        }
+    }
+
+    public function addFreeSubjectClassIfNotExists($class_id)
+    {
+        $free_subject = Subject::where('subject_code', '000')->first();
+        $free_subject_class = Subject_Class::where('subject_id', $free_subject->subject_id)->where('class_id', $class_id)->first();
+        if (is_null($free_subject_class)) {
+            $free_subject_class = new Subject_Class();
+            $free_subject_class->class_id = $class_id;
+            $free_subject_class->subject_id = $free_subject->subject_id;
+            $free_subject_class->save();
+        }
     }
 
     public function addOrUpdatePeriods()
@@ -641,10 +725,17 @@ class AdminController extends Controller
         $class_id = Input::post('class_id');
 
         $lunchBreakSubjectClassId = Subject_Class::getLunchBreakSubjectClassId($class_id);
+        $freeSubjectClassId = Subject_Class::getFreeSubjectClass($class_id)->subject_class_id;
 
         foreach ($periods as $period) {
             if (array_key_exists('is_lunch_break', $period) && $period['is_lunch_break'] == 1) {
-                $periodTemp = Period::getPeriod($lunchBreakSubjectClassId->subject_class_id, $period['day'], $period['period_num']);
+                $periodTemp = ($period['period_id'] != -1) ? Period::find($period['period_id']) : null;
+                if (!is_null($periodTemp) && ($periodTemp->subject_class_id != $lunchBreakSubjectClassId->subject_class_id)) {
+                    $periodTemp->deleted = 1;
+                    $periodTemp->deleted_at = Carbon::now()->toDateTimeString();
+                    $periodTemp->save();
+                    $periodTemp = new Period();
+                }
                 if (is_null($periodTemp)) $periodTemp = new Period();
                 $periodTemp->subject_class_id = $lunchBreakSubjectClassId->subject_class_id;
                 $periodTemp->period_num = $period['period_num'];
@@ -652,10 +743,18 @@ class AdminController extends Controller
                 $periodTemp->start_time = $period['start_time'];
                 $periodTemp->end_time = $period['end_time'];
                 $periodTemp->save();
+
             } else if (array_key_exists('subject_class_id', $period)) {
-                $periodTemp = ($period['period_id'] != -1) ? Period::find($period['period_id']) : new Period();
-                $periodTemp->subject_class_id = ($period['subject_class_id'] != -1) ? $period['subject_class_id'] : null;
+                $periodTemp = ($period['period_id'] != -1) ? Period::find($period['period_id']) : null;
+                if (!is_null($periodTemp) && ($periodTemp->subject_class_id != $period['subject_class_id'])) {
+                    $periodTemp->deleted = 1;
+                    $periodTemp->deleted_at = Carbon::now()->toDateTimeString();
+                    $periodTemp->save();
+                    $periodTemp = new Period();
+                }
+                if (is_null($periodTemp)) $periodTemp = new Period();
                 $periodTemp->room = $period['room'];
+                $periodTemp->subject_class_id = ($period['subject_class_id'] != $freeSubjectClassId) ? $period['subject_class_id'] : $freeSubjectClassId;
                 $periodTemp->period_num = $period['period_num'];
                 $periodTemp->day = $period['day'];
                 $periodTemp->start_time = $period['start_time'];
@@ -782,9 +881,25 @@ class AdminController extends Controller
         return "Save successfully";
     }
 
-    public function attendancePercentage() {
-        return view('admin.attendance-percentage');
+    public function attendancePercentage()
+    {
+        $years = Year::all();
+        $class_id = Input::get('class_id');
+        $studentsAttendance = [];
+        if (!is_null($class_id)) {
+            $student_ids = Student::where('class_id', $class_id)->select('student_id')->get();
+            $attendanceRecords = Attendance::whereIn('student_id', $student_ids)->get();
+            foreach ($attendanceRecords as $attendanceRecord) {
+                $tempAttendance = [];
+                $tempAttendance['Roll No'] = $attendanceRecord->student->roll_no;
+                $tempAttendance['Name'] = $attendanceRecord->student->name;
+                $attendanceJson = json_decode($attendanceRecord->attendance_json);
+                foreach ($attendanceJson as $key => $subject) {
+                    $tempAttendance[$subject->subject_code . '##'] = number_format("$subject->percent", 2);
+                }
+                array_push($studentsAttendance, $tempAttendance);
+            }
+        }
+        return view('admin.attendance-percentage')->with(['studentsAttendance' => $studentsAttendance, 'class_id' => $class_id, 'years' => $years]);
     }
-
-
 }

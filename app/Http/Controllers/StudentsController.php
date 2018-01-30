@@ -7,10 +7,6 @@ use App\Student;
 
 class StudentsController extends Controller
 {
-    public function show(Student $student) {
-    	return response($student);
-    }
-
     public function findByEmail($email) {
     	$student = Student::getStudentByEmail($email);
     	if(!$student) {
