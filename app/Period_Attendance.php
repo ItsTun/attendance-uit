@@ -98,11 +98,33 @@ class Period_Attendance extends Model
                 AND subject_class.class_id = classes.class_id
                 AND periods.subject_class_id = subject_class.subject_class_id
                 AND open_periods.period_id = periods.period_id
-                GROUP BY period_attendance.student_id, open_periods.date) AS t1
+                GROUP BY period_attendance.student_id, open_periods.date
+                ORDER BY LENGTH(students.roll_no), students.roll_no) AS t1
             WHERE t1.total = 0
             GROUP BY t1.date
             ORDER BY t1.date;"
         ), array('class_id' => $class_id, 'from_date' => $from, 'to_date' => $to));
+    }
+
+    public static function getStudentsAbsentDays($class_id, $from, $to) {
+        return DB::select( DB::raw(
+            "SELECT t.roll_no, GROUP_CONCAT(t.date) AS absent_dates FROM 
+                (SELECT open_periods.date, SUM(period_attendance.present) AS total, students.roll_no
+                            FROM open_periods, period_attendance, students, classes, subject_class, periods
+                            WHERE period_attendance.open_period_id = open_periods.open_period_id
+                            AND period_attendance.student_id = students.student_id
+                            AND classes.class_id = :class_id
+                            AND open_periods.date BETWEEN :from_date AND :to_date
+                            AND students.class_id = classes.class_id
+                            AND subject_class.class_id = classes.class_id
+                            AND periods.subject_class_id = subject_class.subject_class_id
+                            AND open_periods.period_id = periods.period_id
+                            GROUP BY period_attendance.student_id, open_periods.date
+                            ORDER BY LENGTH(students.roll_no), students.roll_no, open_periods.date) AS t
+                WHERE t.total = 0
+                GROUP BY t.roll_no
+                ORDER BY LENGTH(t.roll_no), t.roll_no;"
+        ), array('class_id' => $class_id, 'from_date' => $from, 'to_date' => $to) );
     }
 
     public static function saveAttendance($period_ids, $date, $presentStudents) {

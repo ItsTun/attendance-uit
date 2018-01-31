@@ -37,6 +37,7 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 	Route::get('checkIfRollNoExists', 'AdminController@checkIfRollNoExists')->name('admin.checkIfRollNoExists');
 	Route::get('getStudentAttendanceDetails', 'AdminController@getStudentAttendanceDetails')->name('admin.getStudentAttendanceDetails');
 	Route::get('getStudentsAbsentList', 'AdminController@getStudentsAbsentList')->name('admin.getStudentsAbsentList');
+	Route::get('getStudentsAbsentForThreeDaysOrAbove', 'AdminController@getStudentsAbsentForThreeDaysOrAbove')->name('admin.getStudentsAbsentForThreeDaysOrAbove');
 
 	Route::post('add/{period_id}', 'AdminController@saveOrEditAttendance');
 	Route::post('addOrUpdatePeriods', 'AdminController@addOrUpdatePeriods')->name('admin.addOrUpdatePeriods');
