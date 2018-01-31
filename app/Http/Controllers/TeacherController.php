@@ -15,6 +15,7 @@ use App\Klass;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 
 class TeacherController extends Controller
@@ -158,8 +159,25 @@ class TeacherController extends Controller
 
         $teacher_id = Teacher::getCurrentTeacher()->teacher_id;
         $currentDay = date('N');
-        $timetable = $period->getTeacherTimetable($teacher_id,
+        $tempTimetable = $period->getTeacherTimetable($teacher_id,
             (!is_null($date)) ? Utils::getDayFromDate($date) : (($currentDay != 6 && $currentDay != 7) ? $currentDay : 1));
+
+        $timetable = [];
+        $tempArray = [];
+
+        if (!is_null($tempTimetable) && sizeof($tempTimetable) > 0) {
+            $lastPeriod = $tempTimetable[0];
+            foreach ($tempTimetable as $period) {
+                if ($period->period_num != $lastPeriod->period_num) {
+                    array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
+                    $tempArray = [];
+                }
+                array_push($tempArray, $period);
+                $lastPeriod = $period;
+            }
+        }
+
+        array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
 
         $with = ['timetables' => $timetable, 'dates' => Utils::getDatesInThisWeek()];
         $with['selectedDate'] = (!is_null($date)) ? $date : Utils::getDefaultDate();
