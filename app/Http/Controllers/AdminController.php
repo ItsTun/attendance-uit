@@ -780,10 +780,12 @@ class AdminController extends Controller
         $error = $this->check($date, $periods);
         $periodObjects = Period::find($periods);
         $numberOfPeriods = Period::getUniquePeriodNumber($periods);
+        $student_ids = Student::getStudentsWithMedicalLeave($date);
         if (is_null($error)) {
             $students = Student::getStudentsFromPeriod($periods);
             return view('admin.add_attendance')->with(['students' => $students, 'periods' => $periods, 'date' => $date,
-                'periodObjects' => $periodObjects, 'numberOfPeriods' => $numberOfPeriods, 'attendedStudents' => $this->getAttendedStudentsFromPeriods($periods, $date)]);
+                'periodObjects' => $periodObjects, 'numberOfPeriods' => $numberOfPeriods, 'attendedStudents' => $this->getAttendedStudentsFromPeriods($periods, $date),
+                'studentsWithMedicalLeaves' => array_column($student_ids->toArray(), 'student_id')]);
         } else {
             return $error;
         }
