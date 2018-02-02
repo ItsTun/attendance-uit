@@ -113,6 +113,8 @@
                         </li>
                         <li> <a class="waves-effect waves-dark" href="{{ route('admin-admins') }}" aria-expanded="false"><i class="mdi mdi-account-star"></i><span class="hide-menu">Admins</span></a>
                         </li>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-medical-leave') }}" aria-expanded="false"><i class="mdi mdi-account-star"></i><span class="hide-menu">Medical Leave</span></a>
+                        </li>
                     </ul>
                 </nav>
                 <!-- End Sidebar navigation -->

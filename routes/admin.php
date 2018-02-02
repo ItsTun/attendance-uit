@@ -22,11 +22,14 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 	Route::get('departments', 'AdminController@departments')->name('admin-departments');
 	Route::get('subjects', 'AdminController@subjects')->name('admin-subjects');
 	Route::get('admins', 'AdminController@admins')->name('admin-admins');
+    Route::get('medical-leave', 'AdminController@medicalLeave')->name('admin-medical-leave');
 	Route::get('timetables', 'AdminController@timetables')->name('admin-timetables');
 	Route::get('attendance', 'AdminController@attendance')->name('admin-attendance');
 	Route::get('attendance/percentage', 'AdminController@attendancePercentage')->name('admin.student.percentage');
 	Route::get('years', 'AdminController@years')->name('admin-years');
 	Route::get('getTeacherWithEmail', 'AdminController@getTeacherWithEmail')->name('admin.getTeacherWithEmail');
+	Route::get('getStudentFromRollNo', 'AdminController@getStudentFromRollNo')->name('admin.getStudentFromRollNo');
+	Route::post('saveMedicalLeave', 'AdminController@saveMedicalLeave')->name('admin.saveMedicalLeave');
 
 	Route::get('getStudentsFromClass', 'AdminController@getStudentsFromClass')->name('admin.getStudentsFromClass');
 	Route::get('add/{period_id}', 'AdminController@addAttendance');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Attendance;
+use App\MedicalLeave;
 use App\User;
 use App\Year;
 use App\Klass;
@@ -18,6 +19,8 @@ use App\Open_Period;
 use App\Period_Attendance;
 use App\PaginationUtils;
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -108,6 +111,12 @@ class AdminController extends Controller
             'periods' => [],
             'free_subject_class_id' => -1,
             'lunch_break_subject_class_id' => -1]);
+    }
+
+    public function medicalLeave()
+    {
+        $years = Year::all();
+        return view('admin.medical_leave')->with(['years' => $years]);
     }
 
     public function students()
@@ -274,7 +283,7 @@ class AdminController extends Controller
     {
         $email = Input::get('email');
 
-        $user = User::where('email', $email)->first();
+        $user = User::where('email', $email)->where('role', 'admin')->first();
 
         return (is_null($user)) ? 'false' : 'true';
     }
@@ -469,7 +478,7 @@ class AdminController extends Controller
             return "Invalid date format!";
         }
 
-        if(is_null($date)) $date = date("Y-m-d");
+        if (is_null($date)) $date = date("Y-m-d");
 
         $years = Year::all();
 
@@ -618,14 +627,14 @@ class AdminController extends Controller
 
     public function addOrUpdateFaculty()
     {
-        $faculty_id=Input::post('faculty_id');
-        $name=Input::post('name');
+        $faculty_id = Input::post('faculty_id');
+        $name = Input::post('name');
 
         $faculty;
 
-        if(!is_null($year_id)) {
+        if (!is_null($year_id)) {
             $faculty = Faculty::find($faculty_id);
-        }else{
+        } else {
             $faculty = new faculty();
         }
 
@@ -864,6 +873,39 @@ class AdminController extends Controller
         return redirect('admin/admins');
     }
 
+    public function getStudentFromRollNo()
+    {
+        $roll_no = Input::get('roll_no');
+        $student = Student::where('roll_no', $roll_no)->first();
+        return $student;
+    }
+
+    public function saveMedicalLeave()
+    {
+        DB::transaction(function () {
+            try {
+                $student_id = Input::get('student_id');
+                $leave_from = Input::get('leave_from');
+                $leave_to = Input::get('leave_to');
+
+                $medical_leave = new MedicalLeave();
+                $medical_leave->student_id = $student_id;
+                $medical_leave->leave_from = $leave_from;
+                $medical_leave->leave_to = $leave_to;
+                $medical_leave->added_by = $id = Auth::id();
+                $medical_leave->save();
+
+                $open_periods = Open_Period::getOpenPeriodWithinDateRange($leave_from, $leave_to);
+                Period_Attendance::setAllPresent($student_id, $open_periods);
+                return "Saved";
+            } catch (\Illuminate\Database\QueryException $e) {
+                return $e;
+            } catch (\Exception $e) {
+                return $e;
+            }
+        });
+    }
+
     public function migrateStudents()
     {
         $class_id = Input::get('to_class_id');
@@ -874,7 +916,7 @@ class AdminController extends Controller
         foreach ($students as $stu) {
             $student = Student::find($stu['student_id']);
             $student->class_id = $class_id;
-            $student->roll_no = $klass->short_form . $stu['new_roll_no'];
+            $student->roll_no = $klass->short_form . '-' . $stu['new_roll_no'];
             $student->save();
         }
 
