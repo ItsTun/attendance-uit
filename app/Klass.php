@@ -80,7 +80,10 @@ class Klass extends Model
     {
         return $this->hasMany(Subject_Class::class, 'class_id');
     }
-
+    public function faculty_class()
+    {
+        return $this->hasMany(Faculty_Class::class, 'class_id');
+    }
     public function year()
     {
         return $this->belongsTo(Year::class, 'year_id');
