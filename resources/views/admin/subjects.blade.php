@@ -109,14 +109,13 @@
                         <label class="col-md-12" style="margin-bottom: 10px;">Classes</label>
                         <div class="col-md-12">
                           <select class="class-select col-md-12" style="width: 100%;" name="classes[]" multiple="multiple">
-                            @foreach($years as $year)
-                              <optgroup label="{{ $year->name }}" data-year-id="{{ $year->year_id }}">
-                                @foreach($year->klasses as $klass)
-                                  <option value="{{ $klass->class_id }}">{{ $klass->name }}</option>
-                                @endforeach
-                              </optgroup>
-                            @endforeach                        
-                          </select>
+                          @foreach($years as $year)
+                            <optgroup label="{{ $year->name }}" data-year-id="{{ $year->year_id }}">
+                              @foreach($year->klasses as $klass)
+                                <option value="{{ $klass->class_id }}">{{ $klass->name }}</option>
+                              @endforeach
+                            </optgroup>
+                          @endforeach 
                         </div>                        
                       </div>
               </div>

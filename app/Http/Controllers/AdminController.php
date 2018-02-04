@@ -18,6 +18,7 @@ use App\Utils;
 use App\Open_Period;
 use App\Period_Attendance;
 use App\PaginationUtils;
+use App\Faculty_Class;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -64,7 +65,10 @@ class AdminController extends Controller
     public function departments()
     {
         $faculties = Faculty::getFaculty();
-        return view('admin.departments')->with(['faculties' => $faculties]);
+
+        $years = Year::all();
+
+        return view('admin.departments')->with(['faculties' => $faculties, 'years' => $years]);
     }
 
     public function subjects()
@@ -681,19 +685,33 @@ class AdminController extends Controller
 
     public function addOrUpdateFaculty()
     {
-        $faculty_id = Input::post('faculty_id');
-        $name = Input::post('name');
+        $name=Input::post('name');
+        $faculty_id=Input::post('faculty_id');
+        $klasses = Input::post('classes');
 
         $faculty;
 
-        if (!is_null($year_id)) {
+        if(!is_null($faculty_id)) {
             $faculty = Faculty::find($faculty_id);
-        } else {
-            $faculty = new faculty();
+        }else{
+            $faculty = new Faculty();
         }
 
         $faculty->name = $name;
         $faculty->save();
+
+        if (sizeof($faculty->faculty_class) > 0) foreach ($faculty->faculty_class as $faculty_class) {
+            $existingClassId = $faculty_class->klass->class_id;
+            if (!in_array($existingClassId, $klasses)) $faculty_class->delete();
+            else unset($klasses[array_search($existingClassId, $klasses)]);
+        }
+
+        foreach ($klasses as $klass) {
+            $facultyClass = new Faculty_Class();
+            $facultyClass->faculty_id = $faculty->faculty_id;
+            $facultyClass->class_id = $klass;
+            $facultyClass->save();
+        }
 
         return back()->withInput();
     }

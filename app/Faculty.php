@@ -13,6 +13,10 @@ class Faculty extends Model
     	return $this->hasMany(Teacher::class, 'faculty_id');
     }
 
+    public function faculty_class() {
+    	return $this->hasMany(Faculty_Class::class, 'faculty_id');
+    }
+
     public static function getFaculty() {
     	return Faculty::paginate(PaginationUtils::getDefaultPageSize());
     }

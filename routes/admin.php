@@ -53,6 +53,7 @@ Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 	Route::post('addOrUpdateStudent', 'AdminController@addOrUpdateStudent')->name('admin.addOrUpdateStudent');
 	Route::post('addOrUpdateTeacher', 'AdminController@addOrUpdateTeacher');
 	Route::post('addOrUpdateUser', 'AdminController@addOrUpdateUser');
+	Route::post('addOrUpdateFaculty', 'AdminController@addOrUpdateFaculty');
 
 	Route::get('migration-tool', 'AdminController@migrationTool');
 	Route::post('migrateStudents', 'AdminController@migrateStudents')->name('admin.migrateStudents');
