@@ -20,7 +20,7 @@ class SendEmail extends Command
      *
      * @var string
      */
-    protected $description = 'Send emails to associated teachers for many absent students.';
+    protected $description = 'Sending emails to associated teachers and admins about students with three or more days of absence.';
 
     /**
      * Create a new command instance.

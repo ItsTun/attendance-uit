@@ -657,7 +657,7 @@ class AdminController extends Controller
             $student = new Student();
         }
 
-        $student->roll_no = $prefix . '-' . $roll_no;
+        $student->roll_no = $prefix . $roll_no;
         $student->name = $name;
         $student->email = $email;
         $student->class_id = $class_id;
