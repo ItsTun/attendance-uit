@@ -461,7 +461,6 @@ class AdminController extends Controller
         $to = $request->to;
 
         $response = Student::getStudentsAbsentForThreeDaysOrAbove($class_id, $from, $to);
-        
         return response(json_encode($response), 200);
     }
 
