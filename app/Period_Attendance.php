@@ -10,31 +10,33 @@ use App\Klass;
 
 class Period_Attendance extends Model
 {
-	public $timestamps = false;
+    public $timestamps = false;
 
-	protected $table = "period_attendance";
-	protected $primaryKey = "period_attendance_id";
+    protected $table = "period_attendance";
+    protected $primaryKey = "period_attendance_id";
 
-	public static function getAttendanceDetails($roll_no, $from, $to) {
-	   return DB::table('period_attendance')
+    public static function getAttendanceDetails($roll_no, $from, $to)
+    {
+        return DB::table('period_attendance')
             ->join('students', 'students.student_id', '=', 'period_attendance.student_id')
             ->join('open_periods', 'open_periods.open_period_id', '=', 'period_attendance.open_period_id')
             ->join('periods', 'periods.period_id', '=', 'open_periods.period_id')
-            ->join('subject_class', function($join) {
+            ->join('subject_class', function ($join) {
                 $join->on('periods.subject_class_id', '=', 'subject_class.subject_class_id')
-                     ->on('students.class_id', '=', 'subject_class.class_id');
+                    ->on('students.class_id', '=', 'subject_class.class_id');
             })
             ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
             ->whereBetween('open_periods.date', [$from, $to])
-            ->where('students.roll_no', '=',$roll_no)
+            ->where('students.roll_no', '=', $roll_no)
             ->select('open_periods.open_period_id', 'open_periods.date', 'periods.period_num', 'subjects.subject_code', 'period_attendance.present')
             ->orderby('open_periods.date')
             ->orderby('periods.period_num')
             ->get();
-	}
+    }
 
-	public static function getDailyDetail(Student $student, $date) {
-		return DB::table('period_attendance')
+    public static function getDailyDetail(Student $student, $date)
+    {
+        return DB::table('period_attendance')
             ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
             ->join('open_periods', 'period_attendance.open_period_id', '=', 'open_periods.open_period_id')
             ->join('periods', 'open_periods.period_id', '=', 'periods.period_id')
@@ -43,50 +45,30 @@ class Period_Attendance extends Model
             ->select('periods.period_id', 'period_attendance.present')
             ->orderby('periods.period_num')
             ->get();
-	}
+    }
 
-    public static function getStudentAttendance($student_id) {
+    public static function getMonthlyAttendance($roll_no, $subject_class_id)
+    {
         return DB::table('period_attendance')
-            ->join('students', 'students.student_id', '=', 'period_attendance.student_id')
-            ->join('classes', 'classes.class_id', '=', 'students.class_id')
-            ->join('subject_class', 'subject_class.class_id', '=', 'classes.class_id')
-            ->join('periods', 'periods.subject_class_id', '=', 'subject_class.subject_class_id')
+            ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
+            ->join('open_periods', 'open_periods.open_period_id', '=', 'period_attendance.open_period_id')
+            ->join('periods', 'periods.period_id', '=', 'open_periods.period_id')
+            ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
             ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
-            ->join('open_periods', function($join) {
-                $join->on('open_periods.period_id', '=', 'periods.period_id')->on('period_attendance.open_period_id', '=', 'open_periods.open_period_id');
-            })
-            ->where('period_attendance.student_id', $student_id)
-            ->select('subject_class.subject_class_id', 
-                    'subjects.subject_code', 
-                    'subjects.name',
-                    'classes.name as class_name',
-                    DB::raw('COUNT(open_periods.open_period_id) as total_periods'), 
-                    DB::raw('SUM(period_attendance.present) as attended_periods'), 
-                    DB::raw('SUM(period_attendance.present)/COUNT(open_periods.open_period_id) * 100 as percent'))
-            ->groupby('subject_class.subject_class_id')
+            ->where('students.roll_no', $roll_no)
+            ->where('subject_class.subject_class_id', $subject_class_id)
+            ->select(DB::raw('COUNT(period_attendance.open_period_id) AS periods'),
+                DB::raw('SUM(period_attendance.present) AS present'),
+                DB::raw('(COUNT(period_attendance.open_period_id) - SUM(period_attendance.present)) AS absent'),
+                DB::raw('MONTH(open_periods.date) AS month'))
+            ->groupby(DB::raw('YEAR(open_periods.date), MONTH(open_periods.date)'))
+            ->orderby(DB::raw('YEAR(open_periods.date), MONTH(open_periods.date)'))
             ->get();
     }
 
-    public static function getMonthlyAttendance($roll_no, $subject_class_id) {
-        return DB::table('period_attendance')
-                    ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
-                    ->join('open_periods', 'open_periods.open_period_id', '=', 'period_attendance.open_period_id')
-                    ->join('periods', 'periods.period_id', '=', 'open_periods.period_id')
-                    ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
-                    ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
-                    ->where('students.roll_no', $roll_no)
-                    ->where('subject_class.subject_class_id', $subject_class_id)
-                    ->select(DB::raw('COUNT(period_attendance.open_period_id) AS periods'), 
-                            DB::raw('SUM(period_attendance.present) AS present'), 
-                            DB::raw('(COUNT(period_attendance.open_period_id) - SUM(period_attendance.present)) AS absent'),
-                            DB::raw('MONTH(open_periods.date) AS month'))
-                    ->groupby(DB::raw('YEAR(open_periods.date), MONTH(open_periods.date)'))
-                    ->orderby(DB::raw('YEAR(open_periods.date), MONTH(open_periods.date)'))
-                    ->get();
-    }
-
-    public static function getStudentsAbsentList($class_id, $from, $to) {
-        return DB::select( DB::raw(
+    public static function getStudentsAbsentList($class_id, $from, $to)
+    {
+        return DB::select(DB::raw(
             "SELECT t1.date, GROUP_CONCAT(t1.roll_no) AS absent_students FROM (
                 SELECT open_periods.date, SUM(period_attendance.present) AS total, students.roll_no
                 FROM open_periods, period_attendance, students, classes, subject_class, periods
@@ -106,8 +88,9 @@ class Period_Attendance extends Model
         ), array('class_id' => $class_id, 'from_date' => $from, 'to_date' => $to));
     }
 
-    public static function getStudentsAbsentDays($class_id, $from, $to) {
-        return DB::select( DB::raw(
+    public static function getStudentsAbsentDays($class_id, $from, $to)
+    {
+        return DB::select(DB::raw(
             "SELECT t.roll_no, GROUP_CONCAT(t.date) AS absent_dates FROM 
                 (SELECT open_periods.date, SUM(period_attendance.present) AS total, students.roll_no
                             FROM open_periods, period_attendance, students, classes, subject_class, periods
@@ -124,21 +107,22 @@ class Period_Attendance extends Model
                 WHERE t.total = 0
                 GROUP BY t.roll_no
                 ORDER BY LENGTH(t.roll_no), t.roll_no;"
-        ), array('class_id' => $class_id, 'from_date' => $from, 'to_date' => $to) );
+        ), array('class_id' => $class_id, 'from_date' => $from, 'to_date' => $to));
     }
 
-    public static function saveAttendance($period_ids, $date, $presentStudents) {
+    public static function saveAttendance($period_ids, $date, $presentStudents)
+    {
         $date = strtotime($date);
         $date = date('Y-m-d', $date);
 
         foreach ($period_ids as $periodId) {
             $klass = Klass::getClassFromPeriod($periodId);
-            
+
             $openPeriod = Open_Period::firstOrNew(array('date' => $date, 'period_id' => $periodId));
             $openPeriod->save();
 
             $openPeriodId = $openPeriod->open_period_id;
-            
+
             $students = Student::where('class_id', $klass->class_id)->get();
 
             foreach ($students as $value) {
@@ -156,12 +140,36 @@ class Period_Attendance extends Model
         }
     }
 
-    public static function updateAttendance($period_ids, $date, $presentStudents) {
+    public static function getStudentAttendance($student_id)
+    {
+        return DB::table('period_attendance')
+            ->join('students', 'students.student_id', '=', 'period_attendance.student_id')
+            ->join('classes', 'classes.class_id', '=', 'students.class_id')
+            ->join('subject_class', 'subject_class.class_id', '=', 'classes.class_id')
+            ->join('periods', 'periods.subject_class_id', '=', 'subject_class.subject_class_id')
+            ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
+            ->join('open_periods', function ($join) {
+                $join->on('open_periods.period_id', '=', 'periods.period_id')->on('period_attendance.open_period_id', '=', 'open_periods.open_period_id');
+            })
+            ->where('period_attendance.student_id', $student_id)
+            ->select('subject_class.subject_class_id',
+                'subjects.subject_code',
+                'subjects.name',
+                'classes.name as class_name',
+                DB::raw('COUNT(open_periods.open_period_id) as total_periods'),
+                DB::raw('SUM(period_attendance.present) as attended_periods'),
+                DB::raw('SUM(period_attendance.present)/COUNT(open_periods.open_period_id) * 100 as percent'))
+            ->groupby('subject_class.subject_class_id')
+            ->get();
+    }
+
+    public static function updateAttendance($period_ids, $date, $presentStudents)
+    {
         foreach ($period_ids as $periodId) {
             $openPeriod = Open_Period::where('date', $date)
                 ->where('period_id', $periodId)
                 ->first();
-            
+
             foreach ($openPeriod->attendedStudents as $periodAttendance) {
                 $student_id = $periodAttendance['student_id'];
 
@@ -172,6 +180,13 @@ class Period_Attendance extends Model
                 Attendance::updateStudentAttendance($student_id, $studentAttendance);
             }
         }
+    }
+
+    public static function setAllPresent($student_id, $open_periods)
+    {
+        Period_Attendance::where('student_id', $student_id)
+            ->whereIn('open_period_id', $open_periods)
+            ->update(['present' => 1]);
     }
 
 }
