@@ -455,7 +455,8 @@ class AdminController extends Controller
         return response(json_encode($response), '200');
     }
 
-    public function getStudentsAbsentForThreeDaysOrAbove(Request $request) {
+    public function getStudentsAbsentForThreeDaysOrAbove(Request $request)
+    {
         $class_id = $request->class_id;
         $from = $request->from;
         $to = $request->to;
@@ -491,7 +492,7 @@ class AdminController extends Controller
             return "Invalid date format!";
         }
 
-        if (is_null($date)) $date = date("Y-m-d");
+        if (is_null($date)) $date = Utils::getDefaultDate();
 
         $years = Year::all();
 
@@ -640,15 +641,15 @@ class AdminController extends Controller
 
     public function addOrUpdateFaculty()
     {
-        $name=Input::post('name');
-        $faculty_id=Input::post('faculty_id');
+        $name = Input::post('name');
+        $faculty_id = Input::post('faculty_id');
         $klasses = Input::post('classes');
 
         $faculty;
 
-        if(!is_null($faculty_id)) {
+        if (!is_null($faculty_id)) {
             $faculty = Faculty::find($faculty_id);
-        }else{
+        } else {
             $faculty = new Faculty();
         }
 
