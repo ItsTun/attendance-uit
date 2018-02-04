@@ -1,0 +1,29 @@
+label {
+    font-weight: normal;
+}
+
+input[type=button i] {
+    background-color: #26c6da !important;
+    height: 38px;
+}
+
+label[for='submit-btn'] {
+    color: white;
+}
+
+#class-select {
+    width: 100%;
+}
+
+.select2-selection {
+    height: 38px !important;
+    padding-top: 4px;
+}
+
+.select2-selection__arrow {
+    margin-top: 4px;
+}
+
+#roll-no {
+    width: 86%;
+}
