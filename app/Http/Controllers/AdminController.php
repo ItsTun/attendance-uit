@@ -276,7 +276,7 @@ class AdminController extends Controller
             $student->class_id = $value->class_id;
             $student->save();
         }
-        echo "Students saved!";
+        echo back();
     }
 
     public function checkIfUserEmailExists()
