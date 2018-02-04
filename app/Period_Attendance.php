@@ -91,8 +91,8 @@ class Period_Attendance extends Model
     public static function getStudentsAbsentDays($class_id, $from, $to)
     {
         return DB::select(DB::raw(
-            "SELECT t.roll_no, GROUP_CONCAT(t.date) AS absent_dates FROM 
-                (SELECT open_periods.date, SUM(period_attendance.present) AS total, students.roll_no
+            "SELECT t.student_id, t.roll_no, t.name, t.email, GROUP_CONCAT(t.date) AS absent_dates FROM 
+                (SELECT open_periods.date, SUM(period_attendance.present) AS total, students.student_id, students.roll_no, students.name, students.email
                             FROM open_periods, period_attendance, students, classes, subject_class, periods
                             WHERE period_attendance.open_period_id = open_periods.open_period_id
                             AND period_attendance.student_id = students.student_id

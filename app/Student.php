@@ -134,7 +134,10 @@ class Student extends Model
                 array_push($absent_dates, $date_range);
             }
             if (count($total_absences) != 0 && count($absent_dates) != 0) {
+                $data['student_id'] = $student->student_id;
                 $data['roll_no'] = $student->roll_no;
+                $data['name'] = $student->name;
+                $data['email'] = $student->email;
                 $data['total_absences'] = $total_absences;
                 $data['absent_dates'] = $absent_dates;
                 array_push($response, $data);
