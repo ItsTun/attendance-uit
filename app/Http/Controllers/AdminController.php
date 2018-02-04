@@ -460,52 +460,8 @@ class AdminController extends Controller
         $from = $request->from;
         $to = $request->to;
 
-        $response = [];
-        $absent_students = Period_Attendance::getStudentsAbsentDays($class_id, $from, $to);
-        foreach ($absent_students as $student) {
-            $absent_dates_ary = explode(',', $student->absent_dates);
-            sort($absent_dates_ary);
-
-            $start = null; $end = null; $count = 0;
-            $total_absences = []; $absent_dates = [];
-            foreach ($absent_dates_ary as $date_str) {
-                $current_date = new DateTime($date_str);
-                $aday_before = new DateTime($current_date->format('Y-m-d'));
-                $aday_before->modify('-1 day');
-
-                while (Utils::getDayFromDate($aday_before->format('Y-m-d')) == 0 
-                    || Utils::getDayFromDate($aday_before->format('Y-m-d')) == 6) {
-                    $aday_before->modify('-1 day');
-                }
-
-                if ($end == $aday_before) {
-                    $end = new DateTime($current_date->format('Y-m-d'));
-                    $count++;
-                } else {
-                    if ($count >= 3) {
-                        array_push($total_absences, $count);
-                        $date_range['from'] = $start->format('Y-m-d');
-                        $date_range['to'] = $end->format('Y-m-d');
-                        array_push($absent_dates, $date_range);
-                    }
-                    $start = new DateTime($current_date->format('Y-m-d'));
-                    $end = new DateTime($current_date->format('Y-m-d'));
-                    $count = 1;
-                }
-            }
-            if ($count >= 3) {
-                array_push($total_absences, $count);
-                $date_range['from'] = $start->format('Y-m-d');
-                $date_range['to'] = $end->format('Y-m-d');
-                array_push($absent_dates, $date_range);
-            }
-            if (count($total_absences) != 0 && count($absent_dates) != 0) {
-                $data['roll_no'] = $student->roll_no;
-                $data['total_absences'] = $total_absences;
-                $data['absent_dates'] = $absent_dates;
-                array_push($response, $data);
-            }
-        }
+        $response = Student::getStudentsAbsentForThreeDaysOrAbove($class_id, $from, $to);
+        
         return response(json_encode($response), 200);
     }
 
