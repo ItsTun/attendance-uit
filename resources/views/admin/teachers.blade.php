@@ -21,9 +21,7 @@
             </div>
         </div>
     </div>
-    <form action="#" method="get">
-        <div class="card" style="margin: 7px;">
-            <div class="card-block">
+    
                 <form action="#" method="get">
                     <div class="card" style="margin: 7px;">
                         <div class="card-block">
@@ -211,9 +209,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </form>
+
 @endsection
 
 @section('scripts')

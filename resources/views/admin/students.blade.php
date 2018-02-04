@@ -59,6 +59,7 @@
                   <input type="submit" class="btn btn-success af" value="Apply Filters" />
                 </div>
               </div>
+        </div>      
       </div>
   </div>
 </form>
