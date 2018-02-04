@@ -2,9 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\EmailUtils;
 use App\Klass;
 
+use App\Mail\AbsentStudentList;
+use App\Student;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 
 class SendEmail extends Command
 {
@@ -39,7 +43,22 @@ class SendEmail extends Command
      */
     public function handle()
     {
-        echo 'testing ...';
-        // send mail to all teachers and admins
+        $klasses = Klass::all();
+        $mail = null;
+        $emails = [];
+        foreach ($klasses as $klass) {
+            $students = Student::getAllStudentAbsentsForThreeDaysOrAbove($klass->class_id);
+            if (!is_null($students) && sizeof($students) > 0) {
+                $mail = new AbsentStudentList($klass, $students);
+                array_push($emails, $mail);
+                $teachers_emails = EmailUtils::getTeacherMailingList($klass->class_id);
+                print_r($teachers_emails);
+                foreach ($teachers_emails as $teacher_email) {
+                    Mail::send('mail_templates.absent_list', ['klass' => $klass, 'students' => $students], function ($message) use ($teacher_email) {
+                        $message->to($teacher_email, "")->subject("Students Absent Report");
+                    });
+                }
+            }
+        }
     }
 }

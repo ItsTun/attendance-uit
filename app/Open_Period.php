@@ -43,4 +43,14 @@ class Open_Period extends Model
 					->select(DB::raw('IF(count(open_periods.open_period_id) > 0, true, false) AS is_open'))
 					->first();
 	}
+
+	public static function getFirstDate() {
+		return DB::table('open_periods')
+				->min('open_periods.date');
+	}
+
+	public static function getLastDate() {
+		return DB::table('open_periods')
+				->max('open_periods.date');
+	}
 }
