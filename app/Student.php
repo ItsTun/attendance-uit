@@ -90,7 +90,48 @@ class Student extends Model
     public static function getAllStudentAbsentsForThreeDaysOrAbove($class_id) {
         $from = Open_Period::getFirstDate();
         $to = Open_Period::getLastDate();
-        return Student::getStudentsAbsentForThreeDaysOrAbove($class_id, $from, $to);
+        $current_date = new DateTime();
+        $current_date = $current_date->format('Y-m-d');
+        $absent_students = Period_Attendance::getStudentsAbsentDays($class_id, $from, $to);
+        $response = [];
+        foreach ($absent_students as $student) {
+            $absent_dates_ary = explode(',', $student->absent_dates);
+            if (!in_array($current_date, $absent_dates_ary)) {
+                continue;
+            }
+            rsort($absent_dates_ary);
+            $count = 0; $total_absences = []; $absent_dates = [];
+            $start_date = null;
+            $aday_before = new DateTime($current_date);
+            foreach ($absent_dates_ary as $date) {
+                if ($aday_before->format('Y-m-d') != $date) {
+                    break;
+                }
+                $count++;
+                $start_date = $date;
+                $aday_before->modify('-1 day');
+                while (Utils::getDayFromDate($aday_before->format('Y-m-d')) == 0
+                    || Utils::getDayFromDate($aday_before->format('Y-m-d')) == 6) {
+                    $aday_before->modify('-1 day');
+                }
+            }
+            if ($count >= 3) {
+                array_push($total_absences, $count);
+                $date_range['from'] = $start_date;
+                $date_range['to'] = $absent_dates_ary[0];
+                array_push($absent_dates, $date_range);
+            }
+            if (count($total_absences) != 0 && count($absent_dates) != 0) {
+                $data['student_id'] = $student->student_id;
+                $data['roll_no'] = $student->roll_no;
+                $data['name'] = $student->name;
+                $data['email'] = $student->email;
+                $data['total_absences'] = $total_absences;
+                $data['absent_dates'] = $absent_dates;
+                array_push($response, $data);
+            }
+        }
+        return $response;
     }
 
     public static function getStudentsAbsentForThreeDaysOrAbove($class_id, $from, $to) {
