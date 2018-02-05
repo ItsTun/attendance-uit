@@ -81,4 +81,11 @@ class Utils {
 		}
 		return $period;
 	}
+
+	public static function getPrettyDateFormat($date) {
+		$months = ['January','Febuary','March','April','May','June','July','August','September','October','November','December'];
+		$date_ary = explode('-', $date);
+		$pretty_date = $months[$date_ary[1]] . ' ' . $date_ary[2] . ',' . $date_ary[0];
+		return $pretty_date;
+	}
 }

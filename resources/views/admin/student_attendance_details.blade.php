@@ -157,7 +157,7 @@
 				var attendances = element['attendances'];
 
 				var row = $('<tr></tr>').appendTo($('table'));
-				$('<td></td>').text(date).appendTo(row);
+				$('<td></td>').html('<strong>' + getPrettyDate(date) + '</strong>').appendTo(row);
 				for (var key in attendances) {
 					if (attendances.hasOwnProperty(key)) {
 						if (attendances[key]['present'] == 0) {

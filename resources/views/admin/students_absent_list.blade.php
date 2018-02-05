@@ -124,13 +124,13 @@
 
             $("#from_datepicker").datepicker({
                 onSelect: function (selectedDate) {
-                    // $('#to_datepicker').datepicker('option', 'minDate', selectedDate);
+                    $('#to_datepicker').datepicker('option', 'minDate', selectedDate);
                 }
             });
 
             $("#to_datepicker").datepicker({
                 onSelect: function (selectedDate) {
-                    // $('#from_datepicker').datepicker('option', 'maxDate', selectedDate);
+                    $('#from_datepicker').datepicker('option', 'maxDate', selectedDate);
                 }
             });
 
@@ -173,33 +173,34 @@
         }
 
         function showTableForThreeDaysOrAboveAbsent(data) {
-            console.log(data);
             var row = $('<tr></tr>').appendTo($('table'));
             $('<th></th>').text('Roll No').appendTo(row);
+            $('<th></th>').text('Name').appendTo(row);
             $('<th></th>').text('Absence').appendTo(row);
 
             data.forEach(function (student) {
                 var roll_no = student['roll_no'];
+                var name = student['name'];
                 var total_absences = student['total_absences'];
                 var absent_dates = student['absent_dates'];
 
                 var row = $('<tr></tr>').appendTo($('table'));
                 $('<td></td>').text(roll_no).appendTo(row);
+                $('<td></td>').text(name).appendTo(row);
                 var col = $('<td></td>').appendTo(row);
 
                 for (var i = 0; i < total_absences.length; i++) {
                     var total_absence = total_absences[i];
                     var absent_date = absent_dates[i];
 
-                    $('<span></span>').html("from <strong>" + absent_date['from'] + "</strong> to <strong>" + absent_date['to'] + "</strong>")
-                        .css('margin-right', '30px')
-                        .appendTo(col);
+                    var sub_row = $('<div></div>').addClass('row').appendTo(col);
+                    $('<div></div>').html("from <strong>" + getPrettyDate(absent_date['from']) + "</strong> to <strong>" + getPrettyDate(absent_date['to']) + "</strong>")
+                        .addClass('col-md-6')
+                        .appendTo(sub_row);
 
-                    $('<span></span>').text(total_absence + " day(s)")
-                        .addClass('label label-info')
-                        .appendTo(col);
-
-                    $('<br>').appendTo(col);
+                    $('<div></div>').text(total_absence + " days")
+                        .addClass('col-md-3')
+                        .appendTo(sub_row);
                 }
             });
 
@@ -227,7 +228,9 @@
                 var absent_students = element['absent_students'];
 
                 var row = $('<tr></tr>').appendTo($('table'));
-                $('<td></td>').text(date).appendTo(row);
+                $('<td></td>').text(getPrettyDate(date))
+                        .css('width', '120px')
+                        .appendTo(row);
                 if (absent_students == null) {
                     $('<td></td>').text('No absent students').appendTo(row);
                     return;
