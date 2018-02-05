@@ -20,8 +20,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('/v1/auth/google/tokensignin', 'Auth\StudentLoginController@getStudentRecord');
 
 // Route::group(['middleware' => ['client']], function () {
-	Route::get('/v1/attendance/{student_id}', 'AttendancesController@studentAttendance'); // using
-	Route::get('/v1/attendance/{student}/daily/detail', 'AttendancesController@dailyDetail'); // using
-	Route::get('/v1/attendance/details/{student}/{subject_class_id}', 'AttendancesController@attendanceDetails'); // using
-	Route::get('/v1/students/email/{email}', 'StudentsController@findByEmail'); // using
+	Route::get('/v1/attendance/{student_id}', 'AttendancesController@studentAttendance'); 
+	Route::get('/v1/attendance/daily/detail/{student_id}', 'AttendancesController@dailyDetail'); 
+	Route::get('/v1/attendance/details/{student_id}/{subject_class_id}', 'AttendancesController@attendanceDetails'); 
+	Route::get('/v1/students/email/{email}', 'StudentsController@findByEmail');
 // });

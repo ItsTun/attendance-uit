@@ -403,8 +403,8 @@ class AdminController extends Controller
                     $data->period_num = $period->period_num;
                     $data->present = -1;
                 } else {
-                    $data->subject_code = $period->subject_class->subject->subject_code;
-                    $data->period_num = $period->period_num;
+                    $data->subject_code = $attendances[$period->period_num]->subject_code;
+                    $data->period_num = $attendances[$period->period_num]->period_num;
                     $data->present = $attendances[$period->period_num]->present;
                 }
                 $response[$key]['attendances'][$period->period_num] = $data;

@@ -14,11 +14,18 @@ use App\Klass;
 use App\Attendance;
 use App\Utils;
 use App\Teacher;
+use App\Subject_Class;
 
 class AttendancesController extends Controller
 {
-    public function dailyDetail(Request $request, Student $student) {
+    public function dailyDetail(Request $request) {
+        $student_id = $request->student_id;
         $date = $request->date;
+
+        $student = Student::find($student_id);
+        if ($student == null) {
+            return response('Student not found!', 200);
+        }
 
         $date = Utils::getDate($date);
 
@@ -27,48 +34,82 @@ class AttendancesController extends Controller
 
         $attendance = [];
         foreach ($results as $value) {
-            $attendance[$value->period_id] = $value->present;
+            $attendance[$value->period_num] = $value->present;
         }
 
         $day = Utils::getDayFromDate($date);
-        $timetable = Period::getTimetable($student->class_id, $day);
+        $timetable = Period::getTimetable($day, $student->class_id);
         if (!$timetable) return response('No data!');
 
-        $response = [];
-
-        foreach ($timetable as $key => $value) {
-            $info['period_id'] = $value->period_id;
-            $info['subject_code'] = $value->subject_code;
-            $info['subject_name'] = $value->subject_name;
-            $info['subject_class_id'] = $value->subject_class_id;
-            $info['period_num'] = $value->period_num;
-            $info['room'] = $value->room;
-            $info['start_time'] = $value->start_time;
-            $info['end_time'] = $value->end_time;
-            $info['day'] = $day;
-            $info['class_short_form'] = $value->class_short_form;
-            $info['class_name'] = $value->class_name;
-
-            if (array_key_exists($value->period_id, $attendance)) {
-                $info['present'] = $attendance[$value->period_id];
-            } else {
-                $info['present'] = -1;
+        $new_timetable = [];
+        foreach ($timetable as $period) {
+            $period_num = $period->period_num;
+            if (!array_key_exists($period_num, $new_timetable)) {
+                $new_timetable[$period_num] = [];
             }
-
-            array_push($response, $info);
+            array_push($new_timetable[$period_num], $period);
         }
 
-        return response($response);
+        $response = [];
+        $free_period = Subject_Class::getFreeSubjectClass($student->class_id);
+        $lunch_period = Subject_Class::getLunchBreakSubjectClassId($student->class_id);
+
+        foreach ($new_timetable as $period_ary) {
+            $period = Utils::getAssociatedPeriod($period_ary, $date);
+            if (!array_key_exists($period->period_num, $attendance)) {
+                $info['period_id'] = $period->period_id;
+                $info['subject_class_id'] = $period->subject_class_id;
+                $info['period_num'] = $period->period_num;
+                $info['start_time'] = $period->start_time;
+                $info['end_time'] = $period->end_time;
+                $info['day'] = $day;
+                $info['present'] = -1;
+                if ($period->subject_class_id == $free_period->subject_class_id) {
+                    $info['subject_code'] = 'Free';
+                    $info['subject_name'] = '';
+                    $info['room'] = '';
+                } else if ($period->subject_class_id == $lunch_period->subject_class_id) {
+                    continue;
+                } else {
+                    $info['subject_code'] = $period->subject_class->subject->subject_code;
+                    $info['subject_name'] = $period->subject_class->subject->name;
+                    $info['room'] = $period->room;
+                }
+            } else {
+                $info['period_id'] = $period->period_id;
+                $info['subject_code'] = $period->subject_class->subject->subject_code;
+                $info['subject_name'] = $period->subject_class->subject->name;
+                $info['subject_class_id'] = $period->subject_class_id;
+                $info['period_num'] = $period->period_num;
+                $info['room'] = $period->room;
+                $info['start_time'] = $period->start_time;
+                $info['end_time'] = $period->end_time;
+                $info['day'] = $day;
+                $info['present'] = $attendance[$period->period_num];
+            }
+            array_push($response, $info);
+        }
+        return response($response, 200);
     }
 
     public function studentAttendance(Request $request) {
         $student_id = $request->student_id;
-        $studentAttendance = json_decode(Attendance::show($student_id)->attendance_json);
-        return response($studentAttendance);
+        $attendance = Attendance::show($student_id);
+        if ($attendance == null) {
+            return response('Student not found!', 200);
+        }
+        $studentAttendance = json_decode($attendance->attendance_json);
+        return response($studentAttendance, 200);
     }
 
-    public function attendanceDetails(Student $student, $subject_class_id) {
-        $studentAttendance = json_decode(Attendance::show($student->roll_no)->attendance_json);
+    public function attendanceDetails(Request $request) {
+        $student_id = $request->student_id;
+        $student = Student::find($student_id);
+        if ($student == null) {
+            return response('Student not found!', 200);
+        }
+        $subject_class_id = $request->subject_class_id;
+        $studentAttendance = json_decode(Attendance::show($student->student_id)->attendance_json);
         $_studentAttendance = [];
         foreach ($studentAttendance as $key => $value) {
             if ($studentAttendance[$key]->subject_class_id == $subject_class_id) {
@@ -84,9 +125,10 @@ class AttendancesController extends Controller
         }
         $_studentAttendance->teachers = implode(', ', $teachers_ary);
 
-        $attendance = Period_Attendance::getMonthlyAttendance($student->roll_no, $subject_class_id);
+        $attendance = Period_Attendance::getMonthlyAttendance($student->student_id, $subject_class_id);
+        dd($attendance);
         $_studentAttendance->attendance = $attendance->toArray();
         
-        return response(json_encode($_studentAttendance));
+        return response(json_encode($_studentAttendance), 200);
     }
 }

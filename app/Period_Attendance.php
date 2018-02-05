@@ -37,25 +37,25 @@ class Period_Attendance extends Model
     public static function getDailyDetail(Student $student, $date)
     {
         return DB::table('period_attendance')
-            ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
+            ->join('students', 'students.student_id', '=', 'period_attendance.student_id')
             ->join('open_periods', 'period_attendance.open_period_id', '=', 'open_periods.open_period_id')
             ->join('periods', 'open_periods.period_id', '=', 'periods.period_id')
             ->where('open_periods.date', $date)
             ->where('students.roll_no', $student->roll_no)
-            ->select('periods.period_id', 'period_attendance.present')
+            ->select('periods.period_id', 'periods.period_num','period_attendance.present')
             ->orderby('periods.period_num')
             ->get();
     }
 
-    public static function getMonthlyAttendance($roll_no, $subject_class_id)
+    public static function getMonthlyAttendance($student_id, $subject_class_id)
     {
         return DB::table('period_attendance')
-            ->join('students', 'students.roll_no', '=', 'period_attendance.roll_no')
+            ->join('students', 'students.student_id', '=', 'period_attendance.student_id')
             ->join('open_periods', 'open_periods.open_period_id', '=', 'period_attendance.open_period_id')
             ->join('periods', 'periods.period_id', '=', 'open_periods.period_id')
             ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
             ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
-            ->where('students.roll_no', $roll_no)
+            ->where('students.student_id', $student_id)
             ->where('subject_class.subject_class_id', $subject_class_id)
             ->select(DB::raw('COUNT(period_attendance.open_period_id) AS periods'),
                 DB::raw('SUM(period_attendance.present) AS present'),

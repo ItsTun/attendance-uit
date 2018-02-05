@@ -9,7 +9,7 @@ class StudentsController extends Controller
 {
     public function findByEmail($email) {
     	$student = Student::getStudentByEmail($email);
-    	if(!$student) {
+    	if(count($student) === 0) {
     		return response('No student found with such email!');
     	}
         $s = $student->first();
