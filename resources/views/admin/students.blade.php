@@ -93,11 +93,20 @@
                             <td>{{ $student->name }}</td>
                             <td>{{ $student->email }}</td>
                             <td>
-                                <button type="button" id="edit-btn" class="btn btn-primary" data-toggle="modal"
-                                        data-target="#addOrEditStudent" data-student-id="{{ $student->student_id }}"
-                                        data-roll-no="{{ $student->roll_no }}" data-name="{{ $student->name }}"
-                                        data-email="{{ $student->email }}" data-class-id="{{ $student->class_id }}">Edit
-                                </button>
+                                <form action="@if(is_null($student->suspended)){{ route('admin.suspendStudent') }}@else {{ route('admin.resumeStudent') }}@endif"
+                                      method="post">
+                                    {{ csrf_field() }}
+                                    <button type="button" id="edit-btn" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#addOrEditStudent" data-student-id="{{ $student->student_id }}"
+                                            data-roll-no="{{ $student->roll_no }}" data-name="{{ $student->name }}"
+                                            data-email="{{ $student->email }}" data-class-id="{{ $student->class_id }}">
+                                        Edit
+                                    </button>
+                                    <input type="text" value="{{ $student->student_id }}" name="student_id" hidden/>
+                                    <button type="submit" class="btn @if(is_null($student->suspended)) btn-warning @else btn-success @endif"
+                                            id="btn-suspend">@if(is_null($student->suspended))
+                                            Suspend @else Resume @endif</button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach

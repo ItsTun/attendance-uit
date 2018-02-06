@@ -524,6 +524,28 @@ class AdminController extends Controller
         return view('admin.attendance')->with($with);
     }
 
+    public function resumeStudent()
+    {
+        $student_id = Input::post('student_id');
+        $student = Student::find($student_id);
+        $student->suspended = null;
+        $student->suspended_at = null;
+        $student->save();
+
+        return back()->withInput();
+    }
+
+    public function suspendStudent()
+    {
+        $student_id = Input::post('student_id');
+        $student = Student::find($student_id);
+        $student->suspended = 1;
+        $student->suspended_at = Carbon::now()->toDateTimeString();
+        $student->save();
+
+        return back()->withInput();
+    }
+
     public function admins()
     {
         $admins = User::where('role', 'admin')->paginate(PaginationUtils::getDefaultPageSize());

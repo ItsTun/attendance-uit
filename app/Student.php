@@ -32,6 +32,7 @@ class Student extends Model
             ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
             ->join('students', 'students.class_id', '=', 'subject_class.class_id')
             ->orWhereIn('periods.period_id', $period_ids)
+            ->whereNull('students.suspended')
             ->select('students.*')
             ->distinct()
             ->get();
@@ -49,7 +50,7 @@ class Student extends Model
 
     public static function getStudentsFromClass($class_id)
     {
-        return Student::where('class_id', $class_id)->groupBy('updated_at')->groupBy('roll_no')->orderBy(DB::raw('length(roll_no)'), 'ASC')->orderBy('roll_no')->get();
+        return Student::where('class_id', $class_id)->whereNull('suspended')->groupBy('updated_at')->groupBy('roll_no')->orderBy(DB::raw('length(roll_no)'), 'ASC')->orderBy('roll_no')->get();
     }
 
     public static function getStudentByEmail($email)
@@ -57,6 +58,7 @@ class Student extends Model
         return DB::table('students')
             ->join('classes', 'classes.class_id', '=', 'students.class_id')
             ->where('students.email', '=', $email)
+            ->whereNull('students.suspended')
             ->select('students.roll_no', 'students.name', 'students.email', 'classes.short_form as class_short_form', 'classes.name as class_name')
             ->get();
     }
@@ -65,6 +67,7 @@ class Student extends Model
     {
         return DB::table('students')
             ->whereIn('roll_no', $roll_nos)
+            ->whereNull('students.suspended')
             ->get();
     }
 
@@ -72,6 +75,7 @@ class Student extends Model
     {
         return DB::table('students')
             ->whereIn('email', $emails)
+            ->whereNull('students.suspended')
             ->get();
     }
 
@@ -82,12 +86,8 @@ class Student extends Model
             ->select('student_id')->get();
     }
 
-    public function klass()
+    public static function getAllStudentAbsentsForThreeDaysOrAbove($class_id)
     {
-        return $this->belongsTo(Klass::class, 'class_id', 'class_id');
-    }
-
-    public static function getAllStudentAbsentsForThreeDaysOrAbove($class_id) {
         $from = Open_Period::getFirstDate();
         $to = Open_Period::getLastDate();
         $current_date = new DateTime();
@@ -100,7 +100,9 @@ class Student extends Model
                 continue;
             }
             rsort($absent_dates_ary);
-            $count = 0; $total_absences = []; $absent_dates = [];
+            $count = 0;
+            $total_absences = [];
+            $absent_dates = [];
             $start_date = null;
             $aday_before = new DateTime($current_date);
             foreach ($absent_dates_ary as $date) {
@@ -134,15 +136,19 @@ class Student extends Model
         return $response;
     }
 
-    public static function getStudentsAbsentForThreeDaysOrAbove($class_id, $from, $to) {
+    public static function getStudentsAbsentForThreeDaysOrAbove($class_id, $from, $to)
+    {
         $response = [];
         $absent_students = Period_Attendance::getStudentsAbsentDays($class_id, $from, $to);
         foreach ($absent_students as $student) {
             $absent_dates_ary = explode(',', $student->absent_dates);
             sort($absent_dates_ary);
 
-            $start = null; $end = null; $count = 0;
-            $total_absences = []; $absent_dates = [];
+            $start = null;
+            $end = null;
+            $count = 0;
+            $total_absences = [];
+            $absent_dates = [];
             foreach ($absent_dates_ary as $date_str) {
                 $current_date = new DateTime($date_str);
                 $aday_before = new DateTime($current_date->format('Y-m-d'));
@@ -185,5 +191,10 @@ class Student extends Model
             }
         }
         return $response;
+    }
+
+    public function klass()
+    {
+        return $this->belongsTo(Klass::class, 'class_id', 'class_id');
     }
 }
