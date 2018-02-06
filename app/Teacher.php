@@ -33,7 +33,7 @@ class Teacher extends Model
 
         return Teacher::orWhere('year_head_of', $year->year_id)
             ->orWhere('class_teacher_of', $class_id)
-            ->orWhereIn('faculty_head_of', $faculty_ids)
+            ->orWhereIn('department_head_of', $faculty_ids)
             ->get();
     }
 
