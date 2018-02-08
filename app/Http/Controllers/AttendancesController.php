@@ -30,7 +30,9 @@ class AttendancesController extends Controller
         $date = Utils::getDate($date);
 
         $results = Period_Attendance::getDailyDetail($student, $date);
-        if (!$results) return response('No data!');
+        if (!$results) {
+            return response('No data!', 200);
+        }
 
         $attendance = [];
         foreach ($results as $value) {
@@ -39,7 +41,7 @@ class AttendancesController extends Controller
 
         $day = Utils::getDayFromDate($date);
         $timetable = Period::getTimetable($day, $student->class_id);
-        if (!$timetable) return response('No data!');
+        if (!$timetable) return response('No data!', 200);
 
         $new_timetable = [];
         foreach ($timetable as $period) {
@@ -53,7 +55,6 @@ class AttendancesController extends Controller
         $response = [];
         $free_period = Subject_Class::getFreeSubjectClass($student->class_id);
         $lunch_period = Subject_Class::getLunchBreakSubjectClassId($student->class_id);
-
         foreach ($new_timetable as $period_ary) {
             $period = Utils::getAssociatedPeriod($period_ary, $date);
             if (!array_key_exists($period->period_num, $attendance)) {
@@ -64,6 +65,7 @@ class AttendancesController extends Controller
                 $info['end_time'] = $period->end_time;
                 $info['day'] = $day;
                 $info['present'] = -1;
+                $info['date'] = $date;
                 if ($period->subject_class_id == $free_period->subject_class_id) {
                     $info['subject_code'] = 'Free';
                     $info['subject_name'] = '';
@@ -86,6 +88,7 @@ class AttendancesController extends Controller
                 $info['end_time'] = $period->end_time;
                 $info['day'] = $day;
                 $info['present'] = $attendance[$period->period_num];
+                $info['date'] = $date;
             }
             array_push($response, $info);
         }
@@ -126,7 +129,6 @@ class AttendancesController extends Controller
         $_studentAttendance->teachers = implode(', ', $teachers_ary);
 
         $attendance = Period_Attendance::getMonthlyAttendance($student->student_id, $subject_class_id);
-        dd($attendance);
         $_studentAttendance->attendance = $attendance->toArray();
         
         return response(json_encode($_studentAttendance), 200);

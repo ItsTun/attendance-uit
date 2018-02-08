@@ -52,15 +52,6 @@ class Student extends Model
         return Student::where('class_id', $class_id)->groupBy('updated_at')->groupBy('roll_no')->orderBy(DB::raw('length(roll_no)'), 'ASC')->orderBy('roll_no')->get();
     }
 
-    public static function getStudentByEmail($email)
-    {
-        return DB::table('students')
-            ->join('classes', 'classes.class_id', '=', 'students.class_id')
-            ->where('students.email', '=', $email)
-            ->select('students.roll_no', 'students.name', 'students.email', 'classes.short_form as class_short_form', 'classes.name as class_name')
-            ->get();
-    }
-
     public static function getStudentsWithRollNos($roll_nos)
     {
         return DB::table('students')
