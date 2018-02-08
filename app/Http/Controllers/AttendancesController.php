@@ -71,7 +71,9 @@ class AttendancesController extends Controller
                     $info['subject_name'] = '';
                     $info['room'] = '';
                 } else if ($period->subject_class_id == $lunch_period->subject_class_id) {
-                    continue;
+                    $info['subject_code'] = 'Lunch Break';
+                    $info['subject_name'] = '';
+                    $info['room'] = '';
                 } else {
                     $info['subject_code'] = $period->subject_class->subject->subject_code;
                     $info['subject_name'] = $period->subject_class->subject->name;
