@@ -46,6 +46,7 @@ class Klass extends Model
         $years = Year::all();
         $classTeacherOf = $teacher->class_teacher_of;
         $yearHeadOf = $teacher->year_head_of;
+        $departmentHeadOf = $teacher->department_head_of;
 
         if (!is_null($teacher->is_principle) && $teacher->is_principle == 1) return $years;
 
@@ -54,7 +55,9 @@ class Klass extends Model
                 if (!is_null($classTeacherOf)) {
                     $flag = 0;
                     foreach ($year->klasses as $key => $klass) {
-                        if ($klass->class_id != $classTeacherOf) {
+                        if (!is_null($klass->faculty_class) && sizeof($klass->faculty_class) > 0 && !self::isClassInDepartment($klass, $departmentHeadOf)) {
+                            unset($year->klasses[$key]);
+                        } else if ($klass->class_id != $classTeacherOf) {
                             unset($year->klasses[$key]);
                         } else {
                             $flag = 1;
@@ -71,6 +74,12 @@ class Klass extends Model
         }
     }
 
+    public static function isClassInDepartment($klass, $departmentId)
+    {
+        $faculty_ids = array_column($klass->faculty_class->toArray(), 'faculty_id');
+        return in_array($departmentId, $faculty_ids);
+    }
+
     public function students()
     {
         return $this->hasMany(Student::class, 'class_id');
@@ -80,10 +89,12 @@ class Klass extends Model
     {
         return $this->hasMany(Subject_Class::class, 'class_id');
     }
+
     public function faculty_class()
     {
         return $this->hasMany(Faculty_Class::class, 'class_id');
     }
+
     public function year()
     {
         return $this->belongsTo(Year::class, 'year_id');

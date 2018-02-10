@@ -94,6 +94,7 @@
                                     data-teacher-faculty="{{ $teacher->faculty_id }}"
                                     data-class-teacher-of="{{ $teacher->class_teacher_of }}"
                                     data-year-head-of="{{ $teacher->year_head_of }}"
+                                    data-department-head-of="{{ $teacher->department_head_of }}"
                                     data-is-principle="{{ $teacher->is_principle }}" data-toggle="modal"
                                     data-target="#addOrEditTeacher">Edit
                             </button>
@@ -183,6 +184,17 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <input type="checkbox" id="department-head-of" onchange="onCheckChanged(this)"/>
+                            <label for="department-head-of">Department Head</label>
+                            <div class="col-md-12" style="margin-top: 10px; margin-bottom: 15px;">
+                                <select class="department-head-of" name="department_head_of"
+                                        style="width: 100%;display: none;">
+                                    <option style="display:none"></option>
+                                    @foreach($faculties as $faculty)
+                                        <option value="{{ $faculty->faculty_id }}">{{ $faculty->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <input type="checkbox" id="year-head-of" onchange="onCheckChanged(this)"/>
                             <label for="year-head-of">Year Head</label>
                             <div class="col-md-12" style="margin-top: 10px; margin-bottom: 15px;">
@@ -228,6 +240,10 @@
                 placeholder: "Select year",
             });
             $('.year-head-of').next(".select2-container").hide();
+            $('.department-head-of').select2({
+                placeholder: "Select department",
+            });
+            $('.department-head-of').next(".select2-container").hide();
             @if(!is_null($faculty_id)) $('.filter-faculty-select').val('{{ $faculty_id }}'); @endif
         });
 
@@ -241,6 +257,9 @@
             }
             if (!$('#year-head-of').prop('checked')) {
                 $('.year-head-of option:eq(0)').prop('selected', true).trigger('change');
+            }
+            if (!$('#department-head-of').prop('checked')) {
+                $('.department-head-of option:eq(0)').prop('selected', true).trigger('change');
             }
             if ((isUpdate && oldEmail != email) || !isUpdate) {
                 var responseText = $.ajax({
@@ -272,6 +291,7 @@
             var teacherSubjectClasses = $(this).data('subject-classes');
             var classTeacherOf = $(this).data('class-teacher-of');
             var yearHeadOf = $(this).data('year-head-of');
+            var departmentHeadOf = $(this).data('department-head-of');
             var isPrinciple = $(this).data('is-principle');
 
             console.log(classTeacherOf + ',' + yearHeadOf + ',' + isPrinciple);
@@ -298,6 +318,11 @@
                 $('#year-head-of').prop('checked', true);
                 $('.year-head-of').val(yearHeadOf).trigger('change');
                 onCheckChanged($('#year-head-of'));
+            }
+            if (departmentHeadOf) {
+                $('#department-head-of').prop('checked', true);
+                $('.department-head-of').val(departmentHeadOf).trigger('change');
+                onCheckChanged($('#department-head-of'));
             }
             if (isPrinciple) $('#is-principle').prop('checked', true);
             $('.subject-select').trigger('change');

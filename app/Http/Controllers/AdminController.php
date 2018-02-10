@@ -524,6 +524,28 @@ class AdminController extends Controller
         return view('admin.attendance')->with($with);
     }
 
+    public function resumeStudent()
+    {
+        $student_id = Input::post('student_id');
+        $student = Student::find($student_id);
+        $student->suspended = null;
+        $student->suspended_at = null;
+        $student->save();
+
+        return back()->withInput();
+    }
+
+    public function suspendStudent()
+    {
+        $student_id = Input::post('student_id');
+        $student = Student::find($student_id);
+        $student->suspended = 1;
+        $student->suspended_at = Carbon::now()->toDateTimeString();
+        $student->save();
+
+        return back()->withInput();
+    }
+
     public function admins()
     {
         $admins = User::where('role', 'admin')->paginate(PaginationUtils::getDefaultPageSize());
@@ -561,6 +583,7 @@ class AdminController extends Controller
         $teacher_id = Input::post('teacher_id');
         $class_teacher_of = Input::post('class_teacher_of');
         $year_head_of = Input::post('year_head_of');
+        $department_head_of = Input::post('department_head_of');
         $is_principle = Input::post('is_principle');
 
         $teacher = null;
@@ -574,6 +597,7 @@ class AdminController extends Controller
         $teacher->class_teacher_of = (is_null($class_teacher_of)) ? null : $class_teacher_of;
         $teacher->year_head_of = (is_null($year_head_of)) ? null : $year_head_of;
         $teacher->is_principle = (is_null($is_principle)) ? null : 1;
+        $teacher->department_head_of = (is_null($department_head_of)) ? null : $department_head_of;
         $teacher->save();
 
         $teacher_id = $teacher->teacher_id;
