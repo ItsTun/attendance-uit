@@ -88,4 +88,16 @@ class Utils {
 		$pretty_date = $months[$date_ary[1]] . ' ' . $date_ary[2] . ',' . $date_ary[0];
 		return $pretty_date;
 	}
+
+	public static function getMonthString($month) {
+		$months = ['January','Febuary','March','April','May','June','July','August','September','October','November','December'];
+		return $months[$month - 1];
+	}
+
+	public static function getLastDateOfMonth($month, $year) {
+		$date = new DateTime($year.'-'.$month.'-01');
+		$date->modify('+1 month');
+		$date->modify('-1 day');
+		return $date;
+	}
 }
