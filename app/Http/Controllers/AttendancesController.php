@@ -109,7 +109,7 @@ class AttendancesController extends Controller
         usort($studentAttendance, function ($a, $b) {
             return strnatcmp($a->subject_code, $b->subject_code);
         }); 
-        
+
         foreach ($studentAttendance as $index => $value) {
             $subject_class = Subject_Class::find($value->subject_class_id);
             $studentAttendance[$index]->subject_code = Utils::getCorrectPrefix($subject_class) . $value->subject_code;
@@ -132,6 +132,7 @@ class AttendancesController extends Controller
                 break;
             }
         }
+        $_studentAttendance->subject_code = Utils::getCorrectPrefix(Subject_Class::find($subject_class_id)) . $_studentAttendance->subject_code;
 
         $teachers = Teacher::getTeachersBySubjectClass($_studentAttendance->subject_class_id);
         $teachers_ary = [];
