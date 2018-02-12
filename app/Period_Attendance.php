@@ -42,7 +42,7 @@ class Period_Attendance extends Model
             ->join('periods', 'open_periods.period_id', '=', 'periods.period_id')
             ->where('open_periods.date', $date)
             ->where('students.roll_no', $student->roll_no)
-            ->select('periods.period_id', 'periods.period_num','period_attendance.present')
+            ->select('periods.period_id', 'periods.period_num', 'period_attendance.present')
             ->orderby('periods.period_num')
             ->get();
     }
@@ -63,7 +63,7 @@ class Period_Attendance extends Model
                 DB::raw('MONTH(open_periods.date) AS month'))
             ->groupby(DB::raw('YEAR(open_periods.date), MONTH(open_periods.date)'))
             ->orderby(DB::raw('YEAR(open_periods.date), MONTH(open_periods.date)'))
-            ->get();
+            ->first();
     }
 
     public static function getStudentsAbsentList($class_id, $from, $to)
@@ -135,6 +135,11 @@ class Period_Attendance extends Model
                 $periodAttendance->save();
 
                 $studentAttendance = Period_Attendance::getStudentAttendance($student_id);
+                $studentAttendance = $studentAttendance->toArray();
+                if (sizeof($studentAttendance) > 0) foreach ($studentAttendance as $attendance) {
+                    $attendance->attended_periods = intval($attendance->attended_periods);
+                    $attendance->percent = floatval($attendance->percent);
+                }
                 Attendance::updateStudentAttendance($student_id, $studentAttendance);
             }
         }
@@ -150,7 +155,7 @@ class Period_Attendance extends Model
             ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
             ->join('open_periods', function ($join) {
                 $join->on('open_periods.period_id', '=', 'periods.period_id')
-                     ->on('period_attendance.open_period_id', '=', 'open_periods.open_period_id');
+                    ->on('period_attendance.open_period_id', '=', 'open_periods.open_period_id');
             })
             ->where('period_attendance.student_id', $student_id)
             ->select('subject_class.subject_class_id',
@@ -178,6 +183,11 @@ class Period_Attendance extends Model
                 $periodAttendance->save();
 
                 $studentAttendance = Period_Attendance::getStudentAttendance($student_id);
+                $studentAttendance = $studentAttendance->toArray();
+                if (sizeof($studentAttendance) > 0) foreach ($studentAttendance as $attendance) {
+                    $attendance->attended_periods = intval($attendance->attended_periods);
+                    $attendance->percent = floatval($attendance->percent);
+                }
                 Attendance::updateStudentAttendance($student_id, $studentAttendance);
             }
         }
@@ -190,30 +200,32 @@ class Period_Attendance extends Model
             ->update(['present' => 1]);
     }
 
-    public static function getMonthlyAttendanceForClass($class_id, $date) {
+    public static function getMonthlyAttendanceForClass($class_id, $date)
+    {
         $attendances = DB::table('period_attendance')
-                ->join('students', 'students.student_id', '=', 'period_attendance.student_id')
-                ->join('open_periods', 'open_periods.open_period_id', '=', 'period_attendance.open_period_id')
-                ->join('periods', 'periods.period_id', '=', 'open_periods.period_id')
-                ->join('classes', 'students.class_id', '=', 'classes.class_id')
-                ->join('subject_class', function ($join) {
-                    $join->on('subject_class.subject_class_id', '=', 'periods.subject_class_id')
-                         ->on('subject_class.class_id', '=', 'classes.class_id');
-                })
-                ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
-                ->where('classes.class_id', $class_id)
-                ->where('open_periods.date', '<=', $date)
-                ->select('students.student_id', 'students.roll_no', 'students.name', 'subjects.subject_code', DB::raw('SUM(period_attendance.present) / COUNT(period_attendance.open_period_id) * 100 AS percent'))
-                ->groupby('students.student_id', 'subjects.subject_code')
-                ->orderby(DB::raw('LENGTH(students.roll_no), students.roll_no, subjects.subject_code'))
-                ->get();
+            ->join('students', 'students.student_id', '=', 'period_attendance.student_id')
+            ->join('open_periods', 'open_periods.open_period_id', '=', 'period_attendance.open_period_id')
+            ->join('periods', 'periods.period_id', '=', 'open_periods.period_id')
+            ->join('classes', 'students.class_id', '=', 'classes.class_id')
+            ->join('subject_class', function ($join) {
+                $join->on('subject_class.subject_class_id', '=', 'periods.subject_class_id')
+                    ->on('subject_class.class_id', '=', 'classes.class_id');
+            })
+            ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
+            ->where('classes.class_id', $class_id)
+            ->where('open_periods.date', '<=', $date)
+            ->select('students.student_id', 'students.roll_no', 'students.name', 'subjects.subject_code', DB::raw('SUM(period_attendance.present) / COUNT(period_attendance.open_period_id) * 100 AS percent'))
+            ->groupby('students.student_id', 'subjects.subject_code')
+            ->orderby(DB::raw('LENGTH(students.roll_no), students.roll_no, subjects.subject_code'))
+            ->get();
 
-        $data = []; $subject_percents = [];
+        $data = [];
+        $subject_percents = [];
         $student_id = $attendances[0]->student_id;
         foreach ($attendances as $index => $attendance) {
             if ($student_id != $attendance->student_id || $index == count($attendances) - 1) {
                 if ($index == count($attendances) - 1) {
-                    $subject_percents[$attendance->subject_code.'##'] = number_format($attendance->percent, 2);
+                    $subject_percents[$attendance->subject_code . '##'] = number_format($attendance->percent, 2);
                 }
                 $student = [];
                 $student['Roll No'] = $attendances[$index - 1]->roll_no;
@@ -225,7 +237,7 @@ class Period_Attendance extends Model
                 $student_id = $attendance->student_id;
                 array_push($data, $student);
             }
-            $subject_percents[$attendance->subject_code.'##'] = number_format($attendance->percent, 2);
+            $subject_percents[$attendance->subject_code . '##'] = number_format($attendance->percent, 2);
         }
         return $data;
     }

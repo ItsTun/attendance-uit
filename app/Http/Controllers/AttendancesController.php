@@ -131,7 +131,7 @@ class AttendancesController extends Controller
         $_studentAttendance->teachers = implode(', ', $teachers_ary);
 
         $attendance = Period_Attendance::getMonthlyAttendance($student->student_id, $subject_class_id);
-        $_studentAttendance->attendance = $attendance->toArray();
+        $_studentAttendance->attendance = $attendance;
         
         return response(json_encode($_studentAttendance), 200);
     }

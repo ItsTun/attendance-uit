@@ -78,6 +78,9 @@
                 for (var j = 0, maxj = columns.length; j < maxj; ++j) {
                     var td = _td_.cloneNode(false);
                     cellValue = arr[i][columns[j]];
+                    if(j != 0 && parseFloat(cellValue) < 75.00) {
+                        td.style.color = "#fc4b6c";
+                    }
                     td.appendChild(document.createTextNode(arr[i][columns[j]] || ''));
                     tr.appendChild(td);
                 }
