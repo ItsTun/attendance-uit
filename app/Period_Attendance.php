@@ -63,7 +63,7 @@ class Period_Attendance extends Model
                 DB::raw('MONTH(open_periods.date) AS month'))
             ->groupby(DB::raw('YEAR(open_periods.date), MONTH(open_periods.date)'))
             ->orderby(DB::raw('YEAR(open_periods.date), MONTH(open_periods.date)'))
-            ->first();
+            ->get();
     }
 
     public static function getStudentsAbsentList($class_id, $from, $to)
