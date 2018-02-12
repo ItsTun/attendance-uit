@@ -118,4 +118,15 @@ class Utils
         $date->modify('-1 day');
         return $date;
     }
+
+    public static function getCorrectPrefix($subject_class) {
+        if (is_null($subject_class->custom_prefix)) {
+            return $subject_class->klass->short_form . '-';       
+        } else {
+            if ($subject_class->custom_prefix == "") {
+                return "";
+            }
+            return $subject_class->custom_prefix . '-';
+        }
+    }
 }

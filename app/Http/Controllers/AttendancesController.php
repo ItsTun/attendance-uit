@@ -75,13 +75,13 @@ class AttendancesController extends Controller
                     $info['subject_name'] = '';
                     $info['room'] = '';
                 } else {
-                    $info['subject_code'] = $period->subject_class->subject->subject_code;
+                    $info['subject_code'] = Utils::getCorrectPrefix($period->subject_class) . $period->subject_class->subject->subject_code;
                     $info['subject_name'] = $period->subject_class->subject->name;
                     $info['room'] = $period->room;
                 }
             } else {
                 $info['period_id'] = $period->period_id;
-                $info['subject_code'] = $period->subject_class->subject->subject_code;
+                $info['subject_code'] = Utils::getCorrectPrefix($period->subject_class) . $period->subject_class->subject->subject_code;
                 $info['subject_name'] = $period->subject_class->subject->name;
                 $info['subject_class_id'] = $period->subject_class_id;
                 $info['period_num'] = $period->period_num;
@@ -103,7 +103,17 @@ class AttendancesController extends Controller
         if ($attendance == null) {
             return response('Student not found!', 200);
         }
+
         $studentAttendance = json_decode($attendance->attendance_json);
+
+        usort($studentAttendance, function ($a, $b) {
+            return strnatcmp($a->subject_code, $b->subject_code);
+        }); 
+        
+        foreach ($studentAttendance as $index => $value) {
+            $subject_class = Subject_Class::find($value->subject_class_id);
+            $studentAttendance[$index]->subject_code = Utils::getCorrectPrefix($subject_class) . $value->subject_code;
+        }
         return response($studentAttendance, 200);
     }
 
