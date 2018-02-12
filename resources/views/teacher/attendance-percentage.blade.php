@@ -56,8 +56,10 @@
                 </form>
             </div>
         </div>
-        <div class="card results">
+        <div class="card">
+            <div class="table-responsive results">
 
+            </div>
         </div>
     </div>
 @endsection

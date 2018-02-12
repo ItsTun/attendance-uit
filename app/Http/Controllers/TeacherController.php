@@ -127,6 +127,16 @@ class TeacherController extends Controller
         return response(json_encode($response), '200');
     }
 
+    public function getStudentsAbsentForThreeDaysOrAbove(Request $request)
+    {
+        $class_id = $request->class_id;
+        $from = $request->from;
+        $to = $request->to;
+
+        $response = Student::getStudentsAbsentForThreeDaysOrAbove($class_id, $from, $to);
+        return response(json_encode($response), 200);
+    }
+
     public function getStudentsAbsentList(Request $request)
     {
         $class_id = $request->class_id;
@@ -140,8 +150,8 @@ class TeacherController extends Controller
         }
 
         $response = [];
-        $date = new DateTime($from);
-        $end_date = new DateTime($to);
+        $date = new \DateTime($from);
+        $end_date = new \DateTime($to);
         while ($date <= $end_date) {
             $data = [];
             $data['date'] = $date->format('Y-m-d');
@@ -161,6 +171,14 @@ class TeacherController extends Controller
             $date->modify('+1 day');
         }
         return response(json_encode($response), '200');
+    }
+
+    public function getStudent()
+    {
+        $roll_no = Input::get('roll_no');
+        $student = Student::where('roll_no', $roll_no)->first();
+
+        return (is_null($student)) ? 'null' : $student;
     }
 
     public function timetable()

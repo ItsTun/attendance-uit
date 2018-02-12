@@ -162,7 +162,7 @@
         });
 
         function getStudentsAbsentForThreeDaysOrAbove(class_id, from, to) {
-            $.get('{{ route('admin.getStudentsAbsentForThreeDaysOrAbove') }}', {
+            $.get('{{ route('teacher.getStudentsAbsentForThreeDaysOrAbove') }}', {
                 class_id: class_id,
                 from: from,
                 to: to
@@ -208,7 +208,7 @@
         }
 
         function getStudentsAbsentForWholeDay(class_id, from, to) {
-            $.get('{{ route('admin.getStudentsAbsentList') }}', {
+            $.get('{{ route('teacher.getStudentsAbsentList') }}', {
                 class_id: class_id,
                 from: from,
                 to: to
@@ -259,7 +259,7 @@
             var roll_no = event.data.roll_no;
             var date = event.data.date;
             $('.modal-title').text(date);
-            $.get("{{ route('admin.getStudent') }}", {roll_no: roll_no}, function (student, status) {
+            $.get("{{ route('teacher.getStudent') }}", {roll_no: roll_no}, function (student, status) {
                 $('#student_roll_no').text(student['roll_no']);
                 $('#student_name').text(student['name']);
                 $('#student_email').text(student['email']);
