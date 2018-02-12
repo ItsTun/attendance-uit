@@ -13,8 +13,8 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8"></div>
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="padding: 10px;">
-                <button type="button" class="btn btn-md btn-success pull-right" data-toggle="modal" id="add-btn"
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="padding: 10px;padding-bottom: 0px;">
+                <button type="button" class="btn btn-success pull-right" data-toggle="modal" id="add-btn"
                         data-target="#addOrEditUser">
                     Add New Admin
                 </button>
@@ -23,30 +23,32 @@
     </div>
     <div class="card" style="margin:10px;">
         <div class="row" style="padding: 30px;">
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Options</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($admins as $admin)
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
                     <tr>
-                        <td>{{ $admin->name }}</td>
-                        <td>{{ $admin->email }}</td>
-                        <td>
-                            <button type="button" class="btn btn-primary edit-btn" id="edit-btn" data-toggle="modal"
-                                    data-id="{{ $admin->id }}" data-name="{{ $admin->name }}"
-                                    data-email="{{ $admin->email }}"
-                                    data-target="#addOrEditUser">Edit
-                            </button>
-                        </td>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Options</th>
                     </tr>
-                @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    @foreach($admins as $admin)
+                        <tr>
+                            <td>{{ $admin->name }}</td>
+                            <td>{{ $admin->email }}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary edit-btn" id="edit-btn" data-toggle="modal"
+                                        data-id="{{ $admin->id }}" data-name="{{ $admin->name }}"
+                                        data-email="{{ $admin->email }}"
+                                        data-target="#addOrEditUser">Edit
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         {{ $admins->links('pagination.circle-pagination') }}
@@ -148,8 +150,8 @@
             var password = $('.input-password').val();
             var confirmPassword = $('.input-confirm-password').val();
 
-            if(password.trim() != '') {
-                if(password != confirmPassword) {
+            if (password.trim() != '') {
+                if (password != confirmPassword) {
                     alert("Passwords are not the same");
                     return false;
                 }

@@ -28,30 +28,25 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-md-4">
-                            <div class="form-group form-material">
-                                <label class="col-md-12">Name</label>
-                                <div class="col-md-12">
-                                    <input type="text" class="form-control form-control-line" name="q"
-                                           value="{{ $query }}"/>
-                                </div>
-                            </div>
+                            <label>Name</label>
+
+                            <input type="text" class="form-control " name="q"
+                                   value="{{ $query }}"/>
+
                         </div>
                         <div class="col-md-4">
-                            <div class="form-group form-material">
-                                <label class="col-md-12">Faculty</label>
-                                <div class="col-md-12">
-                                    <select class="form-control form-control-line filter-faculty-select"
-                                            name="f_id">
-                                        <option value="-1">All</option>
-                                        @foreach($faculties as $faculty)
-                                            <option value="{{ $faculty->faculty_id }}">{{ $faculty->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
+                            <label>Faculty</label>
+                            <select class="form-control filter-faculty-select"
+                                    name="f_id">
+                                <option value="-1">All</option>
+                                @foreach($faculties as $faculty)
+                                    <option value="{{ $faculty->faculty_id }}">{{ $faculty->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="col-md-4">
-                            <input type="submit" class="btn btn-success af" value="Apply filter"/>
+                            <label style="color:white;">-</label>
+                            <input type="submit" class="form-control btn btn-success" value="Apply filter"/>
                         </div>
                     </div>
                 </div>
@@ -60,49 +55,51 @@
     </form>
     <div class="card" style="margin: 7px;">
         <div class="row" style="padding: 30px;">
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Subjects</th>
-                    <th>Faculty</th>
-                    <th>Options</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($teachers as $teacher)
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
                     <tr>
-                        <td>{{ $teacher->name }}</td>
-                        <td>{{ $teacher->email }}</td>
-                        <td>
-                            @foreach($teacher->subject_teachers as $subject_teacher)
-                                <span class="label label-primary"
-                                      title="{{ $subject_teacher->subject_class->subject->name }}">
-                                  @php $prefix = $subject_teacher->subject_class->prefix; echo (is_null($prefix)) ? $subject_teacher->subject_class->klass->short_form : $prefix; @endphp -
-                                    {{ $subject_teacher->subject_class->subject->subject_code }}
-                                </span>
-                            @endforeach
-                        </td>
-                        <td>{{ $teacher->faculty->name }}</td>
-                        <td>
-                            <button type="button" id="edit-btn" class="btn btn-success"
-                                    data-teacher-id="{{ $teacher->teacher_id }}"
-                                    data-teacher-name="{{ $teacher->name }}"
-                                    data-teacher-email="{{ $teacher->email }}"
-                                    data-subject-classes="{{ $teacher->subject_teachers }}"
-                                    data-teacher-faculty="{{ $teacher->faculty_id }}"
-                                    data-class-teacher-of="{{ $teacher->class_teacher_of }}"
-                                    data-year-head-of="{{ $teacher->year_head_of }}"
-                                    data-department-head-of="{{ $teacher->department_head_of }}"
-                                    data-is-principle="{{ $teacher->is_principle }}" data-toggle="modal"
-                                    data-target="#addOrEditTeacher">Edit
-                            </button>
-                        </td>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Subjects</th>
+                        <th>Faculty</th>
+                        <th>Options</th>
                     </tr>
-                @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    @foreach($teachers as $teacher)
+                        <tr>
+                            <td>{{ $teacher->name }}</td>
+                            <td>{{ $teacher->email }}</td>
+                            <td>
+                                @foreach($teacher->subject_teachers as $subject_teacher)
+                                    <span class="label label-primary"
+                                          title="{{ $subject_teacher->subject_class->subject->name }}">
+                                  @php $prefix = $subject_teacher->subject_class->prefix; echo (is_null($prefix)) ? $subject_teacher->subject_class->klass->short_form : $prefix;@endphp
+                                        - {{ $subject_teacher->subject_class->subject->subject_code }}
+                                </span>
+                                @endforeach
+                            </td>
+                            <td>{{ $teacher->faculty->name }}</td>
+                            <td>
+                                <button type="button" id="edit-btn" class="btn btn-success"
+                                        data-teacher-id="{{ $teacher->teacher_id }}"
+                                        data-teacher-name="{{ $teacher->name }}"
+                                        data-teacher-email="{{ $teacher->email }}"
+                                        data-subject-classes="{{ $teacher->subject_teachers }}"
+                                        data-teacher-faculty="{{ $teacher->faculty_id }}"
+                                        data-class-teacher-of="{{ $teacher->class_teacher_of }}"
+                                        data-year-head-of="{{ $teacher->year_head_of }}"
+                                        data-department-head-of="{{ $teacher->department_head_of }}"
+                                        data-is-principle="{{ $teacher->is_principle }}" data-toggle="modal"
+                                        data-target="#addOrEditTeacher">Edit
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     {{ $teachers->appends(Request::only('q'))->appends(Request::only('f_id'))->links('pagination.circle-pagination') }}

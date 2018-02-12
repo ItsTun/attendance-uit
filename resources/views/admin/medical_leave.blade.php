@@ -17,7 +17,7 @@
         <div class="card col-md-12">
             <div class="card-block">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="margin-top: 8px;">
                         <label for="class-select">Class</label>
                         <br/>
                         <select id="class-select" onchange="onClassChange()">
@@ -30,32 +30,32 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="margin-top: 8px;">
                         <label for="class-short-form">Roll No</label>
                         <br/>
                         <span id="class-short-form">5SE-</span>
                         <input type="text" class="form-control form-control-line" placeholder="4" id="roll-no"
                                onblur="doneTyping()"/>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="margin-top: 8px;">
                         <label for="student-name">Name</label>
                         <br/>
                         <input type="text" class="form-control form-control-line" id="student-name"
                                disabled="disabled"/>
                     </div>
                 </div>
-                <div class="row" style="margin-top: 10px;">
-                    <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4" style="margin-top: 8px;">
                         <label for="leave-from">From</label>
                         <br/>
                         <input type="text" class="form-control form-control-line" id="leave-from"/>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="margin-top: 8px;">
                         <label for="leave-to">To</label>
                         <br/>
                         <input type="text" class="form-control form-control-line" id="leave-to"/>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4" style="margin-top: 8px;">
                         <label for="submit-btn">-</label>
                         <br/>
                         <input type="button" class="btn btn-info" id="submit-btn" value="Save" onclick="onSaveClick()"/>

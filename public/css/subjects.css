@@ -5,3 +5,34 @@
 input[type=submit i] {
 	background-color: #26c6da !important;
 }
+
+@media (min-width:320px)  {
+	.add-btn-wrapper {
+		margin-top: 10px !important;
+	}
+}
+@media (min-width:481px)  {
+	.add-btn-wrapper {
+		margin-top: 0px !important;
+	}
+}
+@media (min-width:641px)  {
+	.add-btn-wrapper {
+		margin-top: 0px !important;
+	}
+}
+@media (min-width:961px)  {
+	.add-btn-wrapper {
+		margin-top: 0px !important;
+	}
+}
+@media (min-width:1025px) {
+	.add-btn-wrapper {
+		margin-top: 0px !important;
+	}
+}
+@media (min-width:1281px) {
+	.add-btn-wrapper {
+		margin-top: 0px !important;
+	}
+}

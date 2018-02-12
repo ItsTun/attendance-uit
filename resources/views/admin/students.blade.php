@@ -13,20 +13,18 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <div class="col-md-12" style="text-align: right;">
-                <div style="padding: 20px 0px 0px 60px;">
-                    <button class="btn btn-success" data-toggle="modal" id="add-btn" data-target="#addOrEditStudent">Add
-                        New Student
-                    </button>
-                    <button class="btn btn-success" onclick="window.location='{{ route("students.csv") }}'">Import CSV
-                    </button>
-                    <button class="btn btn-warning"
-                            onclick="window.location='{{ route("students.attendance_details") }}'">Attendance Details
-                    </button>
-                    <button class="btn btn-danger" onclick="window.location='{{ route("students.absent_list") }}'">
-                        Absent Students
-                    </button>
-                </div>
+            <div style="width: 100%; text-align: right;">
+                <button class="btn btn-success" data-toggle="modal" id="add-btn" data-target="#addOrEditStudent">Add
+                    New Student
+                </button>
+                <button class="btn btn-success" onclick="window.location='{{ route("students.csv") }}'">Import CSV
+                </button>
+                <button class="btn btn-warning"
+                        onclick="window.location='{{ route("students.attendance_details") }}'">Attendance Details
+                </button>
+                <button class="btn btn-danger" onclick="window.location='{{ route("students.absent_list") }}'">
+                    Absent Students
+                </button>
             </div>
         </div>
     </div>
@@ -35,38 +33,33 @@
             <div class="card-block">
                 <div class="container">
                     <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group form-material">
-                                <label>Roll No</label>
-                                <input class="form-control form-control-line" name="r_q" type="text"
-                                       value="{{ $roll_no_query }}"/>
-                            </div>
+                        <div class="col-md-3 col-sm-12">
+                            <label>Roll No</label>
+                            <input class="form-control" name="r_q" type="text"
+                                   value="{{ $roll_no_query }}"/>
                         </div>
-                        <div class="col-md-3">
-                            <div class="form-group form-material">
-                                <label>Name</label>
-                                <input class="form-control form-control-line" name="q" type="text"
-                                       value="{{ $name_query }}"/>
-                            </div>
+                        <div class="col-md-3 col-sm-12">
+                            <label>Name</label>
+                            <input class="form-control" name="q" type="text"
+                                   value="{{ $name_query }}"/>
                         </div>
-                        <div class="col-md-3">
-                            <div class="form-group form-material">
-                                <label>Class</label>
-                                <select class="form-control form-control-line" name="c_id">
-                                    <option value="-1">All</option>
-                                    @foreach($years as $year)
-                                        <optgroup label="{{ $year->name }}">
-                                            @foreach($year->klasses as $klass)
-                                                <option value="{{ $klass->class_id }}"
-                                                        @if($klass->class_id==$class_id) selected="selected" @endif>{{ $klass->name }}</option>
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                </select>
-                            </div>
+                        <div class="col-md-3 col-sm-12">
+                            <label>Class</label>
+                            <select class="form-control" name="c_id">
+                                <option value="-1">All</option>
+                                @foreach($years as $year)
+                                    <optgroup label="{{ $year->name }}">
+                                        @foreach($year->klasses as $klass)
+                                            <option value="{{ $klass->class_id }}"
+                                                    @if($klass->class_id==$class_id) selected="selected" @endif>{{ $klass->name }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                            </select>
                         </div>
-                        <div class="col-md-3 af-wrappter">
-                            <input type="submit" class="btn btn-success af" value="Apply Filters"/>
+                        <div class="col-md-3 col-sm-12">
+                            <label style="color:white; margin-top: 0px;">-</label>
+                            <input type="submit" class="form-control btn btn-success" value="Apply Filters"/>
                         </div>
                     </div>
                 </div>
@@ -77,41 +70,46 @@
     <div class="card" style="margin: 7px;">
         <div class="row" style="padding: 30px;">
             @if(sizeof($students) > 0)
-                <table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th>Roll No</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Options</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($students as $student)
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
                         <tr>
-                            <td>{{ $student->roll_no }}</td>
-                            <td>{{ $student->name }}</td>
-                            <td>{{ $student->email }}</td>
-                            <td>
-                                <form action="@if(is_null($student->suspended)){{ route('admin.suspendStudent') }}@else {{ route('admin.resumeStudent') }}@endif"
-                                      method="post">
-                                    {{ csrf_field() }}
-                                    <button type="button" id="edit-btn" class="btn btn-primary" data-toggle="modal"
-                                            data-target="#addOrEditStudent" data-student-id="{{ $student->student_id }}"
-                                            data-roll-no="{{ $student->roll_no }}" data-name="{{ $student->name }}"
-                                            data-email="{{ $student->email }}" data-class-id="{{ $student->class_id }}">
-                                        Edit
-                                    </button>
-                                    <input type="text" value="{{ $student->student_id }}" name="student_id" hidden/>
-                                    <button type="submit" class="btn @if(is_null($student->suspended)) btn-warning @else btn-success @endif"
-                                            id="btn-suspend">@if(is_null($student->suspended))
-                                            Suspend @else Resume @endif</button>
-                                </form>
-                            </td>
+                            <th>Roll No</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Options</th>
                         </tr>
-                    @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        @foreach($students as $student)
+                            <tr>
+                                <td>{{ $student->roll_no }}</td>
+                                <td>{{ $student->name }}</td>
+                                <td>{{ $student->email }}</td>
+                                <td>
+                                    <form action="@if(is_null($student->suspended)){{ route('admin.suspendStudent') }}@else {{ route('admin.resumeStudent') }}@endif"
+                                          method="post">
+                                        {{ csrf_field() }}
+                                        <button type="button" id="edit-btn" class="btn btn-primary" data-toggle="modal"
+                                                data-target="#addOrEditStudent"
+                                                data-student-id="{{ $student->student_id }}"
+                                                data-roll-no="{{ $student->roll_no }}" data-name="{{ $student->name }}"
+                                                data-email="{{ $student->email }}"
+                                                data-class-id="{{ $student->class_id }}">
+                                            Edit
+                                        </button>
+                                        <input type="text" value="{{ $student->student_id }}" name="student_id" hidden/>
+                                        <button type="submit"
+                                                class="btn @if(is_null($student->suspended)) btn-warning @else btn-success @endif"
+                                                id="btn-suspend">@if(is_null($student->suspended))
+                                                Suspend @else Resume @endif</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
             @else
                 <div class="col-md-12">
                     <center>No students found.</center>

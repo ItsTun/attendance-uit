@@ -5,17 +5,24 @@
 @endsection
 
 @section ('styles')
+	<style>
+		td {
+			text-align:center;
+			vertical-align:middle;
+		}
+	</style>
 	<link rel="stylesheet" href="{{ asset('/jquery-ui/jquery.ui.css') }}"> 
 @endsection
 
 @section ('content')
-	<div class="card" style="margin: 7px;">
+	<div style="padding: 8px;">
+	<div class="card" style="padding-top: 8px;">
 		<div class="card-block">
 			<form>
 				<div class="container">
 					<div class="row">
 						<div class="col-md-2">
-							<div class="form-group form-material">
+							<div class="form-group">
 								<label>Class</label> 
 								<br>
 								<select id="classesSelect" class="form-control">
@@ -34,7 +41,7 @@
 							</div>
 						</div>
 						<div class="col-md-3">
-							<div class="form-group form-material">
+							<div class="form-group">
 								<label>Roll No</label>
 								<div>
 									<span id="classValue"></span>
@@ -65,15 +72,18 @@
 				</div>
 			</form>
 		</div>
-		<div id="results" class="card" style="margin: 7px;">
-			<div class="card-block" style="padding: 30px;">
+	</div>
+	<div class="card">
+		<div class="card-block" id="results" style="margin: 7px;">
+			<div style="padding: 30px;">
 				<div class="row">
-					<div class="col-md-12">
+					<div class="table-responsive">
 						<table class="table table-bordered"></table>
 					</div>
 				</div>
 			</div>
 		</div>
+	</div>
 	</div>
 @endsection
 

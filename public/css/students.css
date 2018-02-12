@@ -16,6 +16,23 @@ input[type=button i], input[type=submit i] {
   	margin-bottom: 5px;
 }
 
+label {
+	margin-top: 8px;
+}
+
+thead {
+	width: 100% !important;
+}
+
+tbody {
+	width: 100% !important;
+}
+
+.btn {
+	margin-top: 8px !important;
+	margin-right: 8px !important;
+}
+
 .form-horizontal .form-group {
 	margin-bottom: 20px !important;
 }

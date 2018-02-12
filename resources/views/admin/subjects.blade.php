@@ -12,34 +12,26 @@
 @section('content')
     <div class="card" style="margin: 7px;">
         <div class="card-block">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <form action="#" method="get">
-                            <div class="form-group form-material">
-                                <label class="col-md-12">Search By Name</label>
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="col-sm-9">
-                                            <input class="form-control form-control-line" type="text" name="q"
-                                                   value="{{ $query }}"/></div>
-                                        <div class="col-sm-2" style="padding-left: 0px;">
-                                            <input type="submit" class="btn btn-success" value="Search"/></div>
-                                    </div>
-                                </div>
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <form action="#" method="get">
+                        <div class="row">
+                            <div class="col-9">
+                                <input class="form-control" type="text" name="q" placeholder="Name"
+                                       value="{{ $query }}"/>
                             </div>
-                        </form>
-                    </div>
-
-                    <div class="col-md-6" style="text-align: right;">
-                        <div class="form-material">
-                            <div style="padding: 20px 0px 0px 150px;">
-                                <button class="btn btn-md btn-success" id="add-btn" data-toggle="modal"
-                                        data-target="#addOrEditSubject">Add New Subject
+                            <div class="col-2" style="padding-left: 0px;">
+                                <button type="submit" class="btn btn-success" style="height:36px;"
+                                >Search
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </form>
+                </div>
+                <div class="col-md-6 add-btn-wrapper" style="text-align: right;">
+                    <button class="btn btn-success" id="add-btn" style="height:36px;" data-toggle="modal"
+                            data-target="#addOrEditSubject">Add New Subject
+                    </button>
                 </div>
             </div>
         </div>
@@ -49,40 +41,42 @@
     <div class="card" style="margin: 7px;">
         <div class="row" style="padding: 30px;">
             @if(sizeof($subjects) > 0)
-                <table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th>Subject Code</th>
-                        <th>Name</th>
-                        <th>Classes</th>
-                        <th>Options</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($subjects as $subject)
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
                         <tr>
-                            <td>{{ $subject->subject_code }}</td>
-                            <td>{{ $subject->name }}</td>
-                            <td>
-                                @foreach($subject->subject_class as $subject_class)
-                                    <span class="label label-primary"
-                                          title="{{ $subject_class->klass->name }}">{{ $subject_class->klass->short_form }}</span>
-                                @endforeach
-                            </td>
-                            <td>
-                                <button type="button" id="edit-btn" class="btn btn-success" data-toggle="modal"
-                                        data-subject-id="{{ $subject->subject_id }}"
-                                        data-subject-name="{{ $subject->name }}"
-                                        data-subject-code="{{ $subject->subject_code }}"
-                                        data-subject-classes="{{ $subject->subject_class }}"
-                                        data-prefix-option="@php if(is_null($subject->subject_class[0]->custom_prefix)) echo "null"; else echo $subject->subject_class[0]->custom_prefix; @endphp"
-                                        data-target="#addOrEditSubject">Edit
-                                </button>
-                            </td>
+                            <th>Subject Code</th>
+                            <th>Name</th>
+                            <th>Classes</th>
+                            <th>Options</th>
                         </tr>
-                    @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        @foreach($subjects as $subject)
+                            <tr>
+                                <td>{{ $subject->subject_code }}</td>
+                                <td>{{ $subject->name }}</td>
+                                <td>
+                                    @foreach($subject->subject_class as $subject_class)
+                                        <span class="label label-primary"
+                                              title="{{ $subject_class->klass->name }}">{{ $subject_class->klass->short_form }}</span>
+                                    @endforeach
+                                </td>
+                                <td>
+                                    <button type="button" id="edit-btn" class="btn btn-success" data-toggle="modal"
+                                            data-subject-id="{{ $subject->subject_id }}"
+                                            data-subject-name="{{ $subject->name }}"
+                                            data-subject-code="{{ $subject->subject_code }}"
+                                            data-subject-classes="{{ $subject->subject_class }}"
+                                            data-prefix-option="@php if(is_null($subject->subject_class[0]->custom_prefix)) echo "null"; else echo $subject->subject_class[0]->custom_prefix; @endphp"
+                                            data-target="#addOrEditSubject">Edit
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
             @else
                 <div class="col-md-12">
                     <center> No subjects @if(!is_null($query))for "{{ $query }}"@endif</center>
