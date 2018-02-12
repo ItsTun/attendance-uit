@@ -24,7 +24,7 @@ class AttendancesController extends Controller
 
         $student = Student::find($student_id);
         if ($student == null) {
-            return response('Student not found!', 200);
+            return response(['error' => 'Student not found', 'message' => 'Student not found!'], 404);
         }
 
         $date = Utils::getDate($date);
@@ -40,6 +40,7 @@ class AttendancesController extends Controller
         }
 
         $day = Utils::getDayFromDate($date);
+        $day = intval($day);
         $timetable = Period::getTimetable($day, $student->class_id);
         if (!$timetable) return response('No data!', 200);
 
@@ -94,24 +95,24 @@ class AttendancesController extends Controller
             }
             array_push($response, $info);
         }
-        return response($response, 200);
+        return response($response, 200, ['Content-Type' => 'application/json']);
     }
 
     public function studentAttendance(Request $request) {
         $student_id = $request->student_id;
         $attendance = Attendance::show($student_id);
         if ($attendance == null) {
-            return response('Student not found!', 200);
+            return response(['error' => 'Student not found', 'message' => 'Student not found!'], 404);
         }
         $studentAttendance = json_decode($attendance->attendance_json);
-        return response($studentAttendance, 200);
+        return response($studentAttendance, 200, ['Content-Type' => 'application/json']);
     }
 
     public function attendanceDetails(Request $request) {
         $student_id = $request->student_id;
         $student = Student::find($student_id);
         if ($student == null) {
-            return response('Student not found!', 200);
+            return response(['error' => 'Student not found', 'message' => 'Student not found!'], 404);
         }
         $subject_class_id = $request->subject_class_id;
         $studentAttendance = json_decode(Attendance::show($student->student_id)->attendance_json);
@@ -131,8 +132,8 @@ class AttendancesController extends Controller
         $_studentAttendance->teachers = implode(', ', $teachers_ary);
 
         $attendance = Period_Attendance::getMonthlyAttendance($student->student_id, $subject_class_id);
-        $_studentAttendance->attendance = $attendance->toArray();
-        
-        return response(json_encode($_studentAttendance), 200);
+        $_studentAttendance->attendance = $attendance;
+
+        return response(json_encode($_studentAttendance, JSON_NUMERIC_CHECK), 200, ['Content-Type' => 'application/json']);
     }
 }

@@ -28,7 +28,7 @@ class Period extends Model
     public static function getTimetable($day, $klassId)
     {
         $subject_classes = Subject_Class::where('class_id', $klassId)->get();
-        $periods = Period::where('day', $day)->whereNull('subject_class_id')->orWhereIn('subject_class_id', $subject_classes)->orderby('period_num')->orderby('deleted_at')->get();
+        $periods = Period::where('day', $day)->whereIn('subject_class_id', array_column($subject_classes->toArray(), 'subject_class_id'))->groupby('period_id')->orderby('period_num')->orderby('deleted_at')->get();
         return $periods;
     }
 

@@ -18,7 +18,7 @@ class Attendance extends Model
     public static function updateStudentAttendance($student_id, $studentAttendance)
     {
         $attendance = Attendance::firstOrNew(array('student_id' => $student_id));
-        $attendance->attendance_json = $studentAttendance;
+        $attendance->attendance_json = json_encode($studentAttendance);
         $attendance->save();
     }
 

@@ -14,31 +14,48 @@ use App\Student;
 
 class StudentLoginController extends Controller
 {
-	public function getStudentRecord() {
-		$token = Input::post('id_token');
+    public function getStudentRecord() {
+        $token = Input::post('id_token');
 
-		$driver = Socialite::driver('google');
-		$socialUser = $driver->userFromToken($token);
+        $driver = Socialite::driver('google');
+        $socialUser = $driver->userFromToken($token);
 
-		$email = $socialUser->email;
+        if(!is_null($socialUser)) {
 
-		$student = Student::where('email', $email)->first();
-		
-		if (is_null($student)) {
-			 return response(['error_message' => 'No student with this email address, '. $email], 404)
-                  ->header('Content-Type', 'application/json');
-		}
-		
-		$student['klass']->year;
-		$student['class'] = $student->klass;
+            $email = $socialUser->email;
 
-		$klass = $student['klass'];
+            $student = Student::where('email', $email)->whereNull('suspended')->first();
 
-		unset($student['class_id']);
-		unset($student['klass']);
-		unset($klass['year_id']);
+            if (is_null($student)) {
+                return response(['error' => 'Student not found', 'message' => 'No student with email address, ' . $email], 404)
+                    ->header('Content-Type', 'application/json');
+            }
 
-		return response(['student' => $student], 200)
-                  ->header('Content-Type', 'application/json');
-	}
+            $student['klass']->year;
+            $student['class'] = $student->klass;
+
+            $klass = $student['klass'];
+
+            unset($student['class_id']);
+            unset($student['klass']);
+            unset($student['suspended']);
+            unset($student['suspended_at']);
+            unset($student['created_at']);
+            unset($student['updated_at']);
+            unset($klass['created_at']);
+            unset($klass['updated_at']);
+            unset($klass['year_id']);
+
+            $year = $klass->year;
+            unset($year['created_at']);
+            unset($year['updated_at']);
+
+
+            return response(['student' => $student], 200)
+                ->header('Content-Type', 'application/json');
+        } else {
+            return response(['error' => 'Invalid token', 'message' => 'The provided token is invalid'], 401)
+                ->header('Content-Type', 'application/json');
+        }
+    }
 }
