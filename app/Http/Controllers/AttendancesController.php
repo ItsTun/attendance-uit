@@ -24,7 +24,7 @@ class AttendancesController extends Controller
 
         $student = Student::find($student_id);
         if ($student == null) {
-            return response(['error' => 'Student not found', 'message' => 'Student not found!'], 404);
+            return response('Student not found!', 200);
         }
 
         $date = Utils::getDate($date);
@@ -40,7 +40,6 @@ class AttendancesController extends Controller
         }
 
         $day = Utils::getDayFromDate($date);
-        $day = intval($day);
         $timetable = Period::getTimetable($day, $student->class_id);
         if (!$timetable) return response('No data!', 200);
 
@@ -76,13 +75,13 @@ class AttendancesController extends Controller
                     $info['subject_name'] = '';
                     $info['room'] = '';
                 } else {
-                    $info['subject_code'] = $period->subject_class->subject->subject_code;
+                    $info['subject_code'] = Utils::getCorrectPrefix($period->subject_class) . $period->subject_class->subject->subject_code;
                     $info['subject_name'] = $period->subject_class->subject->name;
                     $info['room'] = $period->room;
                 }
             } else {
                 $info['period_id'] = $period->period_id;
-                $info['subject_code'] = $period->subject_class->subject->subject_code;
+                $info['subject_code'] = Utils::getCorrectPrefix($period->subject_class) . $period->subject_class->subject->subject_code;
                 $info['subject_name'] = $period->subject_class->subject->name;
                 $info['subject_class_id'] = $period->subject_class_id;
                 $info['period_num'] = $period->period_num;
@@ -95,24 +94,34 @@ class AttendancesController extends Controller
             }
             array_push($response, $info);
         }
-        return response($response, 200, ['Content-Type' => 'application/json']);
+        return response($response, 200);
     }
 
     public function studentAttendance(Request $request) {
         $student_id = $request->student_id;
         $attendance = Attendance::show($student_id);
         if ($attendance == null) {
-            return response(['error' => 'Student not found', 'message' => 'Student not found!'], 404);
+            return response('Student not found!', 200);
         }
+
         $studentAttendance = json_decode($attendance->attendance_json);
-        return response($studentAttendance, 200, ['Content-Type' => 'application/json']);
+
+        usort($studentAttendance, function ($a, $b) {
+            return strnatcmp($a->subject_code, $b->subject_code);
+        }); 
+
+        foreach ($studentAttendance as $index => $value) {
+            $subject_class = Subject_Class::find($value->subject_class_id);
+            $studentAttendance[$index]->subject_code = Utils::getCorrectPrefix($subject_class) . $value->subject_code;
+        }
+        return response($studentAttendance, 200);
     }
 
     public function attendanceDetails(Request $request) {
         $student_id = $request->student_id;
         $student = Student::find($student_id);
         if ($student == null) {
-            return response(['error' => 'Student not found', 'message' => 'Student not found!'], 404);
+            return response('Student not found!', 200);
         }
         $subject_class_id = $request->subject_class_id;
         $studentAttendance = json_decode(Attendance::show($student->student_id)->attendance_json);
@@ -123,6 +132,7 @@ class AttendancesController extends Controller
                 break;
             }
         }
+        $_studentAttendance->subject_code = Utils::getCorrectPrefix(Subject_Class::find($subject_class_id)) . $_studentAttendance->subject_code;
 
         $teachers = Teacher::getTeachersBySubjectClass($_studentAttendance->subject_class_id);
         $teachers_ary = [];
@@ -133,7 +143,7 @@ class AttendancesController extends Controller
 
         $attendance = Period_Attendance::getMonthlyAttendance($student->student_id, $subject_class_id);
         $_studentAttendance->attendance = $attendance;
-
-        return response(json_encode($_studentAttendance, JSON_NUMERIC_CHECK), 200, ['Content-Type' => 'application/json']);
+        
+        return response(json_encode($_studentAttendance), 200);
     }
 }
