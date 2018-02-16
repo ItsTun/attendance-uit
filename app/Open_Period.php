@@ -53,4 +53,10 @@ class Open_Period extends Model
 		return DB::table('open_periods')
 				->max('open_periods.date');
 	}
+
+	public static function getMonths() {
+		return DB::table('open_periods')
+				->select( DB::raw('DISTINCT month(date) month, year(date) year') )
+				->get();
+	}
 }

@@ -984,21 +984,28 @@ class AdminController extends Controller
     {
         $years = Year::all();
         $class_id = Input::get('class_id');
+        $selected_month = Input::get('month');
         $studentsAttendance = [];
-        if (!is_null($class_id)) {
-            $student_ids = Student::where('class_id', $class_id)->select('student_id')->get();
-            $attendanceRecords = Attendance::whereIn('student_id', $student_ids)->get();
-            foreach ($attendanceRecords as $attendanceRecord) {
-                $tempAttendance = [];
-                $tempAttendance['Roll No'] = $attendanceRecord->student->roll_no;
-                $tempAttendance['Name'] = $attendanceRecord->student->name;
-                $attendanceJson = json_decode($attendanceRecord->attendance_json);
-                foreach ($attendanceJson as $key => $subject) {
-                    $tempAttendance[$subject->subject_code . '##'] = number_format("$subject->percent", 2);
-                }
-                array_push($studentsAttendance, $tempAttendance);
-            }
+        if (!is_null($class_id) && !is_null($selected_month)) {
+            $year = explode(', ', $selected_month)[1];
+            $month = explode(', ', $selected_month)[0];
+            $date = Utils::getLastDateOfMonth($month, $year);
+
+            // $student_ids = Student::where('class_id', $class_id)->select('student_id')->get();
+            // $attendanceRecords = Attendance::whereIn('student_id', $student_ids)->get();
+            // foreach ($attendanceRecords as $attendanceRecord) {
+            //     $tempAttendance = [];
+            //     $tempAttendance['Roll No'] = $attendanceRecord->student->roll_no;
+            //     $tempAttendance['Name'] = $attendanceRecord->student->name;
+            //     $attendanceJson = json_decode($attendanceRecord->attendance_json);
+            //     foreach ($attendanceJson as $key => $subject) {
+            //         $tempAttendance[$subject->subject_code . '##'] = number_format("$subject->percent", 2);
+            //     }
+            //     array_push($studentsAttendance, $tempAttendance);
+            // }
+            $studentsAttendance = Period_Attendance::getMonthlyAttendanceForClass($class_id, $date);
         }
-        return view('admin.attendance-percentage')->with(['studentsAttendance' => $studentsAttendance, 'class_id' => $class_id, 'years' => $years]);
+        $months = Open_Period::getMonths();
+        return view('admin.attendance-percentage')->with(['studentsAttendance' => $studentsAttendance, 'class_id' => $class_id, 'years' => $years, 'months' => $months->toArray(), 'selected_month' => $selected_month]);
     }
 }

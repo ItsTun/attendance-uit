@@ -119,7 +119,7 @@
             $.datepicker.setDefaults({
                 dateFormat: 'yy-mm-dd',
                 constraintInput: false,
-                // maxDate: new Date()
+                maxDate: new Date()
             });
 
             $("#from_datepicker").datepicker({

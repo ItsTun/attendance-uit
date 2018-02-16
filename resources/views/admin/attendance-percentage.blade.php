@@ -28,6 +28,20 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="col-md-4 col-lg-4 col-sm-12 col-xs-12">
+                            <label for="month-select">Month</label>
+                            <select class="form-control class-select" id="month-select" name="month">
+                                <option disabled selected>Select month</option>
+                                @foreach ($months as $month) 
+                                    <option value="{{ $month->month }}, {{ $month->year }}"
+                                        @if ($month->month == $selected_month)
+                                            selected="selected" 
+                                        @endif>
+                                        {{ App\Utils::getMonthString($month->month) }}, {{ $month->year }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="col-md-1 col-lg-1 col-sm-12 col-xs-12">
                             <label for="go-btn" style="color: white;">-</label>
                             <input type="submit" href="#" class="btn btn-info form-control"
