@@ -29,7 +29,7 @@ class Attendance extends Model
 
     public static function getAttendanceForSubject($class_id, $subject_id)
     {
-        $student = Student::getStudentsFromClass($class_id);
+        $student = Student::getStudentsFromClass($class_id, false);
         $subject_class = Subject_Class::where('subject_id', $subject_id)->where('class_id', $class_id)->first();
         $student_ids = array_column($student->toArray(), 'student_id');
 
@@ -46,10 +46,12 @@ class Attendance extends Model
                 else {
                     $attendanceForSubject[$attendance->student->roll_no] = [];
                     $attendanceForSubject[$attendance->student->roll_no]['name'] = $attendance->student->name;
-                    $attendanceForSubject[$attendance->student->roll_no]['percent'] = number_format($value->percent,2);
+                    $attendanceForSubject[$attendance->student->roll_no]['percent'] = number_format($value->percent, 2);
                 }
             }
         }
+
+        Utils::knatsort($attendanceForSubject);
 
         return $attendanceForSubject;
     }
