@@ -12,7 +12,7 @@ function getPrettyDate(date) {
 	var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 	var date_ary = date.split('-');
 	var year = parseInt(date_ary[0]);
-	var month = parseInt(date_ary[1]);
+	var month = parseInt(date_ary[1]) -1;
 	var date = parseInt(date_ary[2]);
 	var pretty_date = months[month] + ' ' + date + ', ' + year;
 	return pretty_date;
