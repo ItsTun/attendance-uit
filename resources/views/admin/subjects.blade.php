@@ -108,10 +108,26 @@
                     <div class="modal-body">
                         <div class="container">
                             <div class="form-group">
-                                <label class="col-md-12">Subject Code</label>
+                                <label class="col-md-12">Subject Prefix</label>
+                                <input type="radio" name="radio_subject_prefix" id="radio-use-class" value="default"
+                                       checked
+                                       required/>
+                                <label for="radio-use-class" style="margin-left: 10px;margin-top: 15px">Use Class's
+                                    Short
+                                    Form</label>
+                                <input type="radio" name="radio_subject_prefix" id="radio-use-custom" value="custom"
+                                       required/>
+                                <label for="radio-use-custom">Use Custom</label>
                                 <div class="col-md-12">
-                                    <input class="form-control form-control-line input-subject-code" type="text"
-                                           name="subject_code" required>
+                                    <input class="form-control form-control-line input-subject-prefix"
+                                           id="input-subject-prefix" type="text"
+                                           name="subject_prefix" value=""/>
+                                </div>
+                                <label class="col-md-12" style="margin-top: 15px;">Subject Code</label>
+                                <div class="col-md-12">
+                                    <input class="form-control form-control-line input-subject-code"
+                                           id="input-subject-code" type="text"
+                                           name="subject_code" value="" required/>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -152,13 +168,38 @@
 @section('scripts')
     <script src="{{ asset('/select2/js/select2.min.js') }}"></script>
     <script>
+        var prefix;
+
         $(document).ready(function () {
             $('.class-select').select2({
                 placeholder: "Select classes that this subject will be taught",
             });
+            prefix = $('#input-subject-prefix');
+            prefix.hide();
         });
 
+        $('input[type=radio][name=radio_subject_prefix]').change(function () {
+            prefix.val("");
+            if (this.value == 'default') {
+                hidePrefix();
+            }
+            else if (this.value == 'custom') {
+                showPrefix();
+            }
+        });
+
+        function hidePrefix() {
+            prefix.hide();
+            prefix.prop('required', false);
+        }
+
+        function showPrefix() {
+            prefix.show();
+            prefix.prop('required', true);
+        }
+
         $(document).on("click", "#edit-btn", function () {
+            prefix.val("");
             var subjectId = $(this).data('subject-id');
             var subjectName = $(this).data('subject-name');
             var subjectCode = $(this).data('subject-code');
@@ -178,6 +219,7 @@
         });
 
         $(document).on("click", "#add-btn", function () {
+            prefix.val("");
             $('.input-subject-id').val('');
             $('.input-subject-name').val('');
             $('.input-subject-code').val('');

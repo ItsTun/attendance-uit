@@ -79,7 +79,7 @@
                             @foreach($teacher->subject_teachers as $subject_teacher)
                                 <span class="label label-primary"
                                       title="{{ $subject_teacher->subject_class->subject->name }}">
-                                  {{ $subject_teacher->subject_class->klass->short_form }} -
+                                  @php $prefix = $subject_teacher->subject_class->prefix; echo (is_null($prefix)) ? $subject_teacher->subject_class->klass->short_form : $prefix; @endphp -
                                     {{ $subject_teacher->subject_class->subject->subject_code }}
                                 </span>
                             @endforeach

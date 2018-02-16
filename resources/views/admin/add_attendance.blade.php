@@ -11,6 +11,7 @@
 @section('content')
     <form action="#" method="post">
         {{ csrf_field() }}
+        <input type="hidden" name="class_id" value="{{ $class_id }}"/>
         <input type="hidden" name="date" value="{{ $date }}"/>
         <input type="hidden" name="period" value="@php echo implode(",",$periods); @endphp"/>
         <div class="container-fluid">

@@ -410,6 +410,7 @@ class AdminController extends Controller
                 $response[$key]['attendances'][$period->period_num] = $data;
             }
         }
+
         return response(json_encode($response), '200');
     }
 
@@ -702,6 +703,7 @@ class AdminController extends Controller
     public function addOrUpdateSubject()
     {
         $subjectCode = Input::post('subject_code');
+        $prefix = Input::post('subject_prefix');
         $name = Input::post('name');
         $klasses = Input::post('classes');
         $subjectId = Input::post('subject_id');
@@ -728,6 +730,7 @@ class AdminController extends Controller
             $subjectClass = new Subject_Class();
             $subjectClass->subject_id = $subject->subject_id;
             $subjectClass->class_id = $klass;
+            $subjectClass->prefix = (is_null($prefix)) ? null : $prefix;
             $subjectClass->save();
         }
 
@@ -831,6 +834,7 @@ class AdminController extends Controller
     public function addAttendance($period_ids)
     {
         $date = Input::get('date');
+        $class_id = Input::get('class_id');
         $periods = explode(',', $period_ids);
         $error = $this->check($date, $periods);
         $periodObjects = Period::find($periods);
@@ -838,7 +842,7 @@ class AdminController extends Controller
         $student_ids = Student::getStudentsWithMedicalLeave($date);
         if (is_null($error)) {
             $students = Student::getStudentsFromPeriod($periods);
-            return view('admin.add_attendance')->with(['students' => $students, 'periods' => $periods, 'date' => $date,
+            return view('admin.add_attendance')->with(['students' => $students, 'periods' => $periods, 'date' => $date, 'class_id' => $class_id,
                 'periodObjects' => $periodObjects, 'numberOfPeriods' => $numberOfPeriods, 'attendedStudents' => $this->getAttendedStudentsFromPeriods($periods, $date),
                 'studentsWithMedicalLeaves' => array_column($student_ids->toArray(), 'student_id')]);
         } else {
@@ -883,6 +887,7 @@ class AdminController extends Controller
         $date = Input::get('date');
         $presentStudents = [];
         $periods = Input::get('period');
+        $class_id = Input::get('class_id');
 
         $period_ids = explode(',', $periods);
 
@@ -903,7 +908,7 @@ class AdminController extends Controller
                 Period_Attendance::updateAttendance($period_ids, $date, $presentStudents);
             }
 
-            return redirect()->action('AdminController@attendance', ['msg_code' => ($isUpdate) ? '2' : '1', 'date' => $date]);
+            return redirect()->action('AdminController@attendance', ['msg_code' => ($isUpdate) ? '2' : '1', 'date' => $date, 'class_id' => $class_id]);
         } else {
             return $error;
         }
@@ -991,18 +996,6 @@ class AdminController extends Controller
             $month = explode(', ', $selected_month)[0];
             $date = Utils::getLastDateOfMonth($month, $year);
 
-            // $student_ids = Student::where('class_id', $class_id)->select('student_id')->get();
-            // $attendanceRecords = Attendance::whereIn('student_id', $student_ids)->get();
-            // foreach ($attendanceRecords as $attendanceRecord) {
-            //     $tempAttendance = [];
-            //     $tempAttendance['Roll No'] = $attendanceRecord->student->roll_no;
-            //     $tempAttendance['Name'] = $attendanceRecord->student->name;
-            //     $attendanceJson = json_decode($attendanceRecord->attendance_json);
-            //     foreach ($attendanceJson as $key => $subject) {
-            //         $tempAttendance[$subject->subject_code . '##'] = number_format("$subject->percent", 2);
-            //     }
-            //     array_push($studentsAttendance, $tempAttendance);
-            // }
             $studentsAttendance = Period_Attendance::getMonthlyAttendanceForClass($class_id, $date);
         }
         $months = Open_Period::getMonths();

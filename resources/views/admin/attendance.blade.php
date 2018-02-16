@@ -36,7 +36,7 @@
                     <div class="col-md-4 col-lg-4 col-sm-12 col-xs-12">
                         <label for="class-select">Class</label>
                         <select class="form-control class-select" id="class-select" name="class_id">
-                            <option disabled selected>Select a class</option>
+                            <option disabled selected value="-1">Select a class</option>
                             @foreach($years as $year)
                                 <optgroup label="{{ $year->name }}">
                                     @foreach($year->klasses as $klass)
@@ -88,7 +88,7 @@
                     @endphp
                     @if($timetables[$i]->subject_code != '000')
                         <div class="col-12">
-                            <a href="add/{{ $periods }}?date={{ $selectedDate }}" style="color:#67757c;">
+                            <a href="add/{{ $periods }}?date={{ $selectedDate }}&class_id={{ $class_id }}" style="color:#67757c;">
                                 <div class="card" style="cursor: pointer; margin-bottom: 10px !important;">
                                     <div class="card-block">
                                         <div class="col-md-3 col-sm-12" style="float: left;">
@@ -134,8 +134,12 @@
 
         function classChange(url) {
             var classSelect = $('.class-select');
-            url += '&class_id=' + classSelect.val();
-            window.location = url;
+            var classId = classSelect.val();
+            console.log(classId);
+            if (classId != undefined) {
+                url += '&class_id=' + classId;
+                window.location = url;
+            }
         }
 
         (function () {
