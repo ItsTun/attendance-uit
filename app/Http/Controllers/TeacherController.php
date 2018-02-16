@@ -175,9 +175,12 @@ class TeacherController extends Controller
                 array_push($tempArray, $period);
                 $lastPeriod = $period;
             }
+            array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
         }
 
-        array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
+        usort($timetable, function ($item1, $item2) {
+            return $item1->period_num > $item2->period_num;
+        });
 
         $with = ['timetables' => $timetable, 'dates' => Utils::getDatesInThisWeek()];
         $with['selectedDate'] = (!is_null($date)) ? $date : Utils::getDefaultDate();
@@ -290,7 +293,7 @@ class TeacherController extends Controller
                 Period_Attendance::updateAttendance($period_ids, $date, $presentStudents);
             }
 
-            return redirect()->action('TeacherController@timetable', ['msg_code' => ($isUpdate) ? '2' : '1']);
+            return redirect()->action('TeacherController@timetable', ['msg_code' => ($isUpdate) ? '2' : '1', 'date' => $date]);
         } else {
             return $error;
         }

@@ -36,7 +36,7 @@
                     <div class="col-md-4 col-lg-4 col-sm-12 col-xs-12">
                         <label for="class-select">Class</label>
                         <select class="form-control class-select" id="class-select" name="class_id">
-                            <option value="-1">All</option>
+                            <option disabled selected>Select a class</option>
                             @foreach($years as $year)
                                 <optgroup label="{{ $year->name }}">
                                     @foreach($year->klasses as $klass)
@@ -59,7 +59,7 @@
             <div class="col-12">
                 <div class="card" style="margin-bottom: 10px !important;">
                     <div class="card-block">
-                        No timetable for today.
+                        Please select class and press "Go".
                     </div>
                 </div>
             </div>

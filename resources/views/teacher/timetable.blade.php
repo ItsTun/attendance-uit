@@ -46,6 +46,7 @@
                         @php
                             if($timetables[$i]->subject_code != '000') {
                                 $periods .= $timetables[$i]->period_id. ",";
+                                if($timetables[$i]->period_num != $timetables[$i+1]->period_num)
                                 $numberOfPeriods+=1;
                             }
                         @endphp

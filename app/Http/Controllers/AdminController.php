@@ -496,30 +496,33 @@ class AdminController extends Controller
 
         $years = Year::all();
 
-        $currentDay = date('N');
-        $tempTimetable = $period->getTimetableInDay((!is_null($date)) ? Utils::getDayFromDate($date) : (($currentDay != 6 && $currentDay != 7) ? $currentDay : 1), $class_id);
-
         $timetable = [];
         $tempArray = [];
 
-        if (!is_null($tempTimetable) && sizeof($tempTimetable) > 0) {
-            $lastPeriod = $tempTimetable[0];
-            foreach ($tempTimetable as $period) {
-                if ($period->period_num != $lastPeriod->period_num) {
-                    array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
-                    $tempArray = [];
+        $currentDay = date('N');
+        if (isset($class_id)) {
+            $tempTimetable = $period->getTimetableInDay((!is_null($date)) ? Utils::getDayFromDate($date) : (($currentDay != 6 && $currentDay != 7) ? $currentDay : 1), $class_id);
+
+            if (!is_null($tempTimetable) && sizeof($tempTimetable) > 0) {
+                $lastPeriod = $tempTimetable[0];
+                foreach ($tempTimetable as $period) {
+                    if ($period->period_num != $lastPeriod->period_num) {
+                        array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
+                        $tempArray = [];
+                    }
+                    array_push($tempArray, $period);
+                    $lastPeriod = $period;
                 }
-                array_push($tempArray, $period);
-                $lastPeriod = $period;
             }
+            array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
         }
-        array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
 
         $with = ['timetables' => $timetable, 'dates' => Utils::getDatesInThisWeek()];
         $with['selectedDate'] = (!is_null($date)) ? $date : Utils::getDefaultDate();
         $with['msgCode'] = (!is_null($msgCode)) ? $msgCode : 0;
-        $with['class_id'] = (!is_null($class_id)) ? $class_id : '';
+        $with['class_id'] = (!is_null($class_id)) ? $class_id : -1;
         $with['years'] = $years;
+
 
         return view('admin.attendance')->with($with);
     }
@@ -900,7 +903,7 @@ class AdminController extends Controller
                 Period_Attendance::updateAttendance($period_ids, $date, $presentStudents);
             }
 
-            return redirect()->action('AdminController@attendance', ['msg_code' => ($isUpdate) ? '2' : '1']);
+            return redirect()->action('AdminController@attendance', ['msg_code' => ($isUpdate) ? '2' : '1', 'date' => $date]);
         } else {
             return $error;
         }

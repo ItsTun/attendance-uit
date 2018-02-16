@@ -34,6 +34,8 @@ class Student extends Model
             ->orWhereIn('periods.period_id', $period_ids)
             ->whereNull('students.suspended')
             ->select('students.*')
+            ->orderBy(DB::raw('length(roll_no)'), 'ASC')
+            ->orderBy('roll_no')
             ->distinct()
             ->get();
     }
