@@ -54,7 +54,7 @@ class Student extends Model
     {
         $sql = Student::where('class_id', $class_id)->whereNull('suspended');
         if ($updated_at) $sql->groupBy('updated_at');
-        $sql->orderBy(DB::raw('length(roll_no)'), 'ASC')->orderBy('roll_no');
+        $sql->groupBy('roll_no')->orderBy(DB::raw('length(roll_no)'), 'ASC')->orderBy('roll_no');
         return $sql->get();
     }
 

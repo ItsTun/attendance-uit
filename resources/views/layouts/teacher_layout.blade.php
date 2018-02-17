@@ -104,6 +104,9 @@
                         <li><a class="waves-effect waves-dark" href="{{ route('teacher.absent_list') }}"
                                aria-expanded="false"><i class="mdi mdi-account-check"></i><span class="hide-menu">Absent Students</span></a>
                         </li>
+                        <li><a class="waves-effect waves-dark" href="{{ route('teacher.attendance_percentage') }}"
+                               aria-expanded="false"><i class="mdi mdi-account-check"></i><span class="hide-menu">Percentage</span></a>
+                        </li>
                     @endif
                 </ul>
             </nav>

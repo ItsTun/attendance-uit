@@ -40,6 +40,22 @@ class TeacherController extends Controller
         return view('teacher.students_absent_list')->with(['years' => $years]);
     }
 
+    public function attendancePercentage() {
+        $years = Klass::getAssociatedClass(Teacher::getCurrentTeacher()->teacher_id);
+        $class_id = Input::get('class_id');
+        $selected_month = Input::get('month');
+        $studentsAttendance = [];
+        if (!is_null($class_id) && !is_null($selected_month)) {
+            $year = explode(', ', $selected_month)[1];
+            $month = explode(', ', $selected_month)[0];
+            $date = Utils::getLastDateOfMonth($month, $year);
+
+            $studentsAttendance = Period_Attendance::getMonthlyAttendanceForClass($class_id, $date);
+        }
+        $months = Open_Period::getMonths();
+        return view('teacher.attendance-percentage')->with(['studentsAttendance' => $studentsAttendance, 'class_id' => $class_id, 'years' => $years, 'months' => $months->toArray(), 'selected_month' => $selected_month]);
+    }
+
     public function getStudentAttendanceDetails(Request $request)
     {
         $roll_no = $request->roll_no;

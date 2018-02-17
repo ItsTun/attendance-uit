@@ -101,7 +101,7 @@ class Utils
     {
         $months = ['January', 'Febuary', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         $date_ary = explode('-', $date);
-        $pretty_date = $months[$date_ary[1]] . ' ' . $date_ary[2] . ',' . $date_ary[0];
+        $pretty_date = $months[$date_ary[1] - 1] . ' ' . $date_ary[2] . ', ' . $date_ary[0];
         return $pretty_date;
     }
 

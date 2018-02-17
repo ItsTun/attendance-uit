@@ -36,13 +36,11 @@ class Period extends Model
     {
         $sql = DB::table('periods')
             ->join('subject_class', 'subject_class.subject_class_id', '=', 'periods.subject_class_id')
-            ->join('subjects', function ($join) {
-                $join->on('subjects.subject_id', '=', 'subject_class.subject_id');
-            })
+            ->join('subjects', 'subjects.subject_id', '=', 'subject_class.subject_id')
             ->join('classes', 'classes.class_id', '=', 'subject_class.class_id')
             ->where('periods.day', $day);
         if (!is_null($class_id) && $class_id != -1) $sql->where('subject_class.class_id', $class_id);
-        $sql->orWhere('subject_class.subject_id', '=', 'null')
+        $sql->orWhere('periods.deleted', '=', 'null')
             ->select('periods.period_id', 'subject_class.subject_id', 'subjects.subject_code', 'subjects.name as subject_name', 'subject_class.subject_class_id', 'periods.start_time', 'periods.end_time', 'periods.period_num', 'periods.day', 'periods.room', 'periods.deleted_at', 'classes.short_form as class_short_form', 'classes.name as class_name')
             ->groupby('periods.period_id')
             ->orderby('periods.period_num')

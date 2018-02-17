@@ -503,7 +503,6 @@ class AdminController extends Controller
         $currentDay = date('N');
         if (isset($class_id)) {
             $tempTimetable = $period->getTimetableInDay((!is_null($date)) ? Utils::getDayFromDate($date) : (($currentDay != 6 && $currentDay != 7) ? $currentDay : 1), $class_id);
-
             if (!is_null($tempTimetable) && sizeof($tempTimetable) > 0) {
                 $lastPeriod = $tempTimetable[0];
                 foreach ($tempTimetable as $period) {
@@ -516,6 +515,7 @@ class AdminController extends Controller
                 }
             }
             array_push($timetable, Utils::getAssociatedPeriod($tempArray, $date));
+
         }
 
         $with = ['timetables' => $timetable, 'dates' => Utils::getDatesInThisWeek()];
@@ -707,6 +707,7 @@ class AdminController extends Controller
         $name = Input::post('name');
         $klasses = Input::post('classes');
         $subjectId = Input::post('subject_id');
+        $prefixOption = Input::post('radio_subject_prefix');
 
         $subject;
 
@@ -723,14 +724,18 @@ class AdminController extends Controller
         if (sizeof($subject->subject_class) > 0) foreach ($subject->subject_class as $subject_class) {
             $existingClassId = $subject_class->klass->class_id;
             if (!in_array($existingClassId, $klasses)) $subject_class->delete();
-            else unset($klasses[array_search($existingClassId, $klasses)]);
+            else {
+                unset($klasses[array_search($existingClassId, $klasses)]);
+                $subject_class->custom_prefix = (is_null($prefix)) ? ($prefixOption == "custom") ? "" : null : $prefix;
+                $subject_class->save();
+            }
         }
 
         foreach ($klasses as $klass) {
             $subjectClass = new Subject_Class();
             $subjectClass->subject_id = $subject->subject_id;
             $subjectClass->class_id = $klass;
-            $subjectClass->prefix = (is_null($prefix)) ? null : $prefix;
+            $subjectClass->custom_prefix = (is_null($prefix)) ? ($prefixOption == "custom") ? "" : null : $prefix;
             $subjectClass->save();
         }
 
@@ -829,6 +834,7 @@ class AdminController extends Controller
                 $periodTemp->save();
             }
         }
+        return "saved";
     }
 
     public function addAttendance($period_ids)

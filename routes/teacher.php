@@ -9,6 +9,7 @@ Route::group(['middleware' => ['teacher', 'web']], function () {
 	Route::post('add/{period_id}', 'TeacherController@saveOrEditAttendance');
 
 	Route::get('attendance_details', 'TeacherController@attendanceDetails')->name('teacher.attendance_details');
+	Route::get('attendance', 'TeacherController@attendancePercentage')->name('teacher.attendance_percentage');
 	Route::get('getStudentDetails', 'TeacherController@getStudentAttendanceDetails')->name('teacher.getStudentAttendanceDetails');
 	Route::get('getStudentAbsentList', 'TeacherController@getStudentsAbsentList')->name('teacher.getStudentsAbsentList');
 	Route::get('absent_list', 'TeacherController@absentList')->name('teacher.absent_list');

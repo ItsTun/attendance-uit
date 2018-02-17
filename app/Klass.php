@@ -50,7 +50,7 @@ class Klass extends Model
 
         if (!is_null($teacher->is_principle) && $teacher->is_principle == 1) return $years;
 
-        if (!is_null($classTeacherOf) || !is_null($yearHeadOf)) {
+        if (!is_null($classTeacherOf) || !is_null($yearHeadOf) || !is_null($departmentHeadOf)) {
             foreach ($years as $year) {
                 if (!is_null($classTeacherOf)) {
                     $flag = 0;

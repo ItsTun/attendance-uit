@@ -9,12 +9,22 @@
 @endsection
 
 @section('content')
+    <div class="container-fluid">
+        <div class="row page-titles" style="margin-bottom: 0px !important; ">
+            <div class="col-md-5 col-8 align-self-center">
+                <h3 class="text-themecolor">{{ \App\Period::find($periods[0])->subject_class->subject->name }}</h3>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">{{ \App\Utils::getPrettyDateFormat($date) }}</li>
+                </ol>
+            </div>
+        </div>
+    </div>
     <form action="#" method="post">
         {{ csrf_field() }}
         <input type="hidden" name="date" value="{{ $date }}"/>
         <input type="hidden" name="period" value="@php echo implode(",",$periods); @endphp"/>
         <div class="container-fluid">
-            <div class="row" style="padding-top: 30px;">
+            <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12"
                      style="background-color: white; padding: 0px !important; margin-left: 15px; margin-bottom: 15px;">
                     <table class="table">

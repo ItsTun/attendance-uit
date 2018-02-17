@@ -19,11 +19,11 @@
                                 <label>Class</label>
                                 <br>
                                 <select id="classesSelect" class="form-control">
-                                    @foreach ($years as $year) 
+                                    @foreach ($years as $year)
                                         <optgroup label="{{ $year->name }}">
                                             @foreach ($year->klasses as $v)
-                                                <option id="{{ $v->class_id }}" 
-                                                        value="{{ $v->short_form }}" 
+                                                <option id="{{ $v->class_id }}"
+                                                        value="{{ $v->short_form }}"
                                                         name="{{ $v->name }}">
                                                     {{ $v->name }}
                                                 </option>
@@ -47,6 +47,16 @@
                                 <br>
                                 <input class="form-control form-control-line" type="text" id="to_datepicker"
                                        readonly="readonly" style="background:white; color: #000;">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>View Types</label>
+                                <br>
+                                <select id="viewTypeSelect" class="form-control">
+                                    <option id="one_day" value="one_day">One Day</option>
+                                    <option id="three_days_or_above" value="three_days_or_above">Three Days or Above</option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-1">
@@ -133,6 +143,7 @@
                 var class_id = $('#classesSelect').find(':selected').attr('id');
                 var fromDate = $('#from_datepicker').val();
                 var toDate = $('#to_datepicker').val();
+                var view_type = $('#viewTypeSelect').find(':selected').attr('id');
 
                 var isFromDateCorrect = validateDate(fromDate);
                 var isToDateCorrect = validateDate(toDate);
@@ -142,29 +153,84 @@
                     return;
                 }
 
-                getData(class_id, fromDate, toDate);
+                if (view_type === 'one_day') {
+                    getStudentsAbsentForWholeDay(class_id, fromDate, toDate);
+                } else if (view_type === 'three_days_or_above')  {
+                    getStudentsAbsentForThreeDaysOrAbove(class_id, fromDate, toDate);
+                }
             });
         });
 
-        function getData(class_id, from, to) {
+        function getStudentsAbsentForThreeDaysOrAbove(class_id, from, to) {
+            $.get('{{ route('admin.getStudentsAbsentForThreeDaysOrAbove') }}', {
+                class_id: class_id,
+                from: from,
+                to: to
+            }, function (data, status) {
+                my_json = JSON.parse(data);
+                showTableForThreeDaysOrAboveAbsent(my_json);
+            });
+        }
+
+        function showTableForThreeDaysOrAboveAbsent(data) {
+            var row = $('<tr></tr>').appendTo($('table'));
+            $('<th></th>').text('Roll No').appendTo(row);
+            $('<th></th>').text('Name').appendTo(row);
+            $('<th></th>').text('Absence').appendTo(row);
+
+            data.forEach(function (student) {
+                var roll_no = student['roll_no'];
+                var name = student['name'];
+                var total_absences = student['total_absences'];
+                var absent_dates = student['absent_dates'];
+
+                var row = $('<tr></tr>').appendTo($('table'));
+                $('<td></td>').text(roll_no).appendTo(row);
+                $('<td></td>').text(name).appendTo(row);
+                var col = $('<td></td>').appendTo(row);
+
+                for (var i = 0; i < total_absences.length; i++) {
+                    var total_absence = total_absences[i];
+                    var absent_date = absent_dates[i];
+
+                    var sub_row = $('<div></div>').addClass('row').appendTo(col);
+                    $('<div></div>').html("from <strong>" + getPrettyDate(absent_date['from']) + "</strong> to <strong>" + getPrettyDate(absent_date['to']) + "</strong>")
+                        .addClass('col-md-6')
+                        .appendTo(sub_row);
+
+                    $('<div></div>').text(total_absence + " days")
+                        .addClass('col-md-3')
+                        .appendTo(sub_row);
+                }
+            });
+
+            $('#results').show();
+        }
+
+        function getStudentsAbsentForWholeDay(class_id, from, to) {
             $.get('{{ route('admin.getStudentsAbsentList') }}', {
                 class_id: class_id,
                 from: from,
                 to: to
             }, function (data, status) {
                 my_json = JSON.parse(data);
-                showTable(my_json);
+                showTableForWholeDayAbsent(my_json);
             });
         }
 
-        function showTable(data) {
-            showTableHeader();
+        function showTableForWholeDayAbsent(data) {
+            var row = $('<tr></tr>').appendTo($('table'));
+            $('<th></th>').text('Date').appendTo(row);
+            $('<th></th>').text('Absent Students').appendTo(row);
+
             data.forEach(function (element) {
                 var date = element['date'];
                 var absent_students = element['absent_students'];
 
                 var row = $('<tr></tr>').appendTo($('table'));
-                $('<td></td>').text(date).appendTo(row);
+                $('<td></td>').text(getPrettyDate(date))
+                    .css('width', '120px')
+                    .appendTo(row);
                 if (absent_students == null) {
                     $('<td></td>').text('No absent students').appendTo(row);
                     return;
@@ -187,12 +253,6 @@
                 });
             });
             $('#results').show();
-        }
-
-        function showTableHeader() {
-            var row = $('<tr></tr>').appendTo($('table'));
-            $('<th></th>').text('Date').appendTo(row);
-            $('<th></th>').text('Absent Students').appendTo(row);
         }
 
         function showStudentDetialsDialog(event) {

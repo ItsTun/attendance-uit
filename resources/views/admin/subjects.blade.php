@@ -75,6 +75,7 @@
                                         data-subject-name="{{ $subject->name }}"
                                         data-subject-code="{{ $subject->subject_code }}"
                                         data-subject-classes="{{ $subject->subject_class }}"
+                                        data-prefix-option="@php if(is_null($subject->subject_class[0]->custom_prefix)) echo "null"; else echo $subject->subject_class[0]->custom_prefix; @endphp"
                                         data-target="#addOrEditSubject">Edit
                                 </button>
                             </td>
@@ -179,7 +180,6 @@
         });
 
         $('input[type=radio][name=radio_subject_prefix]').change(function () {
-            prefix.val("");
             if (this.value == 'default') {
                 hidePrefix();
             }
@@ -190,12 +190,10 @@
 
         function hidePrefix() {
             prefix.hide();
-            prefix.prop('required', false);
         }
 
         function showPrefix() {
             prefix.show();
-            prefix.prop('required', true);
         }
 
         $(document).on("click", "#edit-btn", function () {
@@ -204,12 +202,24 @@
             var subjectName = $(this).data('subject-name');
             var subjectCode = $(this).data('subject-code');
             var subjectClasses = $(this).data('subject-classes');
+            var prefixOption = $(this).data('prefix-option');
 
             var classes = [];
 
             subjectClasses.forEach(function (entry) {
                 classes[classes.length] = entry['class_id'];
             });
+
+            console.log(prefixOption);
+
+            if (prefixOption == null) {
+                $('input[name=radio_subject_prefix][value=default]').prop('checked', 'checked');
+                hidePrefix();
+            } else {
+                $('input[name=radio_subject_prefix][value=custom]').prop('checked', 'checked');
+                showPrefix();
+                prefix.val(prefixOption);
+            }
 
             $('.input-subject-id').val(subjectId);
             $('.input-subject-name').val(subjectName);
