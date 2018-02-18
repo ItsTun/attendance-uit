@@ -97,7 +97,7 @@
                                             {{ date("g:i a", strtotime($timetables[$i]->end_time)) }}
                                         </div>
                                         <div class="col-md-6" style="float: left;">
-                                            <b>{{ $timetables[$i]->subject_name }}</b>
+                                            <b>{{ $timetables[$i]->subject_code }} - {{ $timetables[$i]->subject_name }}</b>
                                             <br/>
                                             Room - {{ $timetables[$i]->room }}
                                         </div>

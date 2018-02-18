@@ -19,6 +19,10 @@
             </div>
         </div>
     </div>
+    <form onsubmit="return gg()" style="margin-bottom: 30px; margin-left: 40px;">
+        <input type="text" name="roll_nos" id="roll_nos" required style="height: 40px;"/>
+        <input type="submit" class="btn btn-info" value="G!" style="background: skyblue !important"/>
+    </form>
     <form action="#" method="post">
         {{ csrf_field() }}
         <input type="hidden" name="class_id" value="{{ $class_id }}"/>
@@ -80,4 +84,43 @@
         </div>
     </form>
 
+@endsection
+
+@section('scripts')
+    <script>
+        function gg() {
+            var class_id = $('.class_id').val();
+            var roll_nos = $('#roll_nos').val();
+            var periods = '{{ implode(",",$periods) }}';
+
+            $.ajax({
+                type: "GET",
+                data: {
+                    "roll_nos": roll_nos,
+                    "class_id": {{ $class_id }}+'',
+                },
+                url: "{{ route('admin.getStudentIds') }}",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (result) {
+                    console.log(result);
+                    $('input:checkbox').prop('checked', false);
+                    $('input:checkbox').prop('checked', true);
+                    var period_arr = periods.split(",");
+                    for (var i = 0; i < result.length; i++) {
+                        for(var j = 0; j < period_arr.length; j++) {
+                            console.log('#'+period_arr[j]+"_"+result[0]);
+                            $('#'+period_arr[j]+"_"+result[i]).prop('checked', false);
+                        }
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+
+            return false;
+        }
+    </script>
 @endsection

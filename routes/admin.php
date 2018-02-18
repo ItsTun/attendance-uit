@@ -33,6 +33,7 @@ Route::post('saveMedicalLeave', 'AdminController@saveMedicalLeave')->name('admin
 Route::post('suspendStudent', 'AdminController@suspendStudent')->name('admin.suspendStudent');
 Route::post('resumeStudent', 'AdminController@resumeStudent')->name('admin.resumeStudent');
 
+Route::get('getStudentIds', 'AdminController@getStudentIds')->name('admin.getStudentIds');
 Route::get('getStudentsFromClass', 'AdminController@getStudentsFromClass')->name('admin.getStudentsFromClass');
 Route::get('add/{period_id}', 'AdminController@addAttendance');
 Route::get('getStudent', 'AdminController@getStudent')->name('admin.getStudent');

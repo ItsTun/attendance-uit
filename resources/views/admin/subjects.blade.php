@@ -68,7 +68,9 @@
                                             data-subject-name="{{ $subject->name }}"
                                             data-subject-code="{{ $subject->subject_code }}"
                                             data-subject-classes="{{ $subject->subject_class }}"
+                                            @if(sizeof($subject->subject_class) > 0)
                                             data-prefix-option="@php if(is_null($subject->subject_class[0]->custom_prefix)) echo "null"; else echo $subject->subject_class[0]->custom_prefix; @endphp"
+                                            @endif
                                             data-target="#addOrEditSubject">Edit
                                     </button>
                                 </td>

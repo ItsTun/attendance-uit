@@ -222,8 +222,8 @@
         }
 
         function validateEmail(email) {
-            var re = /^\w+@uit.edu.mm$/
-            return re.test(email);
+            //var re = /^\w+@uit.edu.mm$/
+            return true;
         }
 
         function saveStudents() {

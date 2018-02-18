@@ -420,6 +420,27 @@ class AdminController extends Controller
         return view('admin.students_absent_list')->with(['years' => $years]);
     }
 
+    public function getStudentIds(Request $request)
+    {
+        $class_id = $request->class_id;
+        $roll_no = $request->roll_nos;
+
+        $roll_no_arr = explode(",", $roll_no);
+
+        $klass = Klass::find($class_id);
+        $short_form = $klass->short_form;
+
+        $student_ids = [];
+
+        foreach ($roll_no_arr as $roll_no) {
+            $student = Student::where('roll_no', '=', $short_form . '-' . $roll_no)->first();
+            if (is_null($student)) return response("Not found : " . $short_form . '-' . $roll_no, '404');
+            else array_push($student_ids, $student->student_id);
+        }
+
+        return response($student_ids, '200');
+    }
+
     public function getStudentsAbsentList(Request $request)
     {
         $class_id = $request->class_id;
