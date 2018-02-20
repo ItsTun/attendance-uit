@@ -7,9 +7,6 @@
 @section('styles')
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('/css/medical_leave.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('/select2/css/select2.min.css') }}"/>
-    <link href="{{ asset('/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet"/>
-    <link href="{{ asset('/css/font-awesome.min.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -67,9 +64,7 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('/select2/js/select2.min.js') }}"></script>
-    <script src="{{ asset('/moment/js/moment.min.js') }}"></script>
-    <script src="{{ asset('/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js') }}"></script>
+    <script src="{{ asset('/js/medical_leave.js') }}"></script>
     <script>
         $(document).ready(function () {
             $('#class-select').select2();

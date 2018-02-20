@@ -7,7 +7,6 @@
 @section('styles')
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('/css/migration-tool.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('/select2/css/select2.min.css') }}"/>
 @endsection
 
 @section('content')
@@ -56,7 +55,7 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('/select2/js/select2.min.js') }}"></script>
+    <script src="{{ asset('js/migration_tool.js') }}"></script>
     <script>
         var oldSelectedIndex = -99;
         var currentStudents = [];

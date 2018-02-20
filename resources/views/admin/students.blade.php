@@ -7,7 +7,6 @@
 @section('styles')
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('/css/students.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('/select2/css/select2.min.css') }}"/>
 @endsection
 
 @section('content')
@@ -196,7 +195,7 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('/select2/js/select2.min.js') }}"></script>
+    <script src="{{ asset('/js/students.js') }}"></script>
     <script>
         var isUpdate = false;
         var oldRollNo = '';

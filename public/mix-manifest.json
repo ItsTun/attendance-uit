@@ -1,0 +1,15 @@
+{
+    "/css/migration-tool.css": "/css/migration-tool.css",
+    "/js/migration_tool.js": "/js/migration_tool.js",
+    "/css/medical_leave.css": "/css/medical_leave.css",
+    "/js/medical_leave.js": "/js/medical_leave.js",
+    "/js/students.js": "/js/students.js",
+    "/css/add_attendance.css": "/css/add_attendance.css",
+    "/css/admin-timetables.css": "/css/admin-timetables.css",
+    "/css/classes.css": "/css/classes.css",
+    "/css/font-awesome.min.css": "/css/font-awesome.min.css",
+    "/css/subjects.css": "/css/subjects.css",
+    "/css/teachers.css": "/css/teachers.css",
+    "/css/years.css": "/css/years.css",
+    "/css/admins.css": "/css/admins.css"
+}
