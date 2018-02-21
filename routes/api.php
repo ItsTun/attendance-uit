@@ -24,5 +24,6 @@ Route::group(['middleware' => ['client']], function () {
     Route::get('/v1/timetable/{student_id}', 'AttendancesController@dailyDetail');
     Route::get('/v1/attendance/details/{student_id}/{subject_class_id}', 'AttendancesController@attendanceDetails');
     Route::get('/v1/students/email/{email}', 'StudentsController@findByEmail');
+    Route::get('/v1/feedback', 'FeedbackController@getFeedbacks');
     Route::post('/v1/feedback', 'FeedbackController@sendFeedback');
 });
