@@ -6,7 +6,6 @@
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('/css/subjects.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('/select2/css/select2.min.css') }}"/>
 @endsection
 
 @section('content')
@@ -163,7 +162,7 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('/select2/js/select2.min.js') }}"></script>
+    <script src="{{ asset('/js/subjects.js') }}"></script>
     <script>
         var prefix;
 

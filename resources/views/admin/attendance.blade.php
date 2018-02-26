@@ -5,8 +5,7 @@
 @endsection
 
 @section('styles')
-    <link href="{{ asset('/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet"/>
-    <link href="{{ asset('/css/font-awesome.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('/css/attendance.css') }}" rel="stylesheet"/>
 @endsection
 
 @section('content')
@@ -88,7 +87,8 @@
                     @endphp
                     @if($timetables[$i]->subject_code != '000')
                         <div class="col-12">
-                            <a href="add/{{ $periods }}?date={{ $selectedDate }}&class_id={{ $class_id }}" style="color:#67757c;">
+                            <a href="add/{{ $periods }}?date={{ $selectedDate }}&class_id={{ $class_id }}"
+                               style="color:#67757c;">
                                 <div class="card" style="cursor: pointer; margin-bottom: 10px !important;">
                                     <div class="card-block">
                                         <div class="col-md-3 col-sm-12" style="float: left;">
@@ -97,7 +97,8 @@
                                             {{ date("g:i a", strtotime($timetables[$i]->end_time)) }}
                                         </div>
                                         <div class="col-md-6" style="float: left;">
-                                            <b>{{ $timetables[$i]->subject_code }} - {{ $timetables[$i]->subject_name }}</b>
+                                            <b>{{ $timetables[$i]->subject_code }}
+                                                - {{ $timetables[$i]->subject_name }}</b>
                                             <br/>
                                             Room - {{ $timetables[$i]->room }}
                                         </div>
@@ -120,8 +121,7 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('/moment/js/moment.min.js') }}"></script>
-    <script src="{{ asset('/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js') }}"></script>
+    <script src="{{ asset('/js/attendance.js') }}"></script>
     <script>
         function dateChange() {
             var dateinput = document.getElementById('datepicker').value;

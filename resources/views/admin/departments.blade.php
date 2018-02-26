@@ -5,8 +5,7 @@
 @endsection
 
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('/css/subjects.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('/select2/css/select2.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('/css/departments.css') }}"/>
 @endsection
 @section('content')
 
@@ -116,7 +115,7 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('/select2/js/select2.min.js') }}"></script>
+    <script src="{{ asset('/js/departments.js') }}"></script>
     <script>
         $(document).ready(function () {
             $('.class-select').select2({

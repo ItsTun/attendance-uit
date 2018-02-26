@@ -6,14 +6,11 @@
 
 @section('styles')
     <link href="{{ asset('/css/admin-timetables.css') }}" rel="stylesheet"/>
-    <link href="{{ asset('/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet"/>
-    <link href="{{ asset('/css/font-awesome.min.css') }}" rel="stylesheet">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     @if(!is_null($class_id) && !is_null($year_id))
-        <script src="{{ asset('/redips/js/redips-drag-min.js') }}"></script>
-        <script src="{{ asset('/js/admin-timetables.js') }}"></script>
+        <script src="{{ asset('/js/admin-timetables-top.js') }}"></script>
     @endif
 
 @endsection
@@ -250,8 +247,7 @@
         @endforeach
     </script>
 
-    <script src="{{ asset('/moment/js/moment.min.js') }}"></script>
-    <script src="{{ asset('/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js') }}"></script>
+    <script src="{{ asset('/js/admin-timetables-bottom.js') }}"></script>
     <script>
         var currentValue = 4;
         var times = [];
