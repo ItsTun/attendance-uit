@@ -17,4 +17,10 @@ class FeedbackController extends Controller
     	$feedback->content = Input::post('content');
     	$feedback->save();
     }
+
+    public function getFeedbacks() 
+    {
+    	$feedbacks = Feedback::orderby('created_at')->get();
+    	return response($feedbacks, 200);
+    }
 }
