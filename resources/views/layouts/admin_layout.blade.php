@@ -76,7 +76,7 @@
                         <!-- Profile -->
                         <!-- ============================================================== -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add user's name here</a>
+                            <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ Auth::user()->name }}</a>
                         </li>
                     </ul>
                 </div>
@@ -114,7 +114,9 @@
                         </li>
                         <li> <a class="waves-effect waves-dark" href="{{ route('admin-admins') }}" aria-expanded="false"><i class="mdi mdi-account-star"></i><span class="hide-menu">Admins</span></a>
                         </li>
-                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-medical-leave') }}" aria-expanded="false"><i class="mdi mdi-account-star"></i><span class="hide-menu">Medical Leave</span></a>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-medical-leave') }}" aria-expanded="false"><i class="mdi mdi-medical-bag"></i><span class="hide-menu">Medical Leave</span></a>
+                        </li>
+                        <li> <a class="waves-effect waves-dark" href="{{ route('admin-migration-tool') }}" aria-expanded="false"><i class="mdi mdi-folder-move"></i><span class="hide-menu">Migration Tool</span></a>
                         </li>
                     </ul>
                 </nav>
@@ -123,7 +125,7 @@
             <!-- End Sidebar scroll-->
             <!-- Bottom points-->
             <div class="sidebar-footer">
-                
+                <a href="logout" class="link" data-toggle="tooltip" title="Logout"><i class="mdi mdi-power"></i></a>
             </div>
             <!-- End Bottom points-->
         </aside>

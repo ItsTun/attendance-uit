@@ -58,7 +58,7 @@ Route::group(['middleware' => ['admin', 'web']], function () {
     Route::post('addOrUpdateUser', 'AdminController@addOrUpdateUser');
     Route::post('addOrUpdateFaculty', 'AdminController@addOrUpdateFaculty');
 
-    Route::get('migration-tool', 'AdminController@migrationTool');
+    Route::get('migration-tool', 'AdminController@migrationTool')->name('admin-migration-tool');
     Route::post('migrateStudents', 'AdminController@migrateStudents')->name('admin.migrateStudents');
 });
 

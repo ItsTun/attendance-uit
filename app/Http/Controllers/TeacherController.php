@@ -310,7 +310,7 @@ class TeacherController extends Controller
 
         $period_ids = explode(',', $periods);
 
-        $error = $this->check($date, $periods);
+        $error = $this->check($date, $period_ids);
 
         if (is_null($error)) {
             foreach ($period_ids as $period_id) {
